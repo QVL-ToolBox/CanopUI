@@ -1,0 +1,313 @@
+import type {
+  HalloweenBatSpec,
+  HalloweenGhostSpec,
+  HalloweenGraveGhostSpec,
+  HalloweenPumpkinSpec,
+  HalloweenSpiderSpec,
+  HalloweenSwarmSpec,
+  HalloweenWebSpec,
+} from "./halloweenSceneTypes";
+import { spiderHoldShare } from "./spiderWebGeometry";
+
+export const batFlock: HalloweenBatSpec[] = [
+  {
+    id: "bat-1",
+    top: "9%",
+    size: "2.1rem",
+    cruise: "swoop",
+    altitude: "dive",
+    cruiseSeconds: 19,
+    altitudeSeconds: 7,
+    jitterSeconds: 2.3,
+    loopSeconds: 11,
+    flap: 0.46,
+    delay: 0,
+    heading: 1,
+    restX: "16%",
+  },
+  {
+    id: "bat-2",
+    top: "18%",
+    size: "1.5rem",
+    cruise: "zigzag",
+    altitude: "rollercoaster",
+    cruiseSeconds: 23,
+    altitudeSeconds: 11,
+    jitterSeconds: 1.7,
+    loopSeconds: 13,
+    flap: 0.4,
+    delay: -9,
+    heading: -1,
+    restX: "70%",
+  },
+  {
+    id: "bat-3",
+    top: "6%",
+    size: "1.8rem",
+    cruise: "glide",
+    altitude: "dive",
+    cruiseSeconds: 29,
+    altitudeSeconds: 13,
+    jitterSeconds: 3.1,
+    loopSeconds: 17,
+    flap: 0.5,
+    delay: -17,
+    heading: 1,
+    restX: "42%",
+  },
+  {
+    id: "bat-4",
+    top: "24%",
+    size: "1.3rem",
+    cruise: "swoop",
+    altitude: "rollercoaster",
+    cruiseSeconds: 17,
+    altitudeSeconds: 5,
+    jitterSeconds: 2.9,
+    loopSeconds: 19,
+    flap: 0.4,
+    delay: -5,
+    heading: -1,
+    restX: "88%",
+  },
+  {
+    id: "bat-5",
+    top: "13%",
+    size: "1.9rem",
+    cruise: "zigzag",
+    altitude: "dive",
+    cruiseSeconds: 31,
+    altitudeSeconds: 7,
+    jitterSeconds: 1.9,
+    loopSeconds: 23,
+    flap: 0.48,
+    delay: -24,
+    heading: 1,
+    restX: "58%",
+  },
+  {
+    id: "bat-6",
+    top: "4%",
+    size: "1.2rem",
+    cruise: "glide",
+    altitude: "rollercoaster",
+    cruiseSeconds: 37,
+    altitudeSeconds: 11,
+    jitterSeconds: 2.3,
+    loopSeconds: 29,
+    flap: 0.4,
+    delay: -13,
+    heading: -1,
+    restX: "30%",
+  },
+  {
+    id: "bat-7",
+    top: "20%",
+    size: "1.6rem",
+    cruise: "swoop",
+    altitude: "dive",
+    cruiseSeconds: 41,
+    altitudeSeconds: 13,
+    jitterSeconds: 1.7,
+    loopSeconds: 31,
+    flap: 0.44,
+    delay: -31,
+    heading: 1,
+    restX: "78%",
+  },
+];
+
+export const batSwarm: HalloweenSwarmSpec = {
+  left: "20%",
+  top: "10%",
+  bats: [
+    { id: "swarm-1", radius: "2.6rem", size: "1rem", seconds: 2.3, delay: 0, flap: 0.36 },
+    { id: "swarm-2", radius: "1.8rem", size: "0.85rem", seconds: 1.9, delay: -0.7, flap: 0.34 },
+    { id: "swarm-3", radius: "3.2rem", size: "1.1rem", seconds: 2.9, delay: -1.3, flap: 0.38 },
+    { id: "swarm-4", radius: "2.2rem", size: "0.9rem", seconds: 2.1, delay: -0.4, flap: 0.35 },
+    { id: "swarm-5", radius: "1.4rem", size: "0.8rem", seconds: 1.7, delay: -1.1, flap: 0.34 },
+  ],
+};
+
+export const ghostCrew: HalloweenGhostSpec[] = [
+  {
+    id: "ghost-1",
+    behavior: "wander",
+    depth: "mid",
+    expression: "boo",
+    size: "clamp(3.25rem, 8vw, 5rem)",
+    top: "14%",
+    from: "6%",
+    to: "52%",
+    drift: 47,
+    float: 7,
+    breathe: 5.3,
+    delay: 0,
+  },
+  {
+    id: "ghost-2",
+    behavior: "fade",
+    depth: "far",
+    expression: "sleepy",
+    size: "clamp(2.25rem, 5vw, 3.25rem)",
+    top: "38%",
+    left: "6%",
+    cycle: 17,
+    delay: -4,
+  },
+  {
+    id: "ghost-3",
+    behavior: "peek",
+    depth: "near",
+    expression: "smile",
+    size: "clamp(3rem, 7vw, 4.5rem)",
+    top: "58%",
+    side: "right",
+    cycle: 13,
+    delay: -2,
+  },
+  {
+    id: "ghost-ground",
+    behavior: "wander",
+    depth: "ground",
+    expression: "boo",
+    size: "clamp(2.5rem, 6vw, 3.75rem)",
+    top: "74%",
+    from: "92%",
+    to: "74%",
+    drift: 31,
+    float: 5.9,
+    breathe: 4.7,
+    delay: -8,
+  },
+  {
+    id: "ghost-4",
+    behavior: "wander",
+    depth: "near",
+    expression: "surprised",
+    size: "clamp(3.75rem, 9vw, 5.75rem)",
+    top: "30%",
+    from: "84%",
+    to: "58%",
+    drift: 59,
+    float: 8.3,
+    breathe: 6.7,
+    delay: -21,
+  },
+  {
+    id: "ghost-5",
+    behavior: "fade",
+    depth: "far",
+    expression: "boo",
+    size: "clamp(2rem, 4.5vw, 3rem)",
+    top: "44%",
+    left: "88%",
+    cycle: 19,
+    delay: -11,
+  },
+  {
+    id: "ghost-mist",
+    behavior: "rise",
+    depth: "ground",
+    expression: "surprised",
+    size: "clamp(2.5rem, 5.5vw, 3.5rem)",
+    top: "68%",
+    left: "82%",
+    cycle: 17,
+    delay: -5,
+  },
+];
+
+export const graveGhost: HalloweenGraveGhostSpec = {
+  expression: "sleepy",
+  cycle: 14,
+  delay: -2,
+};
+
+const leftWeb: HalloweenWebSpec = {
+  id: "web-left",
+  side: "left",
+  hiddenOnMobile: true,
+  size: "clamp(9rem, 24vw, 16rem)",
+  delay: 0.4,
+};
+
+const rightWeb: HalloweenWebSpec = {
+  id: "web-right",
+  side: "right",
+  hiddenOnMobile: false,
+  size: "clamp(7rem, 18vw, 12rem)",
+  delay: 1.2,
+};
+
+export const cornerWebs: HalloweenWebSpec[] = [leftWeb, rightWeb];
+
+interface SpiderRhythm {
+  id: string;
+  thread: string;
+  cycle: number;
+  delay: number;
+}
+
+function hangingFrom(web: HalloweenWebSpec, rhythm: SpiderRhythm): HalloweenSpiderSpec {
+  return {
+    ...rhythm,
+    side: web.side,
+    hiddenOnMobile: web.hiddenOnMobile,
+    inset: `calc(${web.size} * ${spiderHoldShare.across.toFixed(4)})`,
+    top: `calc(${web.size} * ${spiderHoldShare.down.toFixed(4)})`,
+  };
+}
+
+export const danglingSpiders: HalloweenSpiderSpec[] = [
+  hangingFrom(leftWeb, { id: "spider-left", thread: "9rem", cycle: 14, delay: 0 }),
+  hangingFrom(rightWeb, { id: "spider-right", thread: "6.5rem", cycle: 17, delay: -6 }),
+];
+
+export const pumpkinPatch: HalloweenPumpkinSpec[] = [
+  {
+    id: "pumpkin-1",
+    side: "left",
+    inset: "3%",
+    size: "clamp(3rem, 7vw, 4.5rem)",
+    lit: true,
+    flicker: 3.2,
+    delay: 0,
+  },
+  {
+    id: "pumpkin-2",
+    side: "right",
+    inset: "4%",
+    size: "clamp(2.5rem, 6vw, 3.75rem)",
+    lit: true,
+    flicker: 2.7,
+    delay: -1.1,
+  },
+  {
+    id: "pumpkin-3",
+    side: "left",
+    inset: "12%",
+    size: "clamp(1.75rem, 4vw, 2.5rem)",
+    lit: false,
+    flicker: 3.5,
+    delay: 0,
+  },
+  {
+    id: "pumpkin-4",
+    side: "right",
+    inset: "13%",
+    size: "clamp(1.5rem, 3.5vw, 2.25rem)",
+    lit: true,
+    flicker: 3.7,
+    delay: -0.6,
+  },
+  {
+    id: "pumpkin-5",
+    side: "left",
+    inset: "22%",
+    size: "clamp(1.25rem, 3vw, 1.75rem)",
+    lit: false,
+    flicker: 3.1,
+    delay: 0,
+  },
+];

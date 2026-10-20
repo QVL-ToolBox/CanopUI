@@ -1,0 +1,24 @@
+# CanopUI — normalisation des fins de ligne (SCRUM-320)
+# Sans ce fichier, core.autocrlf=true checkout les sources en CRLF sur disque
+# alors que .prettierrc utilise endOfLine=lf par défaut => faux positifs
+# `prettier --check`. On force LF sur disque ET dans les blobs Git.
+
+# Tout fichier texte : détection auto, fin de ligne LF au checkout.
+* text=auto eol=lf
+
+# Le SVG est du XML (texte) — normalisé LF comme le reste.
+
+# Assets binaires : jamais normalisés (protège contre toute corruption).
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.woff  binary
+*.woff2 binary
+*.ttf  binary
+*.eot  binary
+*.otf  binary
+*.webm binary
+*.mp4  binary

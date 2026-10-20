@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+coverage/
+build/
+
+# Jira / backlog local — ne jamais pousser
+docs/BACKLOG-JIRA.md
+*.jira
+
+# Claude local
+.claude/settings.local.json
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+!.env.example
+
+# npm auth — ne jamais committer de token de registre (SEC-S1-02)
+.npmrc
+
+# Archives npm pack et cles / certificats — ne jamais committer (SEC-002)
+*.tgz
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+
+# Logs
+*.log
+
+# Module Federation diagnostics
+.mf/
+
+# Artefacts locaux
+artifact-demo/
+vitrine/dist/

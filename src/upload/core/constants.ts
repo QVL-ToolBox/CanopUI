@@ -1,0 +1,9 @@
+export const MEBIBYTE = 1024 * 1024;
+export const GIBIBYTE = 1024 * MEBIBYTE;
+
+export const DEFAULT_CHUNK_SIZE = 16 * MEBIBYTE;
+export const SINGLE_SHOT_THRESHOLD = 100 * MEBIBYTE;
+export const MAX_DECLARED_SIZE = 10 * GIBIBYTE;
+
+export const DEFAULT_MAX_RETRIES_PER_CHUNK = 3;
+export const DEFAULT_RETRY_BASE_DELAY_MS = 500;
