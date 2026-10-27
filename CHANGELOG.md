@@ -2,6 +2,12 @@
 
 Le format suit [Keep a Changelog](https://keepachangelog.com/fr/) et le versioning [semver](https://semver.org/lang/fr/). Les versions antérieures à `canopui` 3.0.0 ne sont plus listées ici.
 
+## [1.3.4] - 2026-10-27
+
+### Modifié
+
+- Dépendances de développement mises à jour pour corriger des vulnérabilités : vite 7.3.7 (GHSA-587h-7wmj-h5pm, GHSA-698v-4r3x-3vcv, GHSA-r825-w8mm-5pxw), vitest et @vitest/coverage-v8 4.1.12 (GHSA-qxg6-89mg-rqv8, GHSA-xp26-3454-mjgp). Pipeline sur l'agent Linux de la VM de prod. Code de la librairie inchangé.
+
 ## [1.3.3] - 2026-10-20
 
 ### Modifié

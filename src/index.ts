@@ -1,6 +1,6 @@
 import "./styles.css";
 
-export const CANOP_VERSION = "1.3.3";
+export const CANOP_VERSION = "1.3.4";
 
 export * from "./tokens";
 export * from "./theme";

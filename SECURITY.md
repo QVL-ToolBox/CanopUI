@@ -4,22 +4,23 @@
 
 - **Depot** : Azure DevOps,
   https://dev.azure.com/qvl-project/QVL-ToolBox/_git/CanopUI
-- **Registre** : `@canop/ui` est publie sur le registre npm prive QVL
-  (https://npm.qvl-project.com, Verdaccio).
-- **Publication actuelle : manuelle.** Il n'y a pas encore de pipeline. La
-  publication se fait a la main, apres build et tests verts (voir
-  `docs/RELEASE.md`).
-- **Cible : pipeline Azure** (build + tests + `npm publish`), declenche
-  uniquement depuis des refs de confiance (`main` protegee, tags `vX.Y.Z`).
+- **Registres** : `@canop/ui` est publie sur le registre npm QVL
+  (https://npm.qvl-project.com, Verdaccio) et sur npmjs (meme tarball).
+  Miroir public du depot a chaque release : https://github.com/QVL-ToolBox/CanopUI
+  (instantane, sans `azure-pipelines.yml` ni `.npmrc`).
+- **Publication : automatique**, par la pipeline Azure (`azure-pipelines.yml`),
+  seulement sur `main` et apres approbation de l'environnement `verdaccio`
+  (voir `docs/RELEASE.md`). Publication manuelle de secours seulement.
 
 ## Token de registre
 
 - Le token Verdaccio n'est **jamais ecrit dans le depot**. Il est lu depuis un
   fichier `.npmrc` situe **hors du depot**, designe par la variable
   `NPM_CONFIG_USERCONFIG` le temps de la publication.
-- Dans le futur pipeline Azure, ce token sera un secret de pipeline, ecrit dans
-  un fichier temporaire hors du checkout puis supprime en fin de job, meme en
-  cas d'echec.
+- Dans la pipeline Azure, les jetons sont des variables secretes de la
+  definition (`NPM_TOKEN` Verdaccio, `NPMJS_TOKEN` npmjs, `GITHUB_MIRROR_TOKEN`
+  miroir), mappes sur la seule etape qui les utilise ; le `.npmrc` est ecrit
+  hors du checkout et ne contient que la reference au jeton.
 - `.npmrc`, `.env*` (hors `.env.example`), archives `*.tgz` et fichiers de cles
   (`*.pem`, `*.key`, `*.p12`, `*.pfx`, `id_rsa*`) sont dans `.gitignore`.
 
