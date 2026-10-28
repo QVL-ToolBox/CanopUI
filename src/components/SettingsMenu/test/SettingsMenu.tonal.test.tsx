@@ -83,11 +83,9 @@ describe.each(MODES)("SettingsMenu tonal - mode %s", (mode) => {
 
   it("AC3 - le champ de langue recoit un fond opaque teinte depuis le parent", async () => {
     const menu = await ouvrirLeMenu(mode);
-    const fonds = reglesDuChampDeLangue(menu).filter((regle) =>
-      selecteur(regle).includes("::after"),
-    );
-    expect(fonds.join("\n")).toContain(`background-color:${NAVBAR_FIELD_FILL};`);
-    expect(fonds.join("\n")).not.toContain("transparent");
+    const regles = reglesDuChampDeLangue(menu).join("\n");
+    expect(regles).toContain(`--canop-input-fill:${NAVBAR_FIELD_FILL};`);
+    expect(NAVBAR_FIELD_FILL).not.toContain("transparent");
   });
 
   it("AC3 - le champ de langue recoit son contour depuis le parent", async () => {

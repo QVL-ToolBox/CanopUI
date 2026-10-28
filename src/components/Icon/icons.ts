@@ -245,6 +245,8 @@ import PumpkinOutline from "../../assets/icons/pumpkin-outline.svg?react";
 import PumpkinSolid from "../../assets/icons/pumpkin-solid.svg?react";
 import BatOutline from "../../assets/icons/bat-outline.svg?react";
 import BatSolid from "../../assets/icons/bat-solid.svg?react";
+import PowerButtonOutline from "../../assets/icons/power-button-outline.svg?react";
+import PowerButtonSolid from "../../assets/icons/power-button-solid.svg?react";
 
 export const icons = {
   moon: { outline: MoonOutline, solid: MoonSolid },
@@ -390,6 +392,7 @@ export const icons = {
   ghost: { outline: GhostOutline, solid: GhostSolid },
   pumpkin: { outline: PumpkinOutline, solid: PumpkinSolid },
   bat: { outline: BatOutline, solid: BatSolid },
+  power: { outline: PowerButtonOutline, solid: PowerButtonSolid },
 } as const;
 
 export type CanopIconName = keyof typeof icons;

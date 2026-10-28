@@ -176,6 +176,22 @@ const inputsCategory: NavCategory = {
       },
     },
     {
+      path: "/components/date-picker",
+      title: same("DatePicker"),
+      description: {
+        fr: "Champ date, calendrier mensuel et jours récurrents de la semaine.",
+        en: "Date field, monthly calendar and recurring weekdays.",
+      },
+    },
+    {
+      path: "/components/time-picker",
+      title: same("TimePicker"),
+      description: {
+        fr: "Heure sur 24 h, à la saisie ou sur un cadran d'horloge.",
+        en: "24-hour time, typed or picked on a clock dial.",
+      },
+    },
+    {
       path: "/components/form",
       title: same("Form"),
       description: {
@@ -369,6 +385,14 @@ const dataDisplayCategory: NavCategory = {
       description: {
         fr: "Graphique en anneau segmenté avec légende et contenu central.",
         en: "Segmented donut chart with legend and center content.",
+      },
+    },
+    {
+      path: "/components/thermometer",
+      title: same("Thermometer"),
+      description: {
+        fr: "Jauge de température à seuils, colorée par niveau.",
+        en: "Temperature gauge with thresholds, colored by level.",
       },
     },
     {

@@ -195,6 +195,16 @@ const componentExports = [
   "CANOPY_LOOP_SECONDS",
   "canopyScenesFrom",
   "resolveCanopyScene",
+  "Calendar",
+  "useCalendar",
+  "DatePicker",
+  "WeekdayPicker",
+  "Clock",
+  "useClock",
+  "formatClockTime",
+  "parseClockTime",
+  "TimePicker",
+  "Thermometer",
 ];
 
 const pageInsetExports = ["avoidPageTopRight", "reservePageTopRight", "resetPageInsets"];

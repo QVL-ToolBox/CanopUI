@@ -402,3 +402,35 @@ export {
 export { FileCard, type CanopFileCardProps, type CanopFileCardKind } from "./FileCard";
 export { Dropzone, type CanopDropzoneProps } from "./Dropzone";
 export { Lightbox, type CanopLightboxProps, type CanopLightboxItem } from "./Lightbox";
+export {
+  Calendar,
+  useCalendar,
+  type CanopCalendarDay,
+  type CanopCalendarDirection,
+  type CanopCalendarProps,
+  type CanopWeekday,
+  type UseCalendarParams,
+  type UseCalendarResult,
+} from "./Calendar";
+export { DatePicker, type CanopDatePickerProps, type CanopDatePickerSize } from "./DatePicker";
+export { WeekdayPicker, type CanopWeekdayPickerProps } from "./WeekdayPicker";
+export {
+  Clock,
+  useClock,
+  formatClockTime,
+  parseClockTime,
+  type CanopClockMark,
+  type CanopClockMode,
+  type CanopClockProps,
+  type CanopTime,
+  type UseClockDialProps,
+  type UseClockParams,
+  type UseClockResult,
+} from "./Clock";
+export { TimePicker, type CanopTimePickerProps, type CanopTimePickerSize } from "./TimePicker";
+export {
+  Thermometer,
+  type CanopThermometerLevel,
+  type CanopThermometerProps,
+  type CanopThermometerSize,
+} from "./Thermometer";

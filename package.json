@@ -1,6 +1,6 @@
 {
   "name": "@canop/ui",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "type": "module",
   "description": "CanopUI - design system QVL-Studio, librairie de composants React (wrapper MUI). Fork de CH-UI-Library v0.7.0 (QVL-CustHome)",
   "license": "MIT",

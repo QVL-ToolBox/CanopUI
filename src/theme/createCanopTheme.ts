@@ -2,7 +2,7 @@ import { createTheme, type CSSObject, type Theme } from "@mui/material/styles";
 import { tokens } from "../tokens";
 import { scrollbarSx } from "../scrollbar";
 import { mapChromeSx } from "./mapChrome";
-import { squircleClip, squircleClipPath, squircleSurface } from "../squircle";
+import { squircleClip, squircleClipPath, squircleRingPath, squircleSurface } from "../squircle";
 import { SQUIRCLE_CLIP_VAR } from "../squircle/squircleSx";
 import { hoverOrKeyboardFocus, keyboardFocus } from "../interaction";
 import { validFieldHoverOrSelectKeyboardFocus } from "../interaction/interactionStates";
@@ -104,10 +104,12 @@ const OUTLINED_LABEL_SHRUNK_INTO_NOTCH: CSSObject = {
 
 const INPUT_BACKGROUND =
   "color-mix(in srgb, var(--canop-palette-secondary-light) 32%, var(--canop-palette-background-paper))";
+const INPUT_FILL_VAR = "--canop-input-fill";
+const INPUT_FILL = `var(${INPUT_FILL_VAR})`;
 
 const AUTOFILL_INSET_SHADOW_COVERING_AGENT_BACKGROUND = {
-  boxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_BACKGROUND})`,
-  WebkitBoxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_BACKGROUND})`,
+  boxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_FILL})`,
+  WebkitBoxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_FILL})`,
   WebkitTextFillColor: "var(--canop-palette-text-primary)",
   caretColor: "var(--canop-palette-text-primary)",
 };
@@ -140,25 +142,45 @@ const OUTLINE_LAYER_WITHOUT_TOP_EDGE = [
   `${MASK_OPAQUE} ${INPUT_BORDER_WIDTH})`,
 ].join(", ");
 
-const TOP_EDGE_NOTCHED_UNDER_LABEL: CSSObject = {
+const NOTCH_DEPTH = "0.625rem";
+const NOTCH_OUTLINE_SHARE = `${(parseFloat(INPUT_BORDER_WIDTH) / parseFloat(NOTCH_DEPTH)) * 100}%`;
+const NOTCH_BAND_BELOW_FILL_TOP = `calc(${NOTCH_DEPTH} - ${INPUT_BORDER_WIDTH})`;
+const NOTCH_BAND_LAYER = -3;
+const TOP_BAND_OUTLINE_THEN_FILL = [
+  `linear-gradient(${INPUT_OUTLINE} ${NOTCH_OUTLINE_SHARE}`,
+  `${INPUT_FILL} ${NOTCH_OUTLINE_SHARE}) 100% 0 0 0 / ${NOTCH_DEPTH} 0 0 0 stretch`,
+].join(", ");
+const FILL_LAYER_WITHOUT_TOP_BAND = [
+  "linear-gradient(transparent",
+  `transparent ${NOTCH_BAND_BELOW_FILL_TOP}`,
+  `${MASK_OPAQUE} ${NOTCH_BAND_BELOW_FILL_TOP})`,
+].join(", ");
+
+const TOP_BAND_NOTCHED_UNDER_LABEL: CSSObject = {
   [`& ${NOTCHED_OUTLINE}`]: {
     inset: 0,
+    zIndex: NOTCH_BAND_LAYER,
     paddingBlock: 0,
     paddingInline: `${NOTCH_INLINE_START} ${NOTCH_INLINE_END}`,
     borderStyle: "solid",
-    borderWidth: `${INPUT_BORDER_WIDTH} 0 0`,
+    borderWidth: `${NOTCH_DEPTH} 0 0`,
     borderColor: INPUT_OUTLINE,
+    borderImage: TOP_BAND_OUTLINE_THEN_FILL,
     borderRadius: 0,
     clipPath: `var(${SQUIRCLE_CLIP_VAR})`,
     "& legend": {
       display: "block",
-      height: INPUT_BORDER_WIDTH,
-      lineHeight: INPUT_BORDER_WIDTH,
+      height: NOTCH_DEPTH,
+      lineHeight: NOTCH_DEPTH,
       "& > span": { paddingInline: `${NOTCH_LEGEND_GUTTER_START} ${LABEL_SHRINK_SCALED_GUTTER}` },
     },
   },
   "&::before": {
+    clipPath: squircleRingPath(INPUT_RADIUS, INPUT_BORDER_WIDTH),
     maskImage: OUTLINE_LAYER_WITHOUT_TOP_EDGE,
+  },
+  "&::after": {
+    maskImage: FILL_LAYER_WITHOUT_TOP_BAND,
   },
 };
 
@@ -484,11 +506,12 @@ export function createCanopTheme(
           root: ({ theme: t }) => ({
             ...squircleSurface({
               radius: INPUT_RADIUS,
-              background: INPUT_BACKGROUND,
+              background: INPUT_FILL,
               borderColor: INPUT_OUTLINE,
               borderWidth: INPUT_BORDER_WIDTH,
             }),
             [INPUT_OUTLINE_VAR]: t.palette.primary.main,
+            [INPUT_FILL_VAR]: INPUT_BACKGROUND,
             [`& ${NOTCHED_OUTLINE}`]: { border: "none" },
             [`& ${NOTCHED_OUTLINE} legend`]: { display: "none" },
             [validFieldHoverOrSelectKeyboardFocus()]: {
@@ -503,7 +526,7 @@ export function createCanopTheme(
               [INPUT_OUTLINE_VAR]: t.palette.action.disabled,
               "&::before": { backgroundColor: INPUT_OUTLINE },
             },
-            [FIELD_WITH_FLOATING_LABEL]: TOP_EDGE_NOTCHED_UNDER_LABEL,
+            [FIELD_WITH_FLOATING_LABEL]: TOP_BAND_NOTCHED_UNDER_LABEL,
           }),
         },
       },
