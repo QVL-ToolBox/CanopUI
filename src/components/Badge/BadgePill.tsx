@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import { tokens } from "../../tokens";
 import { squircleClip } from "../../squircle";
+import { innerGlow, useNeonGlow } from "../../theme/neonGlow";
 import type { CanopBadgeColor } from "./useBadge";
 
 interface BadgePillProps {
@@ -13,6 +14,7 @@ interface BadgePillProps {
 export function BadgePill({ isDot, color, label, ariaLabel }: BadgePillProps) {
   const background = `var(--canop-palette-${color}-main)`;
   const foreground = `var(--canop-palette-${color}-contrastText)`;
+  const boxShadow = useNeonGlow() ? innerGlow(color, "rest") : undefined;
 
   if (isDot) {
     return (
@@ -27,6 +29,7 @@ export function BadgePill({ isDot, color, label, ariaLabel }: BadgePillProps) {
           height: "0.625rem",
           ...squircleClip("50%", { shape: "circle" }),
           backgroundColor: background,
+          boxShadow,
         }}
       />
     );
@@ -46,6 +49,7 @@ export function BadgePill({ isDot, color, label, ariaLabel }: BadgePillProps) {
         paddingX: 0.5,
         ...squircleClip("0.625rem", { shape: "pill" }),
         backgroundColor: background,
+        boxShadow,
         color: foreground,
         fontFamily: tokens.typography.fontFamily,
         fontSize: tokens.typography.app.overline.fontSize,

@@ -2,7 +2,6 @@ import Box from "@mui/material/Box";
 import { motion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
 import { useTranslation } from "../../i18n";
-import { SeasonalBackdrop } from "../HalloweenDecor/SeasonalBackdrop";
 import { Link } from "../Link";
 import {
   Navbar,
@@ -10,15 +9,21 @@ import {
   type CanopNavbarItem,
   type CanopNavbarTitleLevel,
 } from "../Navbar";
+import type { CanopBackgroundTone } from "../_shared/backgroundTone";
+import type { CanopMainElement } from "../_shared/mainElement";
 import { bleedThroughPageBottom } from "../_shared/pageBottomInset";
+import type { CanopTitleLevel } from "../_shared/titleLevel";
 import { PageBackdrop, type CanopPageBackground } from "./PageBackdrop";
 import { PageHeader } from "./PageHeader";
+import { PageSeasonalBackdrop } from "./PageSeasonalBackdrop";
+import { RouteBoundary } from "./RouteBoundary";
 import { usePageScaffold, type CanopActionsPlacement } from "./usePageScaffold";
 
 export type { CanopPageBackground, CanopActionsPlacement };
 
 export interface CanopPageScaffoldProps {
   title?: string;
+  titleLevel?: CanopTitleLevel;
   subtitle?: string;
   headerActions?: ReactNode;
   navbarTitle?: string;
@@ -35,8 +40,15 @@ export interface CanopPageScaffoldProps {
   supportHref?: string;
   height?: string;
   background?: CanopPageBackground;
+  backgroundTone?: CanopBackgroundTone;
   mobileFooterPlacement?: CanopMobileFooterPlacement;
   actionsPlacement?: CanopActionsPlacement;
+  mainElement?: CanopMainElement;
+  /**
+   * Pose une frontière Suspense qui montre un squelette de page pendant qu'une route lazy charge.
+   * Changer la valeur en cours de vie remonte tout le contenu : l'état local des enfants est perdu.
+   */
+  skeleton?: boolean;
   children: ReactNode;
 }
 
@@ -64,6 +76,7 @@ const contentItemStyle: CSSProperties = {
 
 export function PageScaffold({
   title,
+  titleLevel,
   subtitle,
   headerActions,
   navbarTitle,
@@ -80,8 +93,11 @@ export function PageScaffold({
   supportHref,
   height,
   background = "canopy",
+  backgroundTone = "primary",
   mobileFooterPlacement = "floating",
   actionsPlacement = "header",
+  mainElement,
+  skeleton = true,
   children,
 }: CanopPageScaffoldProps) {
   const { isMobile, pageContext, inlineActions, floatingActions, enter } = usePageScaffold({
@@ -109,6 +125,7 @@ export function PageScaffold({
       supportHref={supportHref}
       height={height}
       mobileFooterPlacement={mobileFooterPlacement}
+      mainElement={mainElement}
     >
       <Box
         sx={{
@@ -121,8 +138,8 @@ export function PageScaffold({
           ...bleedThroughPageBottom(),
         }}
       >
-        <PageBackdrop background={background} />
-        <SeasonalBackdrop />
+        <PageBackdrop background={background} tone={backgroundTone} />
+        <PageSeasonalBackdrop />
         <motion.div
           initial={enter.container.initial}
           animate={enter.container.animate}
@@ -132,6 +149,7 @@ export function PageScaffold({
           <motion.div variants={enter.item.variants} style={headerItemStyle}>
             <PageHeader
               title={title}
+              titleLevel={titleLevel}
               context={pageContext}
               subtitle={subtitle}
               actions={inlineActions}
@@ -139,7 +157,7 @@ export function PageScaffold({
             />
           </motion.div>
           <motion.div variants={enter.item.variants} style={contentItemStyle}>
-            {children}
+            <RouteBoundary enabled={skeleton}>{children}</RouteBoundary>
           </motion.div>
           {!isMobile && (footer || supportHref) ? (
             <Box

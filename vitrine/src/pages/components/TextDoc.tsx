@@ -44,6 +44,14 @@ const numericCode = `<Text variant="metric">1 204,50</Text>
 const asCode = `<Text as="strong" weight="bold">Mise en avant</Text>
 <Text as="span" variant="body-sm" tone="muted">Complément inline</Text>`;
 
+const truncationCode = `<Text noWrap>{longText}</Text>
+<Text lines={2}>{longText}</Text>`;
+
+const truncationSample = {
+  fr: "La canopée filtre la lumière du jour en mille éclats mouvants, et chaque feuille, chaque branche, chaque souffle de vent redessine sans cesse le motif posé sur le sol de la forêt, bien au-delà de ce qu'une seule ligne peut contenir.",
+  en: "The canopy filters daylight into a thousand moving flecks, and every leaf, every branch, every gust of wind keeps redrawing the pattern laid on the forest floor, far beyond what a single line can hold.",
+};
+
 const fr = {
   intro:
     "Composant de texte courant. Il expose l'échelle typographique applicative — corps, libellés, légendes, surtitres, métriques et code — que seuls les tokens rendaient accessible jusqu'ici. Chaque variante embarque sa taille, sa graisse, son interligne et son resserrement optique.",
@@ -83,6 +91,12 @@ const fr = {
       demoDescription:
         "Chaque variante a sa balise par défaut (p, span, code). La prop as permet d'en choisir une autre sans toucher au style.",
     },
+    truncation: {
+      title: "Troncature",
+      demoTitle: "noWrap et lines",
+      demoDescription:
+        "noWrap tient le texte sur une ligne et coupe le surplus d'une ellipse ; lines le coupe au-delà de n lignes. Le texte ne déborde jamais de son conteneur.",
+    },
     api: "API",
   },
   props: {
@@ -96,6 +110,8 @@ const fr = {
     slashedZero: "Barre le zéro pour le distinguer de la lettre O.",
     gutterBottom: "Ajoute une marge basse.",
     color: "Couleur explicite, prioritaire sur tone.",
+    noWrap: "Tient le texte sur une ligne et coupe le surplus d'une ellipse.",
+    lines: "Coupe le texte d'une ellipse au-delà de ce nombre de lignes ; prioritaire sur noWrap.",
   },
 };
 
@@ -138,6 +154,12 @@ const en: typeof fr = {
       demoDescription:
         "Each variant has its default tag (p, span, code). The as prop picks another one without touching the style.",
     },
+    truncation: {
+      title: "Truncation",
+      demoTitle: "noWrap and lines",
+      demoDescription:
+        "noWrap keeps the text on one line and cuts the excess with an ellipsis; lines cuts it beyond n lines. The text never overflows its container.",
+    },
     api: "API",
   },
   props: {
@@ -151,6 +173,9 @@ const en: typeof fr = {
     slashedZero: "Slashes the zero to tell it apart from the letter O.",
     gutterBottom: "Adds a bottom margin.",
     color: "Explicit color, taking precedence over tone.",
+    noWrap: "Keeps the text on one line and cuts the excess with an ellipsis.",
+    lines:
+      "Cuts the text with an ellipsis beyond this number of lines; takes precedence over noWrap.",
   },
 };
 
@@ -231,6 +256,8 @@ export default function TextDoc() {
       description: t.props.gutterBottom,
     },
     { name: "color", type: "string", defaultValue: "tone", description: t.props.color },
+    { name: "noWrap", type: "boolean", defaultValue: "false", description: t.props.noWrap },
+    { name: "lines", type: "number", description: t.props.lines },
   ];
 
   return (
@@ -351,6 +378,20 @@ export default function TextDoc() {
             <Text as="span" variant="body-sm" tone="muted">
               {locale === "fr" ? "Complément inline" : "Inline complement"}
             </Text>
+          </Stack>
+        </DemoCard>
+      </DocSection>
+
+      <DocSection title={t.sections.truncation.title}>
+        <DemoCard
+          title={t.sections.truncation.demoTitle}
+          description={t.sections.truncation.demoDescription}
+          code={truncationCode}
+          align="stretch"
+        >
+          <Stack gap="sm">
+            <Text noWrap>{truncationSample[locale]}</Text>
+            <Text lines={2}>{truncationSample[locale]}</Text>
           </Stack>
         </DemoCard>
       </DocSection>

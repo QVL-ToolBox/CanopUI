@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CanopThemeProvider, palette, paletteDark } from "../../../index";
 import { contrastRatio } from "../../../test/contrastRatio";
-import { derniereValeurEmise } from "../../../test/cssRules";
+import { derniereValeurDansLeGroupe, derniereValeurEmise } from "../../../test/cssRules";
 import { IconActionButton, type CanopIconActionButtonVariant } from "../IconActionButton";
 
 type Mode = "light" | "dark";
@@ -39,9 +39,10 @@ function poserVariante(
 const fondAuRepos = (bouton: HTMLElement) =>
   derniereValeurEmise(bouton, "background-color", "::before");
 const fondAuSurvol = (bouton: HTMLElement) =>
-  derniereValeurEmise(bouton, "background-color", ":hover::before");
+  derniereValeurDansLeGroupe(bouton, "background-color", ":hover::before");
 const fondAuFocusClavier = (bouton: HTMLElement) =>
-  derniereValeurEmise(bouton, "background-color", ".Mui-focusVisible::before");
+  derniereValeurDansLeGroupe(bouton, "background-color", ".Mui-focusVisible::before");
+const SANS_ANNEAU = /^(|none|0(px)?)$/;
 const couleurDuGlyphe = (bouton: HTMLElement) => derniereValeurEmise(bouton, "color").toLowerCase();
 
 describe("AC3 - IconActionButton variante accent : fond et glyphe", () => {
@@ -81,15 +82,14 @@ describe("AC3 - variante accent : survol, focus clavier, disabled, loading", () 
     expect(fond).not.toBe(FOND_ACCENT);
   });
 
-  it("garde un fond accent.main au focus clavier", () => {
-    expect(fondAuFocusClavier(poserBouton())).toBe(FOND_ACCENT);
+  it("reprend au focus clavier le fond de son survol", () => {
+    const bouton = poserBouton();
+    expect(fondAuFocusClavier(bouton)).toBe(fondAuSurvol(bouton));
   });
 
-  it("porte l'anneau de focus visible de la librairie", () => {
+  it("ne porte aucun anneau de focus visible", () => {
     const bouton = poserBouton();
-    expect(derniereValeurEmise(bouton, "outline", ":focus-visible")).toMatch(
-      /^0\.125rem solid var\(--canop-palette-primary-main\)$/,
-    );
+    expect(derniereValeurDansLeGroupe(bouton, "outline", ":focus-visible")).toMatch(SANS_ANNEAU);
   });
 
   it("recoit le focus au clavier", async () => {
@@ -197,27 +197,27 @@ describe("AC3 - variante accent : contrastes sur les tokens", () => {
   });
 });
 
-describe("Focus clavier - chaque variante garde son fond de repos", () => {
+describe("Focus clavier - chaque variante reprend son survol", () => {
   it.each([
-    ["default", "light", "var(--canop-palette-primary-main)"],
-    ["default", "dark", "var(--canop-palette-primary-main)"],
-    ["danger", "light", "var(--canop-palette-error-main)"],
-    ["danger", "dark", "var(--canop-palette-error-main)"],
-    ["secondary", "light", "var(--canop-palette-secondary-dark)"],
-    ["secondary", "dark", "var(--canop-palette-secondary-main)"],
-    ["accent", "light", FOND_ACCENT],
-    ["accent", "dark", FOND_ACCENT],
+    ["default", "light"],
+    ["default", "dark"],
+    ["danger", "light"],
+    ["danger", "dark"],
+    ["secondary", "light"],
+    ["secondary", "dark"],
+    ["accent", "light"],
+    ["accent", "dark"],
   ] as const)(
-    "etant donne la variante %s en mode %s, quand elle recoit le focus clavier, alors son fond reste %s",
-    async (variant, mode, fondAttendu) => {
+    "etant donne la variante %s en mode %s, quand elle recoit le focus clavier, alors son fond est celui du survol",
+    async (variant, mode) => {
       const user = userEvent.setup();
       const bouton = poserVariante(variant, false, mode);
 
       await user.tab();
 
       expect(bouton).toHaveFocus();
-      expect(fondAuFocusClavier(bouton)).toBe(fondAttendu);
-      expect(fondAuFocusClavier(bouton)).toBe(fondAuRepos(bouton));
+      expect(fondAuFocusClavier(bouton)).not.toBe("");
+      expect(fondAuFocusClavier(bouton)).toBe(fondAuSurvol(bouton));
     },
   );
 
@@ -252,17 +252,17 @@ describe("Focus clavier - chaque variante garde son fond de repos", () => {
     ["accent", "light"],
     ["accent", "dark"],
   ] as const)(
-    "etant donne la variante %s en mode %s, quand elle recoit le focus clavier, alors elle garde l'anneau de focus de la librairie",
+    "etant donne la variante %s en mode %s, quand elle recoit le focus clavier, alors elle ne porte aucun anneau",
     async (variant, mode) => {
       const user = userEvent.setup();
       const bouton = poserVariante(variant, false, mode);
 
       await user.tab();
 
-      expect(derniereValeurEmise(bouton, "outline", ":focus-visible")).toBe(
-        "0.125rem solid var(--canop-palette-primary-main)",
+      expect(derniereValeurDansLeGroupe(bouton, "outline", ":focus-visible")).toMatch(SANS_ANNEAU);
+      expect(derniereValeurDansLeGroupe(bouton, "outline", ".Mui-focusVisible")).toMatch(
+        SANS_ANNEAU,
       );
-      expect(derniereValeurEmise(bouton, "outline-offset", ":focus-visible")).toBe("0.125rem");
     },
   );
 });

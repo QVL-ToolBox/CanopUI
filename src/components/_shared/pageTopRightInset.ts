@@ -1,6 +1,6 @@
 import type { CSSObject } from "@mui/material/styles";
 
-const PAGE_TOP_RIGHT_INSET_VAR = "--canop-page-top-right-inset";
+export const PAGE_TOP_RIGHT_INSET_VAR = "--canop-page-top-right-inset";
 
 const inset = `var(${PAGE_TOP_RIGHT_INSET_VAR}, 0rem)`;
 

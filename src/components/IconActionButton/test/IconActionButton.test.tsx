@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CanopThemeProvider } from "../../../theme";
+import { derniereValeurDansLeGroupe } from "../../../test/cssRules";
 import { IconActionButton } from "../IconActionButton";
 
 function renderButton(ui: React.ReactElement) {
@@ -9,17 +10,6 @@ function renderButton(ui: React.ReactElement) {
 }
 
 const iconOf = (name: string) => screen.getByRole("button", { name }).querySelector("svg");
-
-function focusRuleOf(element: Element): string {
-  const feuilles = Array.from(document.querySelectorAll("style"))
-    .map((balise) => balise.textContent ?? "")
-    .join("");
-  return element.className
-    .split(" ")
-    .filter((nom) => nom.startsWith("css-"))
-    .map((nom) => feuilles.match(new RegExp(`\\.${nom}:focus-visible\\{[^}]*\\}`))?.[0] ?? "")
-    .join("");
-}
 
 describe("IconActionButton", () => {
   it("rend un bouton avec le bon aria-label", () => {
@@ -81,11 +71,22 @@ describe("IconActionButton", () => {
     expect(iconOf("Éditer")).toHaveAttribute("width", "1.25rem");
   });
 
-  it("porte l'anneau de focus de la librairie", () => {
+  it("ne porte aucun anneau de focus", () => {
     renderButton(<IconActionButton icon="pencil" ariaLabel="Éditer" />);
-    const regle = focusRuleOf(screen.getByRole("button", { name: "Éditer" }));
+    const bouton = screen.getByRole("button", { name: "Éditer" });
 
-    expect(regle).toContain("outline:");
-    expect(regle).toContain("var(--canop-palette-primary-main)");
+    expect(derniereValeurDansLeGroupe(bouton, "outline", ":focus-visible")).toMatch(
+      /^(|none|0(px)?)$/,
+    );
+    expect(derniereValeurDansLeGroupe(bouton, "outline", ":focus")).toMatch(/^(|none|0(px)?)$/);
+  });
+
+  it("reprend au focus clavier le fond de son survol", () => {
+    renderButton(<IconActionButton icon="pencil" ariaLabel="Éditer" />);
+    const bouton = screen.getByRole("button", { name: "Éditer" });
+
+    expect(
+      derniereValeurDansLeGroupe(bouton, "background-color", ".Mui-focusVisible::before"),
+    ).toBe(derniereValeurDansLeGroupe(bouton, "background-color", ":hover::before"));
   });
 });

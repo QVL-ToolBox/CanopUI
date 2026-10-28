@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from "react";
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
+import { render, screen, waitFor } from "@testing-library/react";
 import { useTheme } from "@mui/material/styles";
 import {
   CanopI18nProvider,
@@ -12,7 +12,11 @@ import {
   useCanopTheme,
   type CanopNavbarItem,
 } from "../../index";
-import { mockMatchMedia } from "../../test/halloweenDecorTestKit";
+import {
+  mockMatchMedia,
+  preparerDecorDeterministe,
+  quitterDecor,
+} from "../../test/halloweenDecorTestKit";
 
 const IN_SEASON_DAY = new Date(2026, 9, 20, 12);
 const OFF_SEASON_DAY = new Date(2026, 5, 10, 12);
@@ -72,19 +76,39 @@ function renderProvider(ui: ReactNode, props: SeasonProps = {}) {
   );
 }
 
+async function decorMonte() {
+  await waitFor(() => {
+    expect(scenes()).toHaveLength(1);
+    expect(upperLayers()).toHaveLength(1);
+  });
+}
+
+async function prechargerDecorEtFond() {
+  preparerDecorDeterministe();
+  mockMatchMedia(false);
+  vi.setSystemTime(IN_SEASON_DAY);
+  const { container } = renderProvider(<Scaffold />);
+  await decorMonte();
+  await waitFor(() => expect(container.querySelector("video")).not.toBeNull());
+  quitterDecor();
+}
+
 function seasonAt(day: Date): string {
   vi.setSystemTime(day);
   renderProvider(<SeasonProbe />);
   return screen.getByTestId("season").textContent ?? "";
 }
 
+beforeAll(prechargerDecorEtFond);
+
 beforeEach(() => {
   window.localStorage.clear();
+  preparerDecorDeterministe();
   mockMatchMedia(false);
 });
 
 afterEach(() => {
-  vi.unstubAllGlobals();
+  quitterDecor();
 });
 
 describe("AC1 — saison automatique sans prop season", () => {
@@ -158,22 +182,23 @@ describe("AC2 — decor affiche sans code cote portail", () => {
     vi.setSystemTime(IN_SEASON_DAY);
   });
 
-  it("rend une seule fois le calque superieur en Portal dans body", () => {
+  it("rend une seule fois le calque superieur en Portal dans body", async () => {
     const { container } = renderProvider(<Scaffold />);
 
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
     expect(document.body).toContainElement(upperLayers()[0]);
     expect(container).not.toContainElement(upperLayers()[0]);
   });
 
-  it("rend une seule scene avec un PageScaffold", () => {
+  it("rend une seule scene avec un PageScaffold", async () => {
     renderProvider(<Scaffold />);
 
-    expect(scenes()).toHaveLength(1);
+    await decorMonte();
   });
 
-  it("place la scene du PageScaffold apres son fond et avant son contenu", () => {
+  it("place la scene du PageScaffold apres son fond et avant son contenu", async () => {
     const { container } = renderProvider(<Scaffold />);
+    await decorMonte();
     const [scene] = scenes();
     const backdrop = container.querySelector("video");
 
@@ -183,7 +208,7 @@ describe("AC2 — decor affiche sans code cote portail", () => {
     expect(precedes(scene, screen.getByText("Contenu"))).toBe(true);
   });
 
-  it("rend une seule scene avec deux PageScaffold montes ensemble", () => {
+  it("rend une seule scene avec deux PageScaffold montes ensemble", async () => {
     renderProvider(
       <>
         <Scaffold label="Premier" />
@@ -191,19 +216,18 @@ describe("AC2 — decor affiche sans code cote portail", () => {
       </>,
     );
 
-    expect(scenes()).toHaveLength(1);
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
   });
 
-  it("rend la scene en repli sans PageScaffold", () => {
+  it("rend la scene en repli sans PageScaffold", async () => {
     renderProvider(<p>Connexion</p>);
 
-    expect(scenes()).toHaveLength(1);
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
   });
 
-  it("retire la scene de repli quand un PageScaffold est monte ensuite", () => {
+  it("retire la scene de repli quand un PageScaffold est monte ensuite", async () => {
     const { rerender, container } = renderProvider(<p>Connexion</p>);
+    await decorMonte();
 
     rerender(
       withI18n(
@@ -213,13 +237,14 @@ describe("AC2 — decor affiche sans code cote portail", () => {
       ),
     );
 
-    expect(scenes()).toHaveLength(1);
+    await decorMonte();
     expect(precedes(container.querySelector("video") as Node, scenes()[0])).toBe(true);
     expect(precedes(scenes()[0], screen.getByText("Contenu"))).toBe(true);
   });
 
-  it("remet la scene de repli quand le PageScaffold est demonte", () => {
+  it("remet la scene de repli quand le PageScaffold est demonte", async () => {
     const { rerender } = renderProvider(<Scaffold />);
+    await decorMonte();
 
     rerender(
       withI18n(
@@ -229,10 +254,10 @@ describe("AC2 — decor affiche sans code cote portail", () => {
       ),
     );
 
-    expect(scenes()).toHaveLength(1);
+    await decorMonte();
   });
 
-  it("ne rend qu'une scene et un calque superieur avec des providers imbriques", () => {
+  it("ne rend qu'une scene et un calque superieur avec des providers imbriques", async () => {
     renderProvider(
       <CanopThemeProvider>
         <CanopThemeProvider season="halloween">
@@ -241,22 +266,20 @@ describe("AC2 — decor affiche sans code cote portail", () => {
       </CanopThemeProvider>,
     );
 
-    expect(scenes()).toHaveLength(1);
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
   });
 
-  it("ne rend qu'une scene et un calque superieur avec un PageScaffold sous des providers imbriques", () => {
+  it("ne rend qu'une scene et un calque superieur avec un PageScaffold sous des providers imbriques", async () => {
     renderProvider(
       <CanopThemeProvider>
         <Scaffold />
       </CanopThemeProvider>,
     );
 
-    expect(scenes()).toHaveLength(1);
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
   });
 
-  it("ne rend que les enfants d'un HalloweenDecor viewport manuel sous un decor gere", () => {
+  it("ne rend que les enfants d'un HalloweenDecor viewport manuel sous un decor gere", async () => {
     renderProvider(
       <HalloweenDecor scope="viewport">
         <p>Enfant du decor</p>
@@ -264,11 +287,10 @@ describe("AC2 — decor affiche sans code cote portail", () => {
     );
 
     expect(screen.getByText("Enfant du decor")).toBeInTheDocument();
-    expect(scenes()).toHaveLength(1);
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
   });
 
-  it("ne rend que les enfants d'un HalloweenDecor viewport manuel dans un PageScaffold", () => {
+  it("ne rend que les enfants d'un HalloweenDecor viewport manuel dans un PageScaffold", async () => {
     renderProvider(
       <PageScaffold items={items}>
         <HalloweenDecor scope="viewport">
@@ -278,8 +300,7 @@ describe("AC2 — decor affiche sans code cote portail", () => {
     );
 
     expect(screen.getByText("Enfant du decor")).toBeInTheDocument();
-    expect(scenes()).toHaveLength(1);
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
   });
 });
 
@@ -300,7 +321,7 @@ describe("AC3 — forcer, couper, palette sans decor", () => {
     expect(decorLayers()).toHaveLength(0);
   });
 
-  it("force la saison, sa palette et son decor avec season halloween hors saison", () => {
+  it("force la saison, sa palette et son decor avec season halloween hors saison", async () => {
     vi.setSystemTime(OFF_SEASON_DAY);
 
     renderProvider(
@@ -313,8 +334,7 @@ describe("AC3 — forcer, couper, palette sans decor", () => {
 
     expect(screen.getByTestId("season")).toHaveTextContent("halloween");
     expect(screen.getByTestId("primary")).toHaveTextContent(paletteHalloween.primary.main);
-    expect(scenes()).toHaveLength(1);
-    expect(upperLayers()).toHaveLength(1);
+    await decorMonte();
   });
 
   it.each([

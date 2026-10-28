@@ -1,13 +1,16 @@
 import Box from "@mui/material/Box";
-import { LayoutGroup } from "framer-motion";
-import { useId, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { useTranslation } from "../../i18n";
+import { SlidingIndicatorGroup } from "../../motion/SlidingIndicatorGroup";
+import { type CanopMainElement } from "../_shared/mainElement";
 import { NavbarRailItem } from "./NavbarRailItem";
 import { NavbarRailSettings } from "./NavbarRailSettings";
+import { NavbarTileTooltipProvider } from "./NavbarTileTooltipProvider";
 import { NavbarUtilities } from "./NavbarUtilities";
 import { useNavbarUtilitiesInset } from "./useNavbarUtilitiesInset";
 import { reservePageTopRight } from "../_shared/pageTopRightInset";
-import { NAVBAR_SURFACE_GRADIENT } from "./navbarStyles";
+import { navbarPanelSx } from "./navbarSurface";
+import { NAVBAR_TEXT } from "./navbarTone";
 import { type CanopNavbarItem } from "./navigation";
 
 export interface NavbarRailProps {
@@ -16,8 +19,10 @@ export interface NavbarRailProps {
   onNavigate?: (href: string) => void;
   userName?: string;
   onLogout?: () => void;
+  sidebarWidget?: ReactNode;
   actions?: ReactNode;
   height: string;
+  mainElement: CanopMainElement;
   children: ReactNode;
 }
 
@@ -29,12 +34,13 @@ export function NavbarRail({
   onNavigate,
   userName,
   onLogout,
+  sidebarWidget,
   actions,
   height,
+  mainElement,
   children,
 }: NavbarRailProps) {
   const { t } = useTranslation();
-  const groupId = useId();
   const utilitiesInset = useNavbarUtilitiesInset(Boolean(actions));
 
   return (
@@ -53,7 +59,6 @@ export function NavbarRail({
         sx={{
           width: RAIL_WIDTH,
           flexShrink: 0,
-          height: "100%",
           boxSizing: "border-box",
           display: "flex",
           flexDirection: "column",
@@ -61,37 +66,41 @@ export function NavbarRail({
           gap: "1rem",
           paddingY: "1.25rem",
           paddingX: "0.5rem",
-          color: "primary.contrastText",
-          background: NAVBAR_SURFACE_GRADIENT,
+          color: NAVBAR_TEXT,
+          ...navbarPanelSx,
           overflowY: "auto",
         }}
       >
-        <Box
-          sx={{
-            flex: 1,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: "0.375rem",
-          }}
-        >
-          <LayoutGroup id={groupId}>
-            {items.map((item) => (
-              <NavbarRailItem
-                key={item.href}
-                item={item}
-                activeHref={activeHref}
-                onNavigate={onNavigate}
-              />
-            ))}
-          </LayoutGroup>
-        </Box>
+        <NavbarTileTooltipProvider>
+          <Box
+            sx={{
+              flex: 1,
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "0.125rem",
+            }}
+          >
+            <SlidingIndicatorGroup>
+              {items.map((item) => (
+                <NavbarRailItem
+                  key={item.href}
+                  item={item}
+                  activeHref={activeHref}
+                  onNavigate={onNavigate}
+                />
+              ))}
+            </SlidingIndicatorGroup>
+          </Box>
 
-        {(userName || onLogout) && <NavbarRailSettings userName={userName} onLogout={onLogout} />}
+          {(userName || onLogout || sidebarWidget) && (
+            <NavbarRailSettings userName={userName} onLogout={onLogout} widget={sidebarWidget} />
+          )}
+        </NavbarTileTooltipProvider>
       </Box>
 
       <Box
-        component="main"
+        component={mainElement}
         sx={{
           flex: 1,
           minWidth: 0,

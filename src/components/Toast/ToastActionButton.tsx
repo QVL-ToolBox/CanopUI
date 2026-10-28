@@ -1,4 +1,5 @@
 import ButtonBase from "@mui/material/ButtonBase";
+import { hoverOrKeyboardFocus } from "../../interaction";
 
 export interface ToastActionButtonProps {
   label: string;
@@ -18,9 +19,10 @@ const actionSx = {
   backgroundColor: "color-mix(in srgb, currentColor 14%, transparent)",
   transition:
     "background-color var(--canop-motion-duration-fast) var(--canop-motion-ease-standard), transform var(--canop-motion-duration-fast) var(--canop-motion-ease-spring-soft)",
-  "&:hover": { backgroundColor: "color-mix(in srgb, currentColor 24%, transparent)" },
+  [hoverOrKeyboardFocus()]: {
+    backgroundColor: "color-mix(in srgb, currentColor 24%, transparent)",
+  },
   "&:active": { transform: "scale(0.96)" },
-  "&:focus-visible": { outline: "0.125rem solid currentColor", outlineOffset: "0.125rem" },
   "@media (prefers-reduced-motion: reduce)": {
     transition: "none",
     "&:active": { transform: "none" },

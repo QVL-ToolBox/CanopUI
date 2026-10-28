@@ -1,9 +1,10 @@
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
-import { useId, useState, type MouseEvent } from "react";
 import { Icon } from "../Icon";
-import { NavbarLink } from "./NavbarLink";
+import { NAVBAR_LINK_INSET, NavbarLink } from "./NavbarLink";
+import { NavbarSectionGroup } from "./NavbarSectionGroup";
 import { isItemActive, navigateFromEvent, type CanopNavbarItem } from "./navigation";
+import { useNavbarItem } from "./useNavbarItem";
 import { useReducedMotion } from "../../motion";
 
 export interface NavbarItemProps {
@@ -13,28 +14,9 @@ export interface NavbarItemProps {
 }
 
 export function NavbarItem({ item, activeHref, onNavigate }: NavbarItemProps) {
-  const subItems = item.children ?? [];
-  const hasSubItems = subItems.length > 0;
-  const subListId = useId();
-  const childActive = subItems.some((sub) => isItemActive(sub.href, activeHref));
-  const active = isItemActive(item.href, activeHref) || childActive;
+  const { sections, hasSubItems, active, childActive, expanded, subListId, handleParentClick } =
+    useNavbarItem(item, activeHref, onNavigate);
   const reducedMotion = useReducedMotion();
-
-  const [open, setOpen] = useState(active);
-  const [syncedActive, setSyncedActive] = useState(active);
-  if (active !== syncedActive) {
-    setSyncedActive(active);
-    setOpen(active);
-  }
-
-  const expanded = hasSubItems && open;
-
-  function handleParentClick(event: MouseEvent) {
-    navigateFromEvent(event, item.href, onNavigate);
-    if (hasSubItems) {
-      setOpen((value) => !value);
-    }
-  }
 
   return (
     <Box
@@ -61,7 +43,6 @@ export function NavbarItem({ item, activeHref, onNavigate }: NavbarItemProps) {
               sx={{
                 display: "inline-flex",
                 transform: expanded ? "rotate(180deg)" : "rotate(0deg)",
-
                 transition:
                   "transform var(--canop-motion-duration-base) var(--canop-motion-ease-standard)",
               }}
@@ -84,16 +65,20 @@ export function NavbarItem({ item, activeHref, onNavigate }: NavbarItemProps) {
               paddingLeft: "1rem",
             }}
           >
-            {subItems.map((sub) => (
-              <NavbarLink
-                key={sub.href}
-                href={sub.href}
-                label={sub.label}
-                icon={sub.icon}
-                active={isItemActive(sub.href, activeHref)}
-                nested
-                onClick={(event) => navigateFromEvent(event, sub.href, onNavigate)}
-              />
+            {sections.map((section, index) => (
+              <NavbarSectionGroup key={index} label={section.label} inset={NAVBAR_LINK_INSET}>
+                {section.items.map((sub) => (
+                  <NavbarLink
+                    key={sub.href}
+                    href={sub.href}
+                    label={sub.label}
+                    icon={sub.icon}
+                    active={isItemActive(sub.href, activeHref)}
+                    nested
+                    onClick={(event) => navigateFromEvent(event, sub.href, onNavigate)}
+                  />
+                ))}
+              </NavbarSectionGroup>
             ))}
           </Box>
         </Collapse>

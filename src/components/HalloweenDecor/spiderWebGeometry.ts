@@ -3,7 +3,7 @@ interface SpiderWebStrand {
   d: string;
 }
 
-interface SpiderWebDew {
+export interface SpiderWebDew {
   id: string;
   cx: string;
   cy: string;

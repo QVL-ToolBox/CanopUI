@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { ghostGlyphSx } from "./ghostSx";
+import { ghostGlyphSx, ghostMotionSx } from "./ghostSx";
 import { HalloweenGhostFace } from "./HalloweenGhostFace";
 import type { HalloweenDepth, HalloweenExpression } from "./halloweenSceneTypes";
 
@@ -26,15 +26,13 @@ export function HalloweenGhostGlyph({
   animated,
 }: HalloweenGhostGlyphProps) {
   return (
-    <Box
-      component="svg"
-      viewBox="0 0 26 26"
-      sx={ghostGlyphSx(depth, { sway, breathe, delay }, animated)}
-    >
-      <path d={BODY} fill="currentColor" />
-      <path d={LEFT_ARM} fill="currentColor" />
-      <path d={RIGHT_ARM} fill="currentColor" />
-      <HalloweenGhostFace expression={expression} />
+    <Box component="span" sx={ghostMotionSx({ sway, breathe, delay }, animated)}>
+      <Box component="svg" viewBox="0 0 26 26" sx={ghostGlyphSx(depth)}>
+        <path d={BODY} fill="currentColor" />
+        <path d={LEFT_ARM} fill="currentColor" />
+        <path d={RIGHT_ARM} fill="currentColor" />
+        <HalloweenGhostFace expression={expression} />
+      </Box>
     </Box>
   );
 }

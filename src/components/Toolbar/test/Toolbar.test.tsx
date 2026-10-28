@@ -151,4 +151,30 @@ describe("Toolbar", () => {
     await user.click(screen.getByRole("menuitem", { name: "Supprimer" }));
     expect(onClick).toHaveBeenCalledTimes(1);
   });
+
+  describe("pastille de la bascule d'affichage", () => {
+    function pillIn(radio: HTMLElement) {
+      return radio.querySelector("span[aria-hidden]") as HTMLElement | null;
+    }
+
+    it("affiche la pastille ombrée sous l'option d'affichage active uniquement", () => {
+      renderToolbar(<Toolbar view={{ value: "list", onChange: () => undefined }} />);
+      const pill = pillIn(screen.getByRole("radio", { name: "Vue liste" })) as HTMLElement;
+      const wrapper = pill.parentElement as HTMLElement;
+      expect(wrapper.style.filter).toBe("var(--canop-drop-shadow-e1) var(--canop-drop-shadow-e1)");
+      expect(wrapper.style.clipPath).toBe("");
+      expect(wrapper.style.pointerEvents).toBe("none");
+      expect(pill.style.clipPath.startsWith("polygon(")).toBe(true);
+      expect(pill.style.filter).toBe("");
+      expect(pillIn(screen.getByRole("radio", { name: "Vue grille" }))).toBeNull();
+    });
+
+    it("bascule l'affichage au clic sur l'option portant la pastille d'une autre vue", async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      renderToolbar(<Toolbar view={{ value: "list", onChange }} />);
+      await user.click(screen.getByRole("radio", { name: "Vue grille" }));
+      expect(onChange).toHaveBeenCalledWith("grid");
+    });
+  });
 });

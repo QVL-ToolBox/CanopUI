@@ -1,12 +1,14 @@
 import "./styles.css";
 
-export const CANOP_VERSION = "1.3.4";
+export const CANOP_VERSION = "2.0.0";
 
 export * from "./tokens";
 export * from "./theme";
 export * from "./motion";
 export * from "./squircle";
+export * from "./liquidGlass";
 export * from "./scrollbar";
+export * from "./interaction";
 export * from "./breakpoints";
 export * from "./color";
 export * from "./components";

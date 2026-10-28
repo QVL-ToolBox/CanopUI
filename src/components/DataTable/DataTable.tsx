@@ -9,17 +9,38 @@ import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import TableSortLabel from "@mui/material/TableSortLabel";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { useRef, useState, type ReactNode } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "../../i18n";
 import { tokens, type CanopBreakpoint } from "../../tokens";
 import { EditButton } from "../EditButton";
 import { Spinner } from "../Spinner";
+import { useSkeletonHold } from "../Skeleton/useSkeletonHold";
+import { useSkeletonScope } from "../Skeleton/useSkeletonScope";
 import { AnimatedRow } from "./AnimatedRow";
+import { DataTableSkeletonRows } from "./DataTableSkeletonRows";
+import {
+  rowGap,
+  rowSurfaceBackground,
+  rowSurfaceDropShadowFollowingSquircle,
+  rowSurfaceGeometry,
+  rowSurfaceRadius,
+} from "./rowSurface";
+import { scrollContainerSx } from "./scrollContainerSx";
+import { scrollRegionFocusSx } from "./scrollRegionFocusSx";
+import {
+  stickyHeaderCellSx,
+  stickyHeaderRestOffset,
+  stickyHeaderSurfaceSx,
+  stickyHeaderTableSx,
+  stickyHeaderViewportSx,
+} from "./stickyHeaderSx";
 import { scrollbarSx } from "../../scrollbar";
 import { columnValue, type CanopColumn } from "./tableColumn";
 import { useKeyboardNav } from "./useKeyboardNav";
 import { useRowDragDrop } from "./useRowDragDrop";
 import { useRowSelection } from "./useRowSelection";
+import { useScrollOverflow } from "./useScrollOverflow";
+import { useScrollbarWidth } from "./useScrollbarWidth";
 import { useStickyHeaderHeight } from "./useStickyHeaderHeight";
 import { useTableSort } from "./useTableSort";
 
@@ -30,6 +51,7 @@ export interface CanopDataTableProps<T> {
   rows: T[];
   getRowKey: (row: T) => string;
   loading?: boolean;
+  skeleton?: boolean;
   /** Contenu affiché quand rows est vide ; par défaut la traduction canop.dataTable.empty. */
   emptyMessage?: ReactNode;
   actions?: (row: T) => ReactNode;
@@ -49,7 +71,12 @@ export interface CanopDataTableProps<T> {
   editLabel?: string;
   fixedLayout?: boolean;
   rowSx?: (row: T) => Record<string, unknown>;
-  /** En-têtes figées en haut au scroll (sticky). */
+  /**
+   * En-têtes figées en haut au scroll (sticky). En défilement de page (sans `maxHeight` ni
+   * `fillHeight`), la barre reste squircle mais les lignes ne sont pas découpées sous ses coins :
+   * pour un rendu parfait, borner la hauteur. Dans ce mode, le défilement horizontal intégré est
+   * coupé pour que l'en-tête colle à la page : bornez la hauteur pour combiner les deux.
+   */
   stickyHeader?: boolean;
   fillHeight?: boolean;
   maxHeight?: string | number;
@@ -79,17 +106,13 @@ export interface CanopDataTableProps<T> {
   onRowActivate?: (row: T) => void;
   /** Breakpoint sous lequel les colonnes hideOnMobile sont masquées. */
   mobileBreakpoint?: CanopBreakpoint;
+  /** Nom accessible de la zone défilante ; par défaut `canop.dataTable.scrollRegion`. */
+  ariaLabel?: string;
 }
 
-const rowSurfaceDropShadowFollowingSquircle = "var(--canop-drop-shadow-e1)";
-const rowSurfaceRadius = "1.5rem";
-const rowSurfaceGeometry = { exponent: 4 };
 const rowSurfaceLayerSelector = "& > td:first-of-type";
-const rowGap = "0.875rem";
-const scrollShadowGutter = tokens.spacing.md;
 const selectionColumnWidth = "3rem";
 const marqueeFill = "color-mix(in srgb, var(--canop-palette-primary-main) 12%, transparent)";
-const focusOutline = "0.125rem solid var(--canop-palette-primary-main)";
 const dragOverFill =
   "color-mix(in srgb, var(--canop-palette-primary-main) 22%, var(--canop-palette-background-paper))";
 
@@ -98,6 +121,7 @@ export function DataTable<T>({
   rows,
   getRowKey,
   loading = false,
+  skeleton = true,
   emptyMessage,
   actions,
   actionsHeader = "",
@@ -124,14 +148,25 @@ export function DataTable<T>({
   displayScrollbar = true,
   onRowActivate,
   mobileBreakpoint = "md",
+  ariaLabel,
 }: CanopDataTableProps<T>) {
   const { t } = useTranslation();
   const hasInternalScroll = fillHeight || maxHeight != null;
   const isCompact = useMediaQuery((theme) => theme.breakpoints.down(mobileBreakpoint));
   const animatedKeys = useRef<Set<string>>(new Set());
+  const skeletonScope = useSkeletonScope();
+  const showsSkeleton = useSkeletonHold(loading && skeleton && skeletonScope.enabled);
 
-  const [scrollEl, setScrollEl] = useState<HTMLElement | null>(null);
+  const [containerEl, setContainerEl] = useState<HTMLElement | null>(null);
+  const scrollEl = hasInternalScroll ? containerEl : null;
+  const headerStuckToPage = stickyHeader && !hasInternalScroll;
+  const isScrollable = useScrollOverflow({
+    element: containerEl,
+    enabled: !headerStuckToPage,
+    includesVertical: hasInternalScroll,
+  });
   const { headerRef, headerHeight } = useStickyHeaderHeight(stickyHeader);
+  const scrollbarWidth = useScrollbarWidth(scrollEl, stickyHeader);
   const { sortedRows, toggleSort, sortDirectionOf, ariaSortOf } = useTableSort<T>({
     columns,
     rows,
@@ -175,14 +210,19 @@ export function DataTable<T>({
   const colSpan =
     visibleColumns.length + (hasActionsColumn ? 1 : 0) + (isSelectionColumnVisible ? 1 : 0);
 
-  const stickyHeaderCellSx = stickyHeader
-    ? { position: "sticky" as const, top: 0, zIndex: 2, backgroundColor: "transparent" }
-    : {};
+  const isHeaderMeasured = stickyHeader && headerHeight > 0;
+  const headerCellStickySx = stickyHeader ? stickyHeaderCellSx : {};
+  const tableStickySx = stickyHeader ? stickyHeaderTableSx(hasInternalScroll) : {};
+  const isViewportClipped = isHeaderMeasured && hasInternalScroll;
+  const viewportStickySx = useMemo(
+    () => (isViewportClipped ? stickyHeaderViewportSx({ headerHeight, scrollbarWidth }) : {}),
+    [isViewportClipped, headerHeight, scrollbarWidth],
+  );
 
   const singleLayerRowSurfaceSx = {
     ...squircleSurface({
       radius: rowSurfaceRadius,
-      background: "var(--canop-palette-background-paper)",
+      background: rowSurfaceBackground,
       shadow: rowSurfaceDropShadowFollowingSquircle,
       layerSelector: rowSurfaceLayerSelector,
       ...rowSurfaceGeometry,
@@ -191,58 +231,47 @@ export function DataTable<T>({
   };
 
   const containerScrollbarSx = displayScrollbar ? scrollbarSx() : scrollbarSx("hidden");
+  const scrollRegionLabel = ariaLabel ?? t("canop.dataTable.scrollRegion");
 
   return (
     <Box
       sx={{
         position: "relative",
+        minWidth: 0,
         ...(fillHeight ? { display: "flex", flexDirection: "column", flex: 1, minHeight: 0 } : {}),
       }}
     >
       <TableContainer
-        ref={hasInternalScroll ? setScrollEl : undefined}
+        ref={setContainerEl}
+        role={isScrollable ? "region" : undefined}
+        aria-label={isScrollable ? scrollRegionLabel : undefined}
         onMouseDown={selectable ? handleMarqueeMouseDown : undefined}
         onKeyDown={enableKeyboardNav ? onKeyDown : undefined}
-        tabIndex={tabIndex}
-        sx={
-          fillHeight
-            ? {
-                flex: 1,
-                minHeight: 0,
-                overflow: "auto",
-                paddingX: scrollShadowGutter,
-                marginX: `-${scrollShadowGutter}`,
-                ...containerScrollbarSx,
-              }
-            : maxHeight != null
-              ? {
-                  maxHeight,
-                  overflow: "auto",
-                  paddingX: scrollShadowGutter,
-                  marginX: `-${scrollShadowGutter}`,
-                  ...containerScrollbarSx,
-                }
-              : { overflow: "visible" }
-        }
+        tabIndex={tabIndex ?? (isScrollable ? 0 : undefined)}
+        sx={{
+          ...scrollRegionFocusSx(isScrollable && !enableKeyboardNav),
+          minWidth: 0,
+          ...scrollContainerSx({
+            fillHeight,
+            maxHeight,
+            headerStuckToPage,
+            scrollbar: containerScrollbarSx,
+          }),
+          ...viewportStickySx,
+        }}
       >
-        {stickyHeader && headerHeight > 0 ? (
+        {isHeaderMeasured ? (
           <Box
             aria-hidden
             data-canop-sticky-surface=""
-            sx={{
-              position: "sticky",
-              top: 0,
-              zIndex: 1,
-              height: `${headerHeight}px`,
-              marginBottom: `-${headerHeight}px`,
-              backgroundColor: "background.paper",
-            }}
+            sx={stickyHeaderSurfaceSx(headerHeight, stickyHeaderRestOffset(hasInternalScroll))}
           />
         ) : null}
         <Table
           sx={{
             borderCollapse: "separate",
             borderSpacing: `0 ${rowGap}`,
+            ...tableStickySx,
             ...(fixedLayout ? { tableLayout: "fixed" } : {}),
           }}
         >
@@ -254,7 +283,7 @@ export function DataTable<T>({
                   sx={{
                     borderBottom: "none",
                     width: selectionColumnWidth,
-                    ...stickyHeaderCellSx,
+                    ...headerCellStickySx,
                   }}
                 >
                   <MuiCheckbox
@@ -279,7 +308,7 @@ export function DataTable<T>({
                       color: "text.secondary",
                       fontWeight: 600,
                       whiteSpace: "nowrap",
-                      ...stickyHeaderCellSx,
+                      ...headerCellStickySx,
                       ...(column.width != null ? { width: column.width } : {}),
                     }}
                   >
@@ -302,7 +331,7 @@ export function DataTable<T>({
                   align="center"
                   sx={{
                     borderBottom: "none",
-                    ...stickyHeaderCellSx,
+                    ...headerCellStickySx,
                     ...(actionsWidth != null ? { width: actionsWidth } : {}),
                   }}
                 >
@@ -311,8 +340,15 @@ export function DataTable<T>({
               ) : null}
             </TableRow>
           </TableHead>
-          <TableBody ref={bodyRef}>
-            {loading ? (
+          <TableBody ref={bodyRef} aria-busy={showsSkeleton || undefined}>
+            {showsSkeleton ? (
+              <DataTableSkeletonRows
+                columnCount={colSpan}
+                knownRowCount={sortedRows.length}
+                rowSurfaceSx={singleLayerRowSurfaceSx}
+                ariaLabel={t("canop.spinner.loading")}
+              />
+            ) : loading ? (
               <TableRow>
                 <TableCell colSpan={colSpan} align="center" sx={{ borderBottom: "none" }}>
                   <Box
@@ -322,7 +358,7 @@ export function DataTable<T>({
                       paddingY: tokens.spacing.lg,
                     }}
                   >
-                    <Spinner />
+                    <Spinner skeleton={false} />
                   </Box>
                 </TableCell>
               </TableRow>
@@ -372,14 +408,6 @@ export function DataTable<T>({
                       ...(onRowDoubleClick || selectable ? { userSelect: "none" } : {}),
                       ...(isDraggable || onRowDoubleClick || selectable
                         ? { cursor: "pointer" }
-                        : {}),
-                      ...(selectable
-                        ? {
-                            "&:focus-visible": {
-                              outline: focusOutline,
-                              outlineOffset: "-0.125rem",
-                            },
-                          }
                         : {}),
                       ...(isSelected ? { "& td": { backgroundColor: "action.selected" } } : {}),
                       ...(isKeyboardFocused && !isSelected

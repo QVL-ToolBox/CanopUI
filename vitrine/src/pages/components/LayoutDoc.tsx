@@ -1,7 +1,6 @@
-import Box from "@mui/material/Box";
 import { Button, Card, Heading, Layout } from "@canop/ui";
-import { squircleClip, tokens } from "@canop/ui";
 import { DemoCard } from "../../kit/DemoCard";
+import { DemoScreen } from "../../kit/DemoScreen";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
 import { PropsTable, type PropRow } from "../../kit/PropsTable";
@@ -9,31 +8,27 @@ import { useDocLocale } from "../../i18n/useDocLocale";
 
 const importCode = `import { Layout } from "@canop/ui";`;
 
-const basicCode = `<Box height="40rem" width="100%" borderRadius="0.75rem" overflow="hidden">
-  <Layout brand="MonPortail">
-    <Card title="Connexion" actions={<Button fullWidth>Se connecter</Button>}>
-      Accédez à votre espace en toute sécurité.
-    </Card>
-  </Layout>
-</Box>`;
+const SCREEN_HEIGHT = "40rem";
 
-const brandCode = `<Box height="40rem" width="100%" borderRadius="0.75rem" overflow="hidden">
-  <Layout brand="HealthServ" maxWidth="31rem">
-    <Card>Portail avec un brand et une largeur de carte personnalisés.</Card>
-  </Layout>
-</Box>`;
+const basicCode = `<Layout brand="MonPortail">
+  <Card title="Connexion" actions={<Button fullWidth>Se connecter</Button>}>
+    Accédez à votre espace en toute sécurité.
+  </Card>
+</Layout>`;
 
-const headerCode = `<Box height="40rem" width="100%" borderRadius="0.75rem" overflow="hidden">
-  <Layout
-    header={
-      <Heading level={1} size={2} gutterBottom={false} color="primary.contrastText">
-        En-tête sur mesure
-      </Heading>
-    }
-  >
-    <Card>Le header fourni remplace le bloc brand par défaut.</Card>
-  </Layout>
-</Box>`;
+const brandCode = `<Layout brand="HealthServ" maxWidth="31rem">
+  <Card>Portail avec un brand et une largeur de carte personnalisés.</Card>
+</Layout>`;
+
+const headerCode = `<Layout
+  header={
+    <Heading level={1} size={2} gutterBottom={false}>
+      En-tête sur mesure
+    </Heading>
+  }
+>
+  <Card>Le header fourni remplace le bloc brand par défaut.</Card>
+</Layout>`;
 
 const fr = {
   intro:
@@ -48,7 +43,7 @@ const fr = {
     basic: {
       title: "Écran portail",
       description:
-        "Un en-tête de marque surmonte une carte centrale contenant le contenu de la page.",
+        "Un en-tête de marque surmonte une carte centrale contenant le contenu de la page. Le gabarit occupe toute la hauteur de la fenêtre : dans ce faux écran, faites-le défiler pour atteindre la bascule de thème.",
     },
     brand: {
       title: "brand et maxWidth",
@@ -61,12 +56,18 @@ const fr = {
     },
   },
   props: {
-    animatedShapes: "Anime le fond de formes derrière la carte.",
+    animatedShapes:
+      "Fait onduler la trame lave derrière la carte. Sans effet quand un mouvement réduit est demandé.",
     showUtilities: "Affiche les utilitaires (langue, thème) en coin de l'écran.",
     brand: "Nom de marque affiché dans l'en-tête par défaut, à côté du logo.",
+    brandLevel:
+      "Niveau sémantique de la marque : un titre h1 à h4, ou « text » pour un simple paragraphe, utile quand la page porte déjà son h1. La taille affichée ne change pas.",
     logo: "Logo affiché avant le brand dans l'en-tête par défaut.",
     header: "En-tête complet sur mesure qui remplace le bloc brand par défaut.",
     maxWidth: "Largeur maximale de la carte centrale.",
+    backgroundTone: "Couleur de la trame lave du fond : primary, ou accent.",
+    mainElement:
+      "Élément de la zone principale : main par défaut, div pour un gabarit imbriqué dans une page qui a déjà son main, comme les démos ci-dessus.",
     children: "Contenu de la carte centrale, typiquement un formulaire d'authentification.",
   },
 };
@@ -83,7 +84,8 @@ const en: typeof fr = {
   demos: {
     basic: {
       title: "Portal screen",
-      description: "A brand header sits above a central card holding the page content.",
+      description:
+        "A brand header sits above a central card holding the page content. The template fills the full window height: in this mock screen, scroll it to reach the theme toggle.",
     },
     brand: {
       title: "brand and maxWidth",
@@ -95,12 +97,18 @@ const en: typeof fr = {
     },
   },
   props: {
-    animatedShapes: "Animates the shape background behind the card.",
+    animatedShapes:
+      "Makes the lava dot grid flow behind the card. No effect when reduced motion is asked for.",
     showUtilities: "Shows the utilities (language, theme) in the corner of the screen.",
     brand: "Brand name shown in the default header, next to the logo.",
+    brandLevel:
+      "Semantic level of the brand: an h1 to h4 heading, or “text” for a plain paragraph, useful when the page already has its h1. The displayed size does not change.",
     logo: "Logo shown before the brand in the default header.",
     header: "Full custom header that replaces the default brand block.",
     maxWidth: "Maximum width of the central card.",
+    backgroundTone: "Colour of the lava dot grid in the background: primary, or accent.",
+    mainElement:
+      "Element of the main area: main by default, div for a template nested in a page that already has its main, like the demos above.",
     children: "Content of the central card, typically an authentication form.",
   },
 };
@@ -117,6 +125,12 @@ export default function LayoutDoc() {
       description: t.props.brand,
     },
     {
+      name: "brandLevel",
+      type: '1 | 2 | 3 | 4 | "text"',
+      defaultValue: "1",
+      description: t.props.brandLevel,
+    },
+    {
       name: "logo",
       type: "ReactNode",
       description: t.props.logo,
@@ -128,8 +142,8 @@ export default function LayoutDoc() {
     },
     {
       name: "maxWidth",
-      type: "number | string",
-      defaultValue: "380",
+      type: "string",
+      defaultValue: '"23.75rem"',
       description: t.props.maxWidth,
     },
     {
@@ -143,6 +157,18 @@ export default function LayoutDoc() {
       type: "boolean",
       defaultValue: "false",
       description: t.props.animatedShapes,
+    },
+    {
+      name: "backgroundTone",
+      type: '"primary" | "accent"',
+      defaultValue: '"primary"',
+      description: t.props.backgroundTone,
+    },
+    {
+      name: "mainElement",
+      type: '"main" | "div"',
+      defaultValue: '"main"',
+      description: t.props.mainElement,
     },
     {
       name: "showUtilities",
@@ -161,22 +187,13 @@ export default function LayoutDoc() {
           code={basicCode}
           align="stretch"
         >
-          <Box
-            sx={[
-              {
-                height: "40rem",
-                width: "100%",
-                overflow: "hidden",
-              },
-              squircleClip(tokens.radius.sm),
-            ]}
-          >
-            <Layout brand="MonPortail">
+          <DemoScreen height={SCREEN_HEIGHT}>
+            <Layout brand="MonPortail" brandLevel="text" mainElement="div">
               <Card title="Connexion" actions={<Button fullWidth>Se connecter</Button>}>
                 Accédez à votre espace en toute sécurité.
               </Card>
             </Layout>
-          </Box>
+          </DemoScreen>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.brand}>
@@ -186,20 +203,11 @@ export default function LayoutDoc() {
           code={brandCode}
           align="stretch"
         >
-          <Box
-            sx={[
-              {
-                height: "40rem",
-                width: "100%",
-                overflow: "hidden",
-              },
-              squircleClip(tokens.radius.sm),
-            ]}
-          >
-            <Layout brand="HealthServ" maxWidth="31rem">
+          <DemoScreen height={SCREEN_HEIGHT}>
+            <Layout brand="HealthServ" brandLevel="text" mainElement="div" maxWidth="31rem">
               <Card>Portail avec un brand et une largeur de carte personnalisés.</Card>
             </Layout>
-          </Box>
+          </DemoScreen>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.header}>
@@ -209,26 +217,18 @@ export default function LayoutDoc() {
           code={headerCode}
           align="stretch"
         >
-          <Box
-            sx={[
-              {
-                height: "40rem",
-                width: "100%",
-                overflow: "hidden",
-              },
-              squircleClip(tokens.radius.sm),
-            ]}
-          >
+          <DemoScreen height={SCREEN_HEIGHT}>
             <Layout
+              mainElement="div"
               header={
-                <Heading level={1} size={2} gutterBottom={false} color="primary.contrastText">
+                <Heading level={4} size={2} gutterBottom={false}>
                   En-tête sur mesure
                 </Heading>
               }
             >
               <Card>Le header fourni remplace le bloc brand par défaut.</Card>
             </Layout>
-          </Box>
+          </DemoScreen>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.api}>

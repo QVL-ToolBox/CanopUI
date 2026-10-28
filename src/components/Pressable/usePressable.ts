@@ -2,7 +2,6 @@ import type { SxProps, Theme } from "@mui/material/styles";
 import { useReducedMotion } from "../../motion";
 import { tokens } from "../../tokens";
 import { squircleClipPath, squircleRingPath } from "../../squircle";
-import { focusRingSx } from "../_shared/focusRing";
 
 export type CanopPressableRadius = "xs" | "sm" | "md" | "lg" | "xl" | "pill" | "circle";
 export type CanopPressableSpacing = keyof typeof tokens.spacing | "none";
@@ -92,7 +91,6 @@ export function usePressable({
             },
           }
         : {}),
-      "&:focus-visible": focusRingSx,
       ...(dimWhenDisabled ? { "&.Mui-disabled": { opacity: 0.5 } } : {}),
     },
   };

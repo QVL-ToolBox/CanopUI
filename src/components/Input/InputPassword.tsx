@@ -6,7 +6,7 @@ import { PasswordStrength } from "./PasswordStrength";
 
 export interface CanopInputPasswordProps extends Omit<
   CanopInputProps,
-  "type" | "icon" | "validate"
+  "type" | "icon" | "validate" | "completion" | "completionNormalize" | "onCompletionAccept"
 > {
   showStrength?: boolean;
 }

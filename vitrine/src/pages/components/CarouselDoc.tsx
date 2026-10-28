@@ -60,7 +60,7 @@ const hookCode = `function NavigationMaison() {
         ))}
       </Stack>
       <Card title={carte.titre}>{carte.corps}</Card>
-      <Stack direction="row" gap="sm" alignItems="center">
+      <Stack direction="row" gap="sm" alignItems="center" wrap>
         <Button size="small" variant="ghost" disabled={!canGoPrevious} onClick={goPrevious}>
           Précédent
         </Button>
@@ -74,6 +74,8 @@ const hookCode = `function NavigationMaison() {
     </Stack>
   );
 }`;
+
+const VERTICAL_DEMO_COLUMN = { flex: "1 1 14rem", minWidth: 0 } as const;
 
 const cartes = [
   { titre: "CustHome", corps: "Portail de gestion locative." },
@@ -271,7 +273,7 @@ function NavigationMaison() {
         ))}
       </Stack>
       <Card title={carte.titre}>{carte.corps}</Card>
-      <Stack direction="row" gap="sm" alignItems="center">
+      <Stack direction="row" gap="sm" alignItems="center" wrap>
         <Button size="small" variant="ghost" disabled={!canGoPrevious} onClick={goPrevious}>
           Précédent
         </Button>
@@ -406,11 +408,7 @@ export default function CarouselDoc() {
               flexWrap: "wrap",
             }}
           >
-            <Box
-              sx={{
-                flex: "1 1 14rem",
-              }}
-            >
+            <Box sx={VERTICAL_DEMO_COLUMN}>
               <Text variant="caption" tone="muted" gutterBottom>
                 {t.labels.arrows}
               </Text>
@@ -418,11 +416,7 @@ export default function CarouselDoc() {
                 {cartesJsx()}
               </Carousel>
             </Box>
-            <Box
-              sx={{
-                flex: "1 1 14rem",
-              }}
-            >
+            <Box sx={VERTICAL_DEMO_COLUMN}>
               <Text variant="caption" tone="muted" gutterBottom>
                 {t.labels.bars}
               </Text>

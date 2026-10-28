@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 
+export interface UseCommandPaletteOptions {
+  shortcut?: boolean;
+}
+
 export interface UseCommandPaletteResult {
   open: boolean;
   setOpen: (value: boolean) => void;
@@ -7,7 +11,9 @@ export interface UseCommandPaletteResult {
   close: () => void;
 }
 
-export function useCommandPalette(): UseCommandPaletteResult {
+export function useCommandPalette({
+  shortcut = true,
+}: UseCommandPaletteOptions = {}): UseCommandPaletteResult {
   const [open, setOpenState] = useState(false);
 
   const setOpen = useCallback((value: boolean) => setOpenState(value), []);
@@ -15,6 +21,7 @@ export function useCommandPalette(): UseCommandPaletteResult {
   const close = useCallback(() => setOpenState(false), []);
 
   useEffect(() => {
+    if (!shortcut) return;
     if (typeof window === "undefined" || typeof document === "undefined") return;
     const handleKeyDown = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && (event.key === "k" || event.key === "K")) {
@@ -24,7 +31,7 @@ export function useCommandPalette(): UseCommandPaletteResult {
     };
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
-  }, [toggle]);
+  }, [shortcut, toggle]);
 
   return { open, setOpen, toggle, close };
 }

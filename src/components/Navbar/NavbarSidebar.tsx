@@ -1,19 +1,24 @@
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
-import { LayoutGroup } from "framer-motion";
-import { useId, type ReactNode } from "react";
+import type { ReactNode } from "react";
+import { SlidingIndicatorGroup } from "../../motion/SlidingIndicatorGroup";
 import { Heading } from "../Heading";
 import { Icon } from "../Icon";
-import { Separator } from "../Separator";
-import { logoutButtonSx } from "../_shared/logoutButtonSx";
 import { useTranslation } from "../../i18n";
+import { NavbarDivider } from "./NavbarDivider";
+import { NavbarFootGlow } from "./NavbarFootGlow";
 import { NavbarItem } from "./NavbarItem";
+import { NAVBAR_LINK_RADIUS } from "./NavbarLink";
 import { NavbarUtilities } from "./NavbarUtilities";
 import { useNavbarUtilitiesInset } from "./useNavbarUtilitiesInset";
 import { reservePageTopRight } from "../_shared/pageTopRightInset";
-import { NAVBAR_FOOT_GLOW, NAVBAR_SURFACE_GRADIENT } from "./navbarStyles";
+import { navbarLogoutSx } from "./navbarLogout";
+import { navbarPanelSx } from "./navbarSurface";
+import { NAVBAR_TEXT, NAVBAR_TEXT_MUTED, NAVBAR_TEXT_STRONG } from "./navbarTone";
 import { type CanopNavbarItem } from "./navigation";
-import { navbarTitleSemantics, type CanopNavbarTitleLevel } from "./navbarTitle";
+import { titleSemantics } from "../_shared/titleLevel";
+import { type CanopMainElement } from "../_shared/mainElement";
+import { type CanopNavbarTitleLevel } from "./navbarTitle";
 
 export interface NavbarSidebarProps {
   items: CanopNavbarItem[];
@@ -26,6 +31,7 @@ export interface NavbarSidebarProps {
   sidebarWidget?: ReactNode;
   actions?: ReactNode;
   height: string;
+  mainElement: CanopMainElement;
   children: ReactNode;
 }
 
@@ -40,10 +46,10 @@ export function NavbarSidebar({
   sidebarWidget,
   actions,
   height,
+  mainElement,
   children,
 }: NavbarSidebarProps) {
   const { t } = useTranslation();
-  const groupId = useId();
   const utilitiesInset = useNavbarUtilitiesInset(Boolean(actions));
 
   return (
@@ -62,30 +68,17 @@ export function NavbarSidebar({
         sx={{
           width: { md: "15.5rem", lg: "17rem" },
           flexShrink: 0,
-          height: "100%",
           boxSizing: "border-box",
-          position: "relative",
           display: "flex",
           flexDirection: "column",
           gap: "1rem",
           padding: "1.25rem 1rem",
-          color: "primary.contrastText",
-          background: NAVBAR_SURFACE_GRADIENT,
+          color: NAVBAR_TEXT,
+          ...navbarPanelSx,
           overflowY: "auto",
         }}
       >
-        <Box
-          aria-hidden
-          sx={{
-            position: "absolute",
-            left: 0,
-            right: 0,
-            bottom: 0,
-            height: "10rem",
-            pointerEvents: "none",
-            background: NAVBAR_FOOT_GLOW,
-          }}
-        />
+        <NavbarFootGlow />
 
         {title && (
           <Box
@@ -97,15 +90,15 @@ export function NavbarSidebar({
             }}
           >
             <Heading
-              {...navbarTitleSemantics(titleLevel)}
-              size={4}
-              align="center"
+              {...titleSemantics(titleLevel)}
+              size={5}
+              align="left"
               gutterBottom={false}
-              color="primary.contrastText"
+              color={NAVBAR_TEXT_STRONG}
             >
               {title}
             </Heading>
-            <Separator variant="normal" />
+            <NavbarDivider />
           </Box>
         )}
 
@@ -114,11 +107,11 @@ export function NavbarSidebar({
             position: "relative",
             display: "flex",
             flexDirection: "column",
-            gap: "0.375rem",
+            gap: "0.125rem",
             flex: 1,
           }}
         >
-          <LayoutGroup id={groupId}>
+          <SlidingIndicatorGroup>
             {items.map((item) => (
               <NavbarItem
                 key={item.href}
@@ -127,7 +120,7 @@ export function NavbarSidebar({
                 onNavigate={onNavigate}
               />
             ))}
-          </LayoutGroup>
+          </SlidingIndicatorGroup>
         </Box>
 
         {sidebarWidget && (
@@ -139,7 +132,7 @@ export function NavbarSidebar({
               gap: "1rem",
             }}
           >
-            <Separator variant="normal" />
+            <NavbarDivider />
             {sidebarWidget}
           </Box>
         )}
@@ -153,7 +146,7 @@ export function NavbarSidebar({
               gap: "1rem",
             }}
           >
-            <Separator variant="normal" />
+            <NavbarDivider />
             <Box
               sx={{
                 display: "flex",
@@ -167,6 +160,7 @@ export function NavbarSidebar({
                     fontSize: "0.95rem",
                     fontWeight: 600,
                     wordBreak: "break-word",
+                    color: NAVBAR_TEXT_MUTED,
                   }}
                 >
                   {userName}
@@ -176,19 +170,20 @@ export function NavbarSidebar({
                 <IconButton
                   onClick={onLogout}
                   aria-label={t("canop.navbar.logout")}
-                  sx={(theme) => ({
+                  sx={{
                     width: "100%",
                     height: "3rem",
                     gap: "0.75rem",
                     paddingX: "0.875rem",
-                    ...logoutButtonSx(theme, "var(--canop-radius-md)"),
-                  })}
+                    justifyContent: "flex-start",
+                    ...navbarLogoutSx(NAVBAR_LINK_RADIUS),
+                  }}
                 >
-                  <Icon name="logout" size="md" />
+                  <Icon name="logout" size="sm" />
                   <Box
                     component="span"
                     sx={{
-                      fontSize: "1rem",
+                      fontSize: "0.9375rem",
                     }}
                   >
                     {t("canop.navbar.logout")}
@@ -201,7 +196,7 @@ export function NavbarSidebar({
       </Box>
 
       <Box
-        component="main"
+        component={mainElement}
         sx={{
           flex: 1,
           minWidth: 0,

@@ -147,7 +147,7 @@ export const TEXT_RULES = [
     label: 'id DOM / layoutId / key "ch-*" -> "canop-*" (HORS PERIMETRE par defaut)',
     // Desactive par defaut : ces chaines sont des ids DOM, des cles React et
     // des layoutId Motion, parfois valeurs par defaut de props publiques
-    // (SlidingIndicator.layoutId). Les renommer casse les selecteurs CSS et les
+    // (ConfirmDialog, ancien SlidingIndicator.layoutId). Les renommer casse les selecteurs CSS et les
     // tests des consommateurs. Activable via --dom-prefix.
     pattern: /(["'])ch-(?=[a-z0-9])/g,
     replace: "$1canop-",

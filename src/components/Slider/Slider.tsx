@@ -1,5 +1,6 @@
 import MuiSlider from "@mui/material/Slider";
 import { squircleClip, squircleSurface } from "../../squircle";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import Stack from "@mui/material/Stack";
 import { tokens } from "../../tokens";
 import { paletteColorVar } from "../_shared/paletteColorVar";
@@ -119,7 +120,7 @@ export function Slider({
             }),
             borderRadius: metrics.thumbRadius,
             transition: HALO_TRANSITION,
-            "&:hover, &.Mui-focusVisible": {
+            [hoverOrKeyboardFocus()]: {
               boxShadow: `0 0 0 0.5rem color-mix(in srgb, ${haloColor} 24%, transparent)`,
             },
             "&.Mui-active": {

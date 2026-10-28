@@ -1,16 +1,26 @@
 import Box from "@mui/material/Box";
-import { CanopyBackground } from "../CanopyBackground";
-import { ShapeBackground } from "../ShapeBackground";
+import { lazy, Suspense } from "react";
+import type { CanopBackgroundTone } from "../_shared/backgroundTone";
+import { DecorBoundary } from "../_shared/DecorBoundary";
 
 export type CanopPageBackground = "canopy" | "shapes";
 
-const AMBIENT_INTENSITY = 1.28;
+const CanopyBackground = lazy(() =>
+  import("../CanopyBackground").then((module) => ({ default: module.CanopyBackground })),
+);
+
+const ShapeBackground = lazy(() =>
+  import("../ShapeBackground").then((module) => ({ default: module.ShapeBackground })),
+);
+
+const backdropFallback = <Box sx={{ height: "100%", backgroundColor: "background.default" }} />;
 
 export interface PageBackdropProps {
   background: CanopPageBackground;
+  tone: CanopBackgroundTone;
 }
 
-export function PageBackdrop({ background }: PageBackdropProps) {
+export function PageBackdrop({ background, tone }: PageBackdropProps) {
   return (
     <Box
       aria-hidden
@@ -22,17 +32,21 @@ export function PageBackdrop({ background }: PageBackdropProps) {
         pointerEvents: "none",
       }}
     >
-      {background === "canopy" ? (
-        <CanopyBackground minHeight="100%" sx={{ height: "100%" }} />
-      ) : (
-        <ShapeBackground
-          variant="ambient"
-          intensity={AMBIENT_INTENSITY}
-          animated
-          minHeight="100%"
-          sx={{ height: "100%" }}
-        />
-      )}
+      <DecorBoundary fallback={backdropFallback}>
+        <Suspense fallback={backdropFallback}>
+          {background === "canopy" ? (
+            <CanopyBackground minHeight="100%" sx={{ height: "100%" }} />
+          ) : (
+            <ShapeBackground
+              variant="ambient"
+              animated
+              color={tone}
+              minHeight="100%"
+              sx={{ height: "100%" }}
+            />
+          )}
+        </Suspense>
+      </DecorBoundary>
     </Box>
   );
 }

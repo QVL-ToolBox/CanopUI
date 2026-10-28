@@ -1,7 +1,11 @@
 import Box from "@mui/material/Box";
-import { squircleClip, tokens as canopTokens } from "@canop/ui";
-import { useMemo } from "react";
-import { tokenizeTsx, type TokenKind } from "./highlightTsx";
+import { scrollbarSx, squircleClip, tokens } from "@canop/ui";
+import { useDocLocale } from "../i18n/useDocLocale";
+import { monoFontFamily } from "./codeStyle";
+import { CopyCodeButton } from "./CopyCodeButton";
+import { docKitTexts } from "./docKitTexts";
+import type { TokenKind } from "./highlightTsx";
+import { useHighlightedCode } from "./useHighlightedCode";
 
 const tokenColors: Record<TokenKind, string> = {
   keyword: "var(--canop-palette-primary-main)",
@@ -13,61 +17,86 @@ const tokenColors: Record<TokenKind, string> = {
   plain: "var(--canop-palette-text-primary)",
 };
 
-export const monoFontFamily =
-  "ui-monospace, 'Cascadia Code', 'Fira Code', Consolas, 'Courier New', monospace";
+const CODE_SURFACE =
+  "color-mix(in srgb, var(--canop-palette-secondary-light) 14%, var(--canop-palette-background-paper))";
+const FRAME_RADIUS = tokens.radius.md;
+const FRAME_GEOMETRY = { exponent: 4 };
+const HAIRLINE = "0.0625rem";
 
 export interface CodeBlockProps {
   code: string;
   bare?: boolean;
 }
 
-const frameRadius = canopTokens.radius.md;
-const frameGeometry = { exponent: 4 };
-const frameBorder = "0.0625rem";
+interface CodeLinesProps {
+  code: string;
+  framed: boolean;
+}
 
-export function CodeBlock({ code, bare = false }: CodeBlockProps) {
-  const tokens = useMemo(() => tokenizeTsx(code.trim()), [code]);
+function CodeLines({ code, framed }: CodeLinesProps) {
+  const highlighted = useHighlightedCode(code);
+  const t = docKitTexts[useDocLocale()];
 
   return (
     <Box
-      sx={
-        bare
-          ? undefined
-          : {
-              ...squircleClip(frameRadius, frameGeometry),
-              padding: frameBorder,
-              backgroundColor: "var(--canop-palette-divider)",
-            }
-      }
+      component="pre"
+      tabIndex={0}
+      role="region"
+      aria-label={t.codeRegion}
+      sx={{
+        margin: 0,
+        minWidth: 0,
+        maxWidth: "100%",
+        padding: framed ? "0.25rem 1.25rem 1.125rem" : "1rem 1.25rem",
+        overflowX: "auto",
+        backgroundColor: CODE_SURFACE,
+        fontFamily: monoFontFamily,
+        fontSize: "0.85rem",
+        lineHeight: 1.7,
+        tabSize: 2,
+        ...scrollbarSx("thin"),
+      }}
+    >
+      <Box component="code" sx={{ fontFamily: "inherit" }}>
+        {highlighted.map((token, index) => (
+          <Box key={index} component="span" sx={{ color: tokenColors[token.kind] }}>
+            {token.text}
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+}
+
+export function CodeBlock({ code, bare = false }: CodeBlockProps) {
+  if (bare) return <CodeLines code={code} framed={false} />;
+
+  return (
+    <Box
+      sx={{
+        minWidth: 0,
+        maxWidth: "100%",
+        padding: HAIRLINE,
+        backgroundColor: "var(--canop-palette-divider)",
+        ...squircleClip(FRAME_RADIUS, FRAME_GEOMETRY),
+      }}
     >
       <Box
-        component="pre"
         sx={{
-          margin: 0,
-          padding: "1rem 1.25rem",
-          ...(bare ? {} : squircleClip(`calc(${frameRadius} - ${frameBorder})`, frameGeometry)),
-
-          backgroundColor:
-            "color-mix(in srgb, var(--canop-palette-secondary-light) 14%, var(--canop-palette-background-paper))",
-
-          overflowX: "auto",
-          fontFamily: monoFontFamily,
-          fontSize: "0.85rem",
-          lineHeight: 1.7,
+          backgroundColor: CODE_SURFACE,
+          ...squircleClip(`calc(${FRAME_RADIUS} - ${HAIRLINE})`, FRAME_GEOMETRY),
         }}
       >
         <Box
-          component="code"
           sx={{
-            fontFamily: "inherit",
+            display: "flex",
+            justifyContent: "flex-end",
+            padding: "0.5rem 0.5rem 0",
           }}
         >
-          {tokens.map((token, index) => (
-            <Box key={index} component="span" sx={{ color: tokenColors[token.kind] }}>
-              {token.text}
-            </Box>
-          ))}
+          <CopyCodeButton code={code} />
         </Box>
+        <CodeLines code={code} framed />
       </Box>
     </Box>
   );

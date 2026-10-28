@@ -1,8 +1,7 @@
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { tokens } from "../../tokens";
-import { overlineSx } from "../_shared/overlineSx";
-import { CommandPaletteOption } from "./CommandPaletteOption";
+import { CommandEmpty } from "./CommandEmpty";
+import { CommandGroup } from "./CommandGroup";
+import { CommandList } from "./CommandList";
+import { CommandOption } from "./CommandOption";
 import type { CanopCommandItem } from "./commandPaletteTypes";
 import type { CommandPaletteGroup } from "./useCommandPaletteController";
 
@@ -25,64 +24,29 @@ export function CommandPaletteList({
   onHighlight,
   onSelect,
 }: CommandPaletteListProps) {
-  if (groups.length === 0) {
-    return (
-      <Box role="status" id={id} sx={{ px: tokens.spacing.md, py: tokens.spacing.xl }}>
-        <Typography
-          variant="body2"
-          align="center"
-          sx={{
-            color: "text.secondary",
-          }}
-        >
-          {emptyLabel}
-        </Typography>
-      </Box>
-    );
-  }
+  if (groups.length === 0) return <CommandEmpty id={id}>{emptyLabel}</CommandEmpty>;
 
   return (
-    <Box
-      role="listbox"
-      id={id}
-      sx={{
-        maxHeight: "24rem",
-        overflowY: "auto",
-        px: tokens.spacing.xs,
-        py: tokens.spacing.xs,
-      }}
-    >
+    <CommandList id={id}>
       {groups.map((group) => (
-        <Box key={group.key}>
-          {group.label ? (
-            <Typography
-              component="div"
-              sx={{
-                color: "text.secondary",
-                px: tokens.spacing.md,
-                pt: tokens.spacing.sm,
-                pb: tokens.spacing["2xs"],
-                ...overlineSx,
-              }}
-            >
-              {group.label}
-            </Typography>
-          ) : null}
+        <CommandGroup key={group.key} label={group.label}>
           {group.items.map((item, itemIndex) => {
             const index = group.startIndex + itemIndex;
             return (
-              <CommandPaletteOption
+              <CommandOption
                 key={item.id}
-                item={item}
                 id={optionId(index)}
+                label={item.label}
+                icon={item.icon}
+                meta={item.group}
                 active={index === activeIndex}
                 onHighlight={() => onHighlight(index)}
                 onSelect={() => onSelect(item)}
               />
             );
           })}
-        </Box>
+        </CommandGroup>
       ))}
-    </Box>
+    </CommandList>
   );
 }

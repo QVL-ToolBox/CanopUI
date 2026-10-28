@@ -4,31 +4,9 @@ import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
-import type { ReactNode } from "react";
 import { Link, Stack, Text, squircleClip, tokens } from "@canop/ui";
-import { monoFontFamily } from "../kit/CodeBlock";
+import { InlineCode } from "../kit/InlineCode";
 import type { ChangelogBlock, ChangelogInline } from "./parseChangelog";
-
-function InlineCode({ children }: { children: ReactNode }) {
-  return (
-    <Box
-      component="code"
-      sx={{
-        padding: "0.075rem 0.35rem",
-        ...squircleClip(tokens.radius.xs),
-        display: "inline",
-        fontFamily: monoFontFamily,
-        fontSize: "0.85em",
-        color: "text.primary",
-
-        backgroundColor:
-          "color-mix(in srgb, var(--canop-palette-secondary-light) 22%, var(--canop-palette-background-paper))",
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
 
 function InlineRun({ content }: { content: ChangelogInline[] }) {
   return (

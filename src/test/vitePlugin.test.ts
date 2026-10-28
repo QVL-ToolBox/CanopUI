@@ -124,9 +124,13 @@ describe("canopyVideo — recopie au build", () => {
 
     const fichiers = await readdir(join(sortie, "canopui", "video"));
     expect(fichiers.sort()).toEqual([
+      "canopy-dark-720.mp4",
+      "canopy-dark-720.webm",
       "canopy-dark-poster.jpg",
       "canopy-dark.mp4",
       "canopy-dark.webm",
+      "canopy-light-720.mp4",
+      "canopy-light-720.webm",
       "canopy-light-poster.jpg",
       "canopy-light.mp4",
       "canopy-light.webm",

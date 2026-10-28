@@ -1,19 +1,20 @@
 import Box from "@mui/material/Box";
-import { Icon } from "../Icon";
+import { Icon, type CanopIconName } from "../Icon";
 import { NavbarActiveIndicator } from "./NavbarActiveIndicator";
-import { type CanopNavbarItem } from "./navigation";
+import { NAVBAR_TILE_RADIUS } from "./navbarTile";
 
 export interface NavbarTileContentProps {
-  item: CanopNavbarItem;
+  label: string;
+  icon?: CanopIconName;
   active: boolean;
 }
 
-export function NavbarTileContent({ item, active }: NavbarTileContentProps) {
+export function NavbarTileContent({ label, icon, active }: NavbarTileContentProps) {
   return (
     <>
-      {active && <NavbarActiveIndicator radius="var(--canop-radius-lg)" />}
+      {active && <NavbarActiveIndicator radius={NAVBAR_TILE_RADIUS} />}
       <Box component="span" sx={{ position: "relative", zIndex: 1, display: "inline-flex" }}>
-        {item.icon ? <Icon name={item.icon} size="md" /> : item.label}
+        {icon ? <Icon name={icon} size="md" variant={active ? "solid" : "outline"} /> : label}
       </Box>
     </>
   );

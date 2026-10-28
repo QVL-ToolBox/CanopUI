@@ -109,7 +109,7 @@ const fr = {
     feedbackLabel: "Action :",
   },
   responsiveDescription:
-    "Sous le point de rupture mobile, la barre passe en mode compact : les boutons de tri et d'action n'affichent plus que leur icône, et les actions qui ne tiennent pas sont regroupées derrière un bouton « plus ».",
+    "Sous le point de rupture mobile, la barre passe en mode compact : les boutons de tri et d'action n'affichent plus que leur icône, et les actions qui ne tiennent pas sont regroupées derrière un bouton « plus ». Sous sm, la barre passe à la ligne : la recherche prend toute la largeur, les actions se rangent dessous, et rien ne déborde.",
   hookDescription:
     "Toolbar délègue la gestion du dépassement à useToolbar, qui répartit les actions entre visibles et débordantes et pilote le menu de dépassement. Réutilisez-le pour bâtir une barre sur mesure.",
   props: {
@@ -146,7 +146,7 @@ const en: typeof fr = {
     feedbackLabel: "Action:",
   },
   responsiveDescription:
-    "Below the mobile breakpoint, the bar switches to compact mode: sort and action buttons show only their icon, and actions that do not fit are grouped behind a “more” button.",
+    "Below the mobile breakpoint, the bar switches to compact mode: sort and action buttons show only their icon, and actions that do not fit are grouped behind a “more” button. Below sm, the bar wraps: the search takes the full width, the actions line up beneath it, and nothing overflows.",
   hookDescription:
     "Toolbar delegates overflow handling to useToolbar, which splits actions between visible and overflowing ones and drives the overflow menu. Reuse it to build a custom bar.",
   props: {

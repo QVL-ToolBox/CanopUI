@@ -2,6 +2,8 @@ export type CanopHalloweenDecorDensity = "low" | "medium";
 
 export type CanopHalloweenDecorScope = "container" | "viewport";
 
+export type HalloweenDecorBudget = "full" | "lite";
+
 export type HalloweenSide = "left" | "right";
 
 type HalloweenHeading = 1 | -1;

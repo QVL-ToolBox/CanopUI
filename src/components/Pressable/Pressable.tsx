@@ -41,7 +41,7 @@ export interface CanopPressableProps {
 
 /**
  * Une surface cliquable **sans apparence** : elle apporte la forme en
- * squircle, l'anneau de focus, l'etat de selection et l'accessibilite, et
+ * squircle, l'etat de selection et l'accessibilite, et
  * laisse son contenu libre.
  *
  * C'est la piece qui manquait pour que les portails n'aient plus a importer
@@ -85,7 +85,6 @@ export function Pressable({
       component={as ?? "button"}
       onClick={onClick}
       disabled={disabled}
-      focusRipple
       aria-label={ariaLabel}
       role={role}
       aria-checked={ariaChecked}

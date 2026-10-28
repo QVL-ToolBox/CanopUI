@@ -1,7 +1,6 @@
 import { useState, type ReactNode } from "react";
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { Button, Stack, StatusChip, useInView } from "@canop/ui";
+import { Button, Stack, StatusChip, Text, useInView } from "@canop/ui";
 import { squircleClip, tokens } from "@canop/ui";
 import { Map, type CanopMapMarker } from "@canop/ui/map";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -14,7 +13,7 @@ import { useDocLocale } from "../../i18n/useDocLocale";
 const importCode = `import { Map } from "@canop/ui/map";
 import "maplibre-gl/dist/maplibre-gl.css";`;
 
-const basicCode = `<Box height="20rem" borderRadius="0.75rem" overflow="hidden">
+const basicCode = `<Box sx={{ height: "20rem", borderRadius: "0.75rem", overflow: "hidden" }}>
   <Map center={{ lat: 49.4431, lng: 1.0993 }} />
 </Box>`;
 
@@ -24,7 +23,7 @@ const markersCode = `const MARKERS = [
   { id: "vieux-marche", lat: 49.4432, lng: 1.0886 },
 ];
 
-<Box height="20rem" borderRadius="0.75rem" overflow="hidden">
+<Box sx={{ height: "20rem", borderRadius: "0.75rem", overflow: "hidden" }}>
   <Map center={{ lat: 49.4425, lng: 1.0925 }} zoom={15} markers={MARKERS} />
 </Box>`;
 
@@ -35,7 +34,7 @@ const popupCode = `const MARKERS = [
     lng: 1.0946,
     popup: (
       <Stack gap="xs">
-        <Typography fontWeight={700}>Cathédrale Notre-Dame</Typography>
+        <Text weight="bold">Cathédrale Notre-Dame</Text>
         <StatusChip label="4,8 / 5" tone="success" />
       </Stack>
     ),
@@ -48,7 +47,7 @@ const clickCode = `function LocationPicker() {
   const [position, setPosition] = useState({ lat: 49.4431, lng: 1.0993 });
 
   return (
-    <Box height="20rem" borderRadius="0.75rem" overflow="hidden">
+    <Box sx={{ height: "20rem", borderRadius: "0.75rem", overflow: "hidden" }}>
       <Map
         center={position}
         markers={[{ id: "selection", ...position }]}
@@ -63,16 +62,23 @@ const recenterCode = `function RecenterDemo() {
 
   return (
     <Stack gap="md">
-      <Stack direction="row" gap="sm">
+      <Stack direction="row" gap="sm" wrap>
         <Button onClick={() => setCenter(ROUEN)}>Rouen</Button>
         <Button onClick={() => setCenter(BORDEAUX)}>Bordeaux</Button>
       </Stack>
-      <Box height="20rem" borderRadius="0.75rem" overflow="hidden">
+      <Box sx={{ height: "20rem", borderRadius: "0.75rem", overflow: "hidden" }}>
         <Map center={center} markers={[{ id: "ville", ...center }]} />
       </Box>
     </Stack>
   );
 }`;
+
+const TWO_MAPS_GRID = {
+  display: "grid",
+  gridTemplateColumns: { xs: "minmax(0, 1fr)", md: "repeat(2, minmax(0, 1fr))" },
+  gap: "1rem",
+  width: "100%",
+} as const;
 
 const poiCode = `<Map center={ROUEN_CENTRE} zoom={17} />
 <Map center={ROUEN_CENTRE} zoom={17} poi={["bar", "cafe", "fast_food"]} />`;
@@ -103,13 +109,7 @@ const POPUP_MARKERS: CanopMapMarker[] = [
     lng: 1.0946,
     popup: (
       <Stack gap="xs">
-        <Typography
-          sx={{
-            fontWeight: 700,
-          }}
-        >
-          Cathédrale Notre-Dame
-        </Typography>
+        <Text weight="bold">Cathédrale Notre-Dame</Text>
         <StatusChip label="4,8 / 5" tone="success" />
       </Stack>
     ),
@@ -164,14 +164,9 @@ function ClickDemo() {
           onMapClick={(lat, lng) => setPosition({ lat, lng })}
         />
       </MapFrame>
-      <Typography
-        variant="body2"
-        sx={{
-          color: "text.secondary",
-        }}
-      >
+      <Text variant="body-sm" tone="muted" tabularNums>
         {position.lat.toFixed(5)} / {position.lng.toFixed(5)}
-      </Typography>
+      </Text>
     </Stack>
   );
 }
@@ -181,7 +176,7 @@ function RecenterDemo() {
 
   return (
     <Stack gap="md">
-      <Stack direction="row" gap="sm">
+      <Stack direction="row" gap="sm" wrap>
         <Button onClick={() => setCenter(ROUEN)}>Rouen</Button>
         <Button onClick={() => setCenter(BORDEAUX)}>Bordeaux</Button>
       </Stack>
@@ -407,13 +402,7 @@ export default function MapDoc() {
 
   return (
     <DocPage title="Map" intro={t.intro} importCode={importCode}>
-      <Typography
-        sx={{
-          color: "text.secondary",
-        }}
-      >
-        {t.note}
-      </Typography>
+      <Text tone="muted">{t.note}</Text>
       <DocSection title={t.sections.basic}>
         <DemoCard
           title={t.demos.basicTitle}
@@ -477,14 +466,7 @@ export default function MapDoc() {
           code={poiCode}
           align="stretch"
         >
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: "1rem",
-              width: "100%",
-            }}
-          >
+          <Box sx={TWO_MAPS_GRID}>
             <MapFrame>
               <Map center={ROUEN_CENTRE} zoom={17} />
             </MapFrame>
@@ -501,14 +483,7 @@ export default function MapDoc() {
           code={boundariesCode}
           align="stretch"
         >
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: "1rem",
-              width: "100%",
-            }}
-          >
+          <Box sx={TWO_MAPS_GRID}>
             <MapFrame>
               <Map center={FRANCE} zoom={7} boundaries={["country", "region", "department"]} />
             </MapFrame>
@@ -543,14 +518,7 @@ export default function MapDoc() {
           code={themeCode}
           align="stretch"
         >
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" },
-              gap: "1rem",
-              width: "100%",
-            }}
-          >
+          <Box sx={TWO_MAPS_GRID}>
             <MapFrame>
               <Map center={ROUEN} zoom={13} styleMode="light" />
             </MapFrame>

@@ -37,7 +37,7 @@ describe("AC4 - demonstration dans la vitrine", () => {
       const verres = Array.from(container.querySelectorAll(".MuiCard-root")).filter(
         (carte) =>
           getComputedStyle(carte).getPropertyValue("backdrop-filter") ===
-          "blur(0.35rem) saturate(1.3)",
+          "blur(0.25rem) saturate(1.8)",
       );
       expect(verres.length).toBeGreaterThan(0);
     },

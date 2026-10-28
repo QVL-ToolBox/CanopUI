@@ -1,7 +1,9 @@
 import Box from "@mui/material/Box";
+import { HalloweenGlyphLayer } from "./HalloweenGlyphLayer";
 import type { HalloweenPumpkinSpec } from "./halloweenSceneTypes";
-import { pumpkinBodySx, pumpkinGlowSx, pumpkinSx } from "./pumpkinSx";
+import { pumpkinBodySx, pumpkinFaceSx, pumpkinGlowSx, pumpkinSx } from "./pumpkinSx";
 
+const VIEW_BOX = "0 0 24 24";
 const BODY =
   "M12 7.75c-1.6-.9-4-.95-5.9.1C3.7 9.2 2.75 11.6 2.75 14.25c0 3.6 2.6 6 5.6 6c1.4 0 2.6-.4 3.65-1.05c1.05.65 2.25 1.05 3.65 1.05c3 0 5.6-2.4 5.6-6c0-2.65-.95-5.05-3.35-6.4c-1.9-1.05-4.3-1-5.9-.1z";
 const RIBS =
@@ -19,18 +21,24 @@ export function HalloweenPumpkin({ spec, animated }: HalloweenPumpkinProps) {
   return (
     <Box sx={pumpkinSx(spec)}>
       {spec.lit ? <Box sx={pumpkinGlowSx(spec, animated)} /> : null}
-      <Box component="svg" viewBox="0 0 24 24" sx={pumpkinBodySx(spec, animated)}>
-        <path data-part="body" d={BODY} />
-        <path data-part="rib" d={RIBS} fill="none" strokeWidth="0.9" strokeLinecap="round" />
-        <path
-          data-part="stem"
-          d={STEM}
-          fill="none"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {spec.lit ? <path data-part="face" d={FACE} /> : null}
+      <Box component="span" sx={pumpkinBodySx}>
+        <HalloweenGlyphLayer viewBox={VIEW_BOX}>
+          <path data-part="body" d={BODY} />
+          <path data-part="rib" d={RIBS} fill="none" strokeWidth="0.9" strokeLinecap="round" />
+          <path
+            data-part="stem"
+            d={STEM}
+            fill="none"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          />
+        </HalloweenGlyphLayer>
+        {spec.lit ? (
+          <HalloweenGlyphLayer viewBox={VIEW_BOX} sx={pumpkinFaceSx(spec, animated)}>
+            <path data-part="face" d={FACE} />
+          </HalloweenGlyphLayer>
+        ) : null}
       </Box>
     </Box>
   );

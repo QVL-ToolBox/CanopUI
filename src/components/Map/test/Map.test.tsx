@@ -91,6 +91,18 @@ function renderMap(ui: React.ReactElement) {
 
 const CENTER = { lat: 49.4431, lng: 1.0993 };
 
+function fondPeintAuDessusDe(element: HTMLElement, racine: HTMLElement): string {
+  for (
+    let courant = element.parentElement;
+    courant && courant !== racine;
+    courant = courant.parentElement
+  ) {
+    const fond = getComputedStyle(courant).backgroundColor;
+    if (fond !== "" && fond !== "transparent" && fond !== "rgba(0, 0, 0, 0)") return fond;
+  }
+  return "";
+}
+
 describe("Map", () => {
   beforeEach(() => {
     maplibre.options = undefined;
@@ -222,6 +234,21 @@ describe("Map", () => {
     );
     expect(maplibre.options).toBeUndefined();
   });
+
+  it.each(["light", "dark"] as const)(
+    "pose le repli WebGL en état vide sans surface, sur le fond peint par la carte en %s",
+    (mode) => {
+      webgl.available = false;
+      const { container } = render(
+        <CanopThemeProvider mode={mode}>
+          <Map center={CENTER} />
+        </CanopThemeProvider>,
+      );
+      const titre = screen.getByRole("heading", { name: "Carte non affichable ici" });
+      expect(container.querySelector(".MuiCard-root")).toBeNull();
+      expect(fondPeintAuDessusDe(titre, container)).toMatch(/^var\(--canop-palette-/);
+    },
+  );
 
   it("protège le défilement de la page par des gestes coopératifs", () => {
     renderMap(<Map center={CENTER} />);

@@ -1,6 +1,7 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { Marker, Popup, type Map as MaplibreMap } from "maplibre-gl";
+import { SkeletonScope } from "../Skeleton/SkeletonScope";
 import { createMapPin } from "./mapPin";
 
 export interface CanopMapMarker {
@@ -56,12 +57,12 @@ export function MapMarkers({ map, markers }: MapMarkersProps) {
   }, [map, key]);
 
   return (
-    <>
+    <SkeletonScope surface={null}>
       {markers.map((marker) =>
         marker.popup && popupNodes[marker.id]
           ? createPortal(marker.popup, popupNodes[marker.id], marker.id)
           : null,
       )}
-    </>
+    </SkeletonScope>
   );
 }

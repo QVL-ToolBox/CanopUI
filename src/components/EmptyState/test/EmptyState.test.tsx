@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { CanopThemeProvider } from "../../../theme";
 import { EmptyState } from "../EmptyState";
+import { Card } from "../../Card";
+import { racineDeCarte } from "../../../test/cardTestKit";
+import { derniereValeurEmise } from "../../../test/cssRules";
 
 function renderEmptyState(ui: React.ReactElement) {
   return render(<CanopThemeProvider>{ui}</CanopThemeProvider>);
@@ -44,7 +47,7 @@ describe("EmptyState", () => {
     expect(screen.getByRole("button", { name: "Importer" })).toBeInTheDocument();
   });
 
-  it("rend titre, description, action et icône sans formes ambient en surface plain", () => {
+  it("rend titre, description, action et icône sans Card en surface plain", () => {
     const { container } = renderEmptyState(
       <EmptyState
         surface="plain"
@@ -59,16 +62,44 @@ describe("EmptyState", () => {
     expect(screen.getByText("Importez votre premier document.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Importer" })).toBeInTheDocument();
     expect(screen.getByTestId("illustration")).toBeInTheDocument();
-    expect(container.querySelector('[aria-hidden="true"]')).not.toBeInTheDocument();
+    expect(racineDeCarte(container)).toBeNull();
   });
 
-  it("conserve les formes ambient par défaut", () => {
-    const { container } = renderEmptyState(<EmptyState title="Aucun fichier" />);
-    expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+  it.each([
+    ["par défaut", undefined],
+    ["avec surface ambient explicite", "ambient"],
+  ] as const)("rend le contenu dans une Card frosted %s", (_cas, surface) => {
+    const { container } = renderEmptyState(<EmptyState surface={surface} title="Aucun fichier" />);
+    const carte = racineDeCarte(container);
+    expect(carte).not.toBeNull();
+    expect(carte).toContainElement(screen.getByRole("heading", { name: "Aucun fichier" }));
+    const flouAttendu = flouDUneCarteFrosted();
+    expect(flouAttendu).not.toBe("");
+    expect(derniereValeurEmise(carte, "backdrop-filter")).toBe(flouAttendu);
   });
 
-  it("conserve les formes ambient avec surface ambient explicite", () => {
-    const { container } = renderEmptyState(<EmptyState surface="ambient" title="Aucun fichier" />);
-    expect(container.querySelector('[aria-hidden="true"]')).toBeInTheDocument();
+  it("ne rend aucun canvas de lave quelle que soit la surface", () => {
+    const { container } = renderEmptyState(
+      <>
+        <EmptyState title="Ambient" />
+        <EmptyState title="Plain" surface="plain" />
+      </>,
+    );
+    expect(container.querySelector("canvas")).toBeNull();
+  });
+
+  it("ne place pas de div dans un paragraphe pour une description non textuelle", () => {
+    const { container } = renderEmptyState(
+      <EmptyState title="Aucun fichier" description={<div>Bloc riche</div>} />,
+    );
+    expect(screen.getByText("Bloc riche")).toBeInTheDocument();
+    expect(container.querySelector("p div")).toBeNull();
   });
 });
+
+function flouDUneCarteFrosted(): string {
+  const { container, unmount } = renderEmptyState(<Card variant="frosted">Référence</Card>);
+  const flou = derniereValeurEmise(racineDeCarte(container), "backdrop-filter");
+  unmount();
+  return flou;
+}

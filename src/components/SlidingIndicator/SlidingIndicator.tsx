@@ -1,43 +1,52 @@
-import { motion, type Transition } from "framer-motion";
-import { motionDurationSeconds, motionEasing, useReducedMotion } from "../../motion";
+import type { AnimationOptions } from "framer-motion";
+import { motionDurationSeconds, motionEasing } from "../../motion";
+import { useSlidingIndicator } from "../../motion/useSlidingIndicator";
 import { squircleClipPath } from "../../squircle";
 
-const IndicatorSpan = motion.span;
+const TIGHT_SHADOW = "var(--canop-drop-shadow-e1) var(--canop-drop-shadow-e1)";
+
+const SLIDE_TRANSITION: AnimationOptions = {
+  duration: motionDurationSeconds.base,
+  ease: motionEasing.organic,
+};
 
 export interface CanopSlidingIndicatorProps {
-  layoutId?: string;
   radius?: string;
   shadow?: string;
+  halo?: string;
   background?: string;
-  transition?: Transition;
 }
 
 export function SlidingIndicator({
-  layoutId = "canop-sliding-indicator",
   radius = "var(--canop-radius-md)",
-  shadow = "var(--canop-drop-shadow-e1)",
+  shadow = TIGHT_SHADOW,
+  halo,
   background = "var(--canop-palette-background-paper)",
-  transition,
 }: CanopSlidingIndicatorProps) {
-  const reducedMotion = useReducedMotion();
+  const { frameRef, pillRef } = useSlidingIndicator(SLIDE_TRANSITION);
 
   return (
-    <IndicatorSpan
-      aria-hidden
-      layoutId={layoutId}
-      transition={
-        reducedMotion
-          ? { duration: 0 }
-          : (transition ?? { duration: motionDurationSeconds.base, ease: motionEasing.organic })
-      }
+    <span
+      ref={frameRef}
       style={{
         position: "absolute",
         inset: 0,
-        clipPath: squircleClipPath(radius),
-        backgroundColor: background,
-        filter: shadow,
         zIndex: 0,
+        filter: halo ? `${shadow} ${halo}` : shadow,
+        pointerEvents: "none",
       }}
-    />
+    >
+      <span
+        ref={pillRef}
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          transformOrigin: "0 0",
+          clipPath: squircleClipPath(radius),
+          backgroundColor: background,
+        }}
+      />
+    </span>
   );
 }

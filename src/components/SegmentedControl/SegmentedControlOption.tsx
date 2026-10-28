@@ -2,12 +2,15 @@ import ButtonBase from "@mui/material/ButtonBase";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { tokens } from "../../tokens";
-import { focusRingSx } from "../_shared/focusRing";
+import { hoverOrKeyboardFocus } from "../../interaction";
+import { squircleClipPath } from "../../squircle";
+import { SQUIRCLE_CLIP_VAR } from "../../squircle/squircleSx";
+import { glowFilter, useNeonGlow } from "../../theme/neonGlow";
 import { Icon } from "../Icon";
 import { SlidingIndicator } from "../SlidingIndicator";
 import type { CanopSegmentedControlOption, CanopSegmentedControlSize } from "./useSegmentedControl";
 
-const SEGMENT_INDICATOR_LAYOUT_ID = "segment";
+const SEGMENT_INDICATOR_HALO = glowFilter("primary", "rest");
 
 const paddingBySize: Record<CanopSegmentedControlSize, { x: number; y: number }> = {
   small: { x: 1.25, y: 0.5 },
@@ -24,6 +27,7 @@ interface SegmentedControlOptionProps<T extends string> {
   selected: boolean;
   size: CanopSegmentedControlSize;
   fullWidth: boolean;
+  iconOnly: boolean;
   registerRef: (node: HTMLButtonElement | null) => void;
   onSelect: () => void;
 }
@@ -33,37 +37,47 @@ export function SegmentedControlOption<T extends string>({
   selected,
   size,
   fullWidth,
+  iconOnly,
   registerRef,
   onSelect,
 }: SegmentedControlOptionProps<T>) {
-  const padding = paddingBySize[size];
+  const glows = useNeonGlow();
+  const padding = iconOnly ? { x: 0, y: 0 } : paddingBySize[size];
+  const minHeight = minHeightBySize[size];
+  const indicatorRadius = iconOnly ? "var(--canop-radius-pill)" : "var(--canop-radius-md)";
 
   return (
     <ButtonBase
       ref={registerRef}
       role="radio"
       aria-checked={selected}
+      aria-label={iconOnly ? option.label : undefined}
       tabIndex={selected ? 0 : -1}
       disabled={option.disabled}
       onClick={onSelect}
-      focusRipple
       sx={{
         position: "relative",
+        [SQUIRCLE_CLIP_VAR]: squircleClipPath(indicatorRadius),
         flex: fullWidth ? 1 : "0 0 auto",
-        minHeight: minHeightBySize[size],
+        minHeight,
+        minWidth: iconOnly ? minHeight : undefined,
         paddingX: padding.x,
         paddingY: padding.y,
         color: selected
           ? "var(--canop-palette-text-primary)"
           : "var(--canop-palette-text-secondary)",
         transition: "color var(--canop-motion-duration-fast) var(--canop-motion-ease-standard)",
-        "&:hover:not([aria-checked='true'])": { color: "var(--canop-palette-text-primary)" },
-        "&:focus-visible": focusRingSx,
+        [hoverOrKeyboardFocus(":not([aria-checked='true'])")]: {
+          color: "var(--canop-palette-text-primary)",
+        },
         "&.Mui-disabled": { opacity: 0.45 },
       }}
     >
       {selected ? (
-        <SlidingIndicator layoutId={SEGMENT_INDICATOR_LAYOUT_ID} radius="var(--canop-radius-md)" />
+        <SlidingIndicator
+          radius={indicatorRadius}
+          halo={glows ? SEGMENT_INDICATOR_HALO : undefined}
+        />
       ) : null}
       <Stack
         direction="row"
@@ -76,18 +90,25 @@ export function SegmentedControlOption<T extends string>({
         }}
       >
         {option.icon ? (
-          <Icon name={option.icon} size="sm" color={selected ? "primary" : "inherit"} />
+          <Icon
+            name={option.icon}
+            variant={iconOnly && selected ? "solid" : "outline"}
+            size="sm"
+            color={selected ? "primary" : "inherit"}
+          />
         ) : null}
-        <Typography
-          component="span"
-          sx={{
-            fontFamily: tokens.typography.fontFamily,
-            ...tokens.typography.app.label,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {option.label}
-        </Typography>
+        {iconOnly ? null : (
+          <Typography
+            component="span"
+            sx={{
+              fontFamily: tokens.typography.fontFamily,
+              ...tokens.typography.app.label,
+              whiteSpace: "nowrap",
+            }}
+          >
+            {option.label}
+          </Typography>
+        )}
       </Stack>
     </ButtonBase>
   );

@@ -189,6 +189,27 @@ Le centre reste calme : l'animation se concentre sur les bords, le ciel et le so
 
 Le thème embarque un reset global `@media (prefers-reduced-motion: reduce)` appliqué par `CssBaseline` : animations et transitions sont neutralisées et `scroll-behavior` repasse en `auto`. Côté JS, le hook `useReducedMotion()` permet de couper les animations pilotées par `motion` dans un composant.
 
+## Focus : le survol, rien de plus
+
+Aucun composant n'a de style de focus propre : pas d'anneau `outline`, pas de halo, pas d'ondulation MUI, pas de couleur de bordure ou de libellé au focus. Un clic, un toucher ou un focus posé par le code ne changent rien à l'écran.
+
+- **Au clavier** (`:focus-visible` / `.Mui-focusVisible`), un composant prend exactement son style de survol. Sans survol, il ne change pas.
+- **Champs texte** : aucun changement en cours de saisie, le curseur suffit. Un champ texte correspond à `:focus-visible` même au clic, il n'a donc pas d'équivalent clavier. Le `Select` prend sa bordure de survol au clavier.
+- **Thème** : `disableFocusRipple` par défaut sur `Button`, `IconButton`, `Checkbox`, `Radio`, `Switch`, `Fab`, `ToggleButton` et `Tab`, qui prennent à la place leur survol MUI au clavier, couleur par couleur : fond, et ombre du `Button` `contained` (`Tab` n'a pas de survol). `Checkbox` et `Radio` suivent MUI : rien quand `disableRipple`. `palette.action.focus` et `focusOpacity` valent `hover` et `hoverOpacity`, pour que les états `focusVisible` natifs de MUI (`MenuItem`, `Chip`, options d'`Autocomplete`…) se rendent comme le survol.
+- **Effet de pression** : l'onde MUI d'un `ButtonBase` est découpée par la variable `--canop-squircle-clip` posée sur le bouton lui-même (par `squircleSurface`), jamais héritée d'un parent ; sans variable, elle garde le `border-radius` MUI. Les `IconButton`, dont l'onde part du centre, l'agrandissent pour remplir les coins. Un élément cliquable maison prend donc la bonne forme avec `squircleSurface`, ou avec `squircleClip` qui découpe déjà toute la racine.
+- **Élément maison d'un portail** : mêmes outils que la librairie.
+
+```tsx
+import { hoverOrKeyboardFocus, withoutFocusRing } from "@canop/ui";
+
+const tileSx = {
+  ...withoutFocusRing,
+  [hoverOrKeyboardFocus()]: { backgroundColor: "var(--canop-palette-action-hover)" },
+};
+```
+
+`hoverOrKeyboardFocus(suffixe)` accepte un suffixe de sélecteur (`":not([aria-checked='true'])"`, `" .CanopCard-arrow"`), `keyboardFocus(suffixe)` vise le seul focus clavier. Vérification visuelle : vitrine, `#/docs/focus`, clic puis Tab.
+
 ## Surcharge sans rebuild (white-label)
 
 Surcharger quelques variables dans une feuille de style du portail suffit à changer le rendu, sans recompiler ni la lib ni le portail :
@@ -206,6 +227,29 @@ Le sélecteur `html:root` est volontairement plus spécifique que le `:root` ém
 Tous les composants consommant le thème (boutons, champs, surfaces…) reflètent immédiatement les nouvelles valeurs, car MUI référence `var(--canop-…)` dans les styles émis.
 
 Variables disponibles : ouvrir les DevTools sur `:root` — toutes les variables générées portent le préfixe `--canop-`.
+
+## Réserves de la coque
+
+La coque (`Navbar`, donc `PageScaffold`) pose deux variables sur la zone de contenu pour signaler l'espace pris par ses éléments flottants. Elles valent `0rem` quand rien n'est réservé.
+
+| Variable | Posée par | Réserve |
+| --- | --- | --- |
+| `--canop-page-top-right-inset` | utilitaires flottants du coin haut droit (réglages en mobile, langue en tablette et bureau, `actionsPlacement="floating"`) | la largeur à laisser libre à droite d'un élément en haut de page |
+| `--canop-page-bottom-inset` | barre de navigation mobile flottante | la hauteur que traverse le fond et au-dessus de laquelle `PageContent` garde son dernier élément |
+
+Ne pas lire ces variables à la main : passer par les helpers publics.
+
+```tsx
+import { avoidPageTopRight, reservePageTopRight, resetPageInsets } from "@canop/ui";
+
+const barSx = { paddingRight: avoidPageTopRight("1.5rem") };
+const floatingToolSx = reservePageTopRight("3rem");
+const fakeScreenSx = resetPageInsets();
+```
+
+- `avoidPageTopRight(gouttière)` rend `max(gouttière, réserve)` : la gouttière habituelle, élargie seulement quand un utilitaire flottant occupe le coin.
+- `reservePageTopRight(espace)` déclare un utilitaire flottant maison, que `PageHeader` et tout élément passé par `avoidPageTopRight` évitent ensuite.
+- `resetPageInsets()` remet les deux réserves à zéro dans un sous-arbre, par exemple un faux écran de démonstration imbriqué dans une page qui a les siennes.
 
 ## Vitrine
 

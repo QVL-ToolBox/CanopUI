@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import { squircleFill, squircleSurface } from "../../squircle";
+import { hoverOrKeyboardFocus, withoutFocusRing } from "../../interaction";
 import IconButton from "@mui/material/IconButton";
 import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
@@ -37,7 +38,7 @@ const controlSx = {
   }),
   minWidth: "3rem",
   minHeight: "3rem",
-  "&:hover": squircleFill("var(--canop-palette-surface-base)"),
+  [hoverOrKeyboardFocus()]: squircleFill("var(--canop-palette-surface-base)"),
 } as const;
 
 export function LightboxSurface({
@@ -72,6 +73,7 @@ export function LightboxSurface({
         justifyContent: "center",
         inset: 0,
         padding: { xs: "var(--canop-spacing-md)", md: "var(--canop-spacing-2xl)" },
+        ...withoutFocusRing,
       }}
     >
       <IconButton

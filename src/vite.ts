@@ -47,9 +47,9 @@ function cheminDuWorkerChezLeConsommateur(fichier: string): string | undefined {
 }
 
 /**
- * Sert les scenes de `CanopyBackground` — six fichiers, 32 Mo — depuis le
- * paquet lui-meme : middleware en developpement, recopie dans la sortie au
- * build.
+ * Sert les scenes de `CanopyBackground` — dix fichiers : WebM et MP4 en 1080p
+ * et en 720p, plus l'affiche, pour chaque theme — depuis le paquet lui-meme :
+ * middleware en developpement, recopie dans la sortie au build.
  *
  * Sans lui, le fond par defaut de `PageScaffold` reste noir : les scenes ne
  * peuvent pas traverser le bundle du consommateur, parce que Vite inline en

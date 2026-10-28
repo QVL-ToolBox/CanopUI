@@ -6,25 +6,31 @@ export interface LightboxMediaProps {
   item: CanopLightboxItem;
 }
 
+const shadowCarrierSx = {
+  display: "block",
+  filter: "var(--canop-drop-shadow-e5)",
+} as const;
+
 export function LightboxMedia({ item }: LightboxMediaProps) {
   if (item.kind === "video") {
     return (
-      <Box
-        component="video"
-        src={item.src}
-        controls
-        playsInline
-        preload="metadata"
-        aria-label={item.alt ?? item.title ?? undefined}
-        sx={{
-          ...squircleClip("var(--canop-radius-md)"),
-          display: "block",
-          maxWidth: "92vw",
-          maxHeight: "82dvh",
-          backgroundColor: "common.black",
-          filter: "var(--canop-drop-shadow-e5)",
-        }}
-      />
+      <Box sx={shadowCarrierSx}>
+        <Box
+          component="video"
+          src={item.src}
+          controls
+          playsInline
+          preload="metadata"
+          aria-label={item.alt ?? item.title ?? undefined}
+          sx={{
+            ...squircleClip("var(--canop-radius-md)"),
+            display: "block",
+            maxWidth: "92vw",
+            maxHeight: "82dvh",
+            backgroundColor: "common.black",
+          }}
+        />
+      </Box>
     );
   }
 
@@ -48,18 +54,19 @@ export function LightboxMedia({ item }: LightboxMediaProps) {
   }
 
   return (
-    <Box
-      component="img"
-      src={item.src}
-      alt={item.alt ?? item.title ?? ""}
-      sx={{
-        ...squircleClip("var(--canop-radius-md)"),
-        display: "block",
-        maxWidth: "92vw",
-        maxHeight: "82dvh",
-        objectFit: "contain",
-        filter: "var(--canop-drop-shadow-e5)",
-      }}
-    />
+    <Box sx={shadowCarrierSx}>
+      <Box
+        component="img"
+        src={item.src}
+        alt={item.alt ?? item.title ?? ""}
+        sx={{
+          ...squircleClip("var(--canop-radius-md)"),
+          display: "block",
+          maxWidth: "92vw",
+          maxHeight: "82dvh",
+          objectFit: "contain",
+        }}
+      />
+    </Box>
   );
 }

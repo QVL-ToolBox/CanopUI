@@ -1,6 +1,7 @@
 import Box from "@mui/material/Box";
 import { Children, useCallback, useRef, type ReactNode } from "react";
 import { useTranslation } from "../../i18n";
+import { withoutFocusRing } from "../../interaction";
 import { tokens } from "../../tokens";
 import { CarouselArrow, type CarouselArrowDirection } from "./CarouselArrow";
 import { CarouselIndicators } from "./CarouselIndicators";
@@ -129,6 +130,7 @@ export function Carousel({
             width: "100%",
             touchAction: pageScrollAxisLeftToBrowser,
             gridTemplateAreas: '"slide"',
+            ...withoutFocusRing,
             ...(showBars && isVertical ? { paddingRight: tokens.spacing.lg } : null),
           }}
         >

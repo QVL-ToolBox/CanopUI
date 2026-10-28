@@ -2,6 +2,9 @@ import Box from "@mui/material/Box";
 import type { FormEventHandler, ReactNode, Ref } from "react";
 import { tokens } from "../../tokens";
 import type { CanopDataAttributes } from "../_shared/dataAttributes";
+import { mapResponsive, type CanopResponsiveValue } from "../_shared/responsiveValue";
+
+export type { CanopResponsiveValue };
 
 export type CanopStackGap = "xs" | "sm" | "md" | "lg" | "xl";
 export type CanopStackElement = "div" | "form" | "nav" | "section";
@@ -36,10 +39,12 @@ export interface CanopStackProps extends CanopDataAttributes {
   ref?: Ref<HTMLElement>;
   ariaBusy?: boolean;
   gap?: CanopStackGap;
-  direction?: CanopStackDirection;
+  /** Accepte une valeur par point de rupture : `{ xs: "column", md: "row" }`. */
+  direction?: CanopResponsiveValue<CanopStackDirection>;
   alignItems?: CanopStackAlign;
   justifyContent?: CanopStackJustify;
-  wrap?: boolean;
+  /** Accepte une valeur par point de rupture : `{ xs: true, md: false }`. */
+  wrap?: CanopResponsiveValue<boolean>;
   padding?: CanopStackPadding;
   as?: CanopStackElement;
   ariaLabel?: string;
@@ -92,6 +97,10 @@ export interface CanopStackProps extends CanopDataAttributes {
 
 const STICKY_LAYER_ABOVE_SCROLLING_SIBLINGS = 1;
 
+function flexWrapOf(wraps: boolean): "wrap" | "nowrap" {
+  return wraps ? "wrap" : "nowrap";
+}
+
 export function Stack({
   ref,
   ariaBusy,
@@ -137,7 +146,7 @@ export function Stack({
         minWidth: 0,
         display: "flex",
         flexDirection: direction,
-        flexWrap: wrap ? "wrap" : "nowrap",
+        flexWrap: mapResponsive(wrap, flexWrapOf),
         gap: tokens.spacing[gap],
         alignItems: alignItems ? alignMap[alignItems] : undefined,
         justifyContent: justifyContent ? justifyMap[justifyContent] : undefined,

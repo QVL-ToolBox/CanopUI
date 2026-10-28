@@ -6,6 +6,7 @@ import { VersionsPage } from "../VersionsPage";
 
 const RENDU_LENT = 20_000;
 const VERSIONS_ANTERIEURES = [
+  "1.3.4",
   "1.3.3",
   "1.3.2",
   "1.3.1",
@@ -13,12 +14,13 @@ const VERSIONS_ANTERIEURES = [
   "1.2.0",
   "1.1.0",
   "1.0.0",
-  "3.1.1",
-  "3.1.0",
-  "3.0.2",
-  "3.0.1",
-  "3.0.0",
+  "0.1.1",
+  "0.1.0",
+  "0.0.2",
+  "0.0.1",
+  "0.0.0",
 ];
+const VERSIONS_RENUMEROTEES = ["1.0.0", "0.1.1", "0.1.0", "0.0.2", "0.0.1", "0.0.0"];
 
 function monte(ui: ReactNode) {
   return render(
@@ -32,12 +34,16 @@ function carteDeVersion(version: string) {
   return screen.getByRole("button", { name: `Afficher ou masquer la version ${version}` });
 }
 
+function precede(avant: Element, apres: Element) {
+  return Boolean(avant.compareDocumentPosition(apres) & Node.DOCUMENT_POSITION_FOLLOWING);
+}
+
 describe("page Versions de la vitrine", () => {
   it(
-    "marque 1.3.4 comme la version en production",
+    "marque 2.0.0 comme la version en production",
     () => {
       monte(<VersionsPage />);
-      expect(within(carteDeVersion("1.3.4")).getByText("En production")).not.toBeNull();
+      expect(within(carteDeVersion("2.0.0")).getByText("En production")).not.toBeNull();
     },
     RENDU_LENT,
   );
@@ -64,11 +70,35 @@ describe("page Versions de la vitrine", () => {
   );
 
   it(
-    "annonce 1.3.4 comme la version publiée",
+    "annonce 2.0.0 comme la version publiée",
     () => {
       monte(<VersionsPage />);
-      expect(screen.getAllByText("1.3.4").length).toBeGreaterThan(0);
-      expect(screen.getByText(/1\.3\.4 publiée le/)).not.toBeNull();
+      expect(screen.getAllByText("2.0.0").length).toBeGreaterThan(0);
+      expect(screen.getByText(/2\.0\.0 publiée le/)).not.toBeNull();
+    },
+    RENDU_LENT,
+  );
+
+  it(
+    "range les versions renumérotées 0.x sous la 1.0.0, de la plus récente à la plus ancienne",
+    () => {
+      monte(<VersionsPage />);
+      const cartes = VERSIONS_RENUMEROTEES.map(carteDeVersion);
+      cartes.slice(1).forEach((carte, index) => {
+        expect(precede(cartes[index], carte)).toBe(true);
+      });
+    },
+    RENDU_LENT,
+  );
+
+  it(
+    "n'affiche plus aucune version 3.x de CanopUI",
+    () => {
+      monte(<VersionsPage />);
+      expect(
+        screen.queryAllByRole("button", { name: /^Afficher ou masquer la version 3\./ }),
+      ).toHaveLength(0);
+      expect(document.body.textContent ?? "").not.toMatch(/(?<![\d.v])3\.[01]\.\d+(?![\d.])/);
     },
     RENDU_LENT,
   );

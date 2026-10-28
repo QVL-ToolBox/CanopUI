@@ -1,113 +1,160 @@
-import Box from "@mui/material/Box";
-import { Card, ShapeBackground } from "@canop/ui";
-import { squircleClip, tokens } from "@canop/ui";
+import Stack from "@mui/material/Stack";
 import { DemoCard } from "../../kit/DemoCard";
+import { DemoViewport } from "../../kit/DemoViewport";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
 import { PropsTable, type PropRow } from "../../kit/PropsTable";
+import { ThemeScope } from "../../kit/themeScope/ThemeScope";
 import { useDocLocale } from "../../i18n/useDocLocale";
+import { LavaShowcase } from "./shapeBackgroundDoc/LavaShowcase";
 
 const importCode = `import { ShapeBackground } from "@canop/ui";`;
 
-const basicCode = `<Box height="24rem" width="100%" borderRadius="0.75rem" overflow="hidden">
-  <ShapeBackground minHeight="100%">
-    <Card title="CanopUI">Fond décoratif composé de formes organiques.</Card>
-  </ShapeBackground>
-</Box>`;
-
-const colorCode = `<Box height="24rem" width="100%" borderRadius="0.75rem" overflow="hidden">
-  <ShapeBackground minHeight="100%" color="secondary.main">
-    <Card>Le fond adopte la teinte fournie via la prop color.</Card>
-  </ShapeBackground>
-</Box>`;
-
-const contentCode = `<Box height="24rem" width="100%" borderRadius="0.75rem" overflow="hidden">
-  <ShapeBackground minHeight="100%" contentSx={{ maxWidth: "18rem" }}>
-    <Card title="Contenu contraint">
-      contentSx limite ici la largeur de la zone de contenu centrée.
+const basicCode = `<Box height="24rem" width="100%" overflow="hidden">
+  <ShapeBackground animated minHeight="100%" contentSx={{ maxWidth: "22rem" }}>
+    <Card variant="frosted" title="CanopUI">
+      Trame de points traversée de masses de lave lumineuses.
     </Card>
   </ShapeBackground>
 </Box>`;
 
+const modesCode = `<ShapeBackground animated minHeight="100%">
+  <Card variant="frosted" title="Thème courant">
+    Le fond suit le thème clair ou sombre de l'application.
+  </Card>
+</ShapeBackground>`;
+
+const colorCode = `<ShapeBackground animated minHeight="100%" color="accent">
+  <Card variant="frosted" title="Accent">
+    color accepte un nom de palette ou une clé comme "accent.main".
+  </Card>
+</ShapeBackground>
+
+<PageScaffold background="shapes" backgroundTone="accent" items={items}>
+  <PageContent>…</PageContent>
+</PageScaffold>`;
+
+const tuningCode = `<ShapeBackground animated minHeight="100%" density={4} intensity={1.3}>
+  <Card variant="frosted" title="Quatre masses">
+    density fixe le nombre de masses, intensity multiplie leur éclat.
+  </Card>
+</ShapeBackground>`;
+
 const fr = {
   intro:
-    "Fond décoratif animé de formes organiques (cercles, triangles, capsules) dérivées de la palette. Il centre son contenu et sert de toile de fond aux écrans d'authentification et aux pages portail. Les formes s'adaptent automatiquement au mobile.",
+    "Fond « trame lave » : une trame de points discrète que traversent des masses lumineuses à la manière d'une lampe à lave, teintées d'une seule couleur de la palette. Il suit le thème clair ou sombre, centre son contenu et accueille volontiers une carte givrée. Animé, il ondule à 30 images par seconde et se met en pause hors écran ou onglet masqué ; sans animation ou en mouvement réduit, il reste une image fixe.",
   sections: {
     basic: "Usage de base",
+    modes: "Clair et sombre",
     color: "Couleur",
-    content: "Zone de contenu",
+    tuning: "Densité et intensité",
     api: "API",
   },
   demos: {
     basic: {
-      title: "Fond avec contenu centré",
+      title: "Fond avec carte givrée",
       description:
-        "Le contenu est centré verticalement et horizontalement au-dessus des formes. minHeight vaut 100vh par défaut ; ici 100% épouse le conteneur de démonstration.",
+        "Le contenu est centré au-dessus de la trame. minHeight vaut 100vh par défaut ; ici 100% épouse le conteneur de démonstration.",
+      cardTitle: "CanopUI",
+      cardBody: "Trame de points traversée de masses de lave lumineuses.",
+    },
+    modes: {
+      title: "Le même fond, thème clair puis sombre",
+      description:
+        "Aucun réglage à faire : la teinte, l'encre des points et les lueurs se lisent dans les variables du thème courant.",
+      lightTitle: "Thème clair",
+      darkTitle: "Thème sombre",
+      cardBody: "Le fond suit le thème de l'application.",
     },
     color: {
-      title: "Teinte personnalisée",
+      title: "Lave en couleur d'accent",
       description:
-        "color accepte n'importe quelle clé de la palette du thème pour recolorer le fond.",
+        "color choisit la couleur unique du fond : lueurs, points allumés et teinte du fond la suivent, en clair comme en sombre ; seule la trame au repos garde l'encre neutre du texte. Les clés héritées comme accent.main restent acceptées. Dans un gabarit, PageScaffold et Layout passent par backgroundTone, que cette vitrine règle sur accent.",
+      lightTitle: "Accent, thème clair",
+      darkTitle: "Accent, thème sombre",
+      cardBody: "Les masses prennent la teinte accent de la palette.",
     },
-    content: {
-      title: "contentSx",
+    tuning: {
+      title: "density et intensity",
       description:
-        "contentSx cible la zone de contenu centrée, par exemple pour en contraindre la largeur.",
+        "density fixe le nombre de masses, de 1 à 10. intensity multiplie l'éclat des masses et des points.",
+      cardTitle: "Quatre masses",
+      cardBody: "Moins de masses, plus lumineuses.",
     },
   },
   props: {
-    variant:
-      "Composition des formes : hero occupe le centre, ambient reste discret derrière un contenu, edge se tient aux bords.",
-    density: "Nombre de formes. Sans elle, la densité suit la variante et la largeur de l'écran.",
-    intensity: "Facteur d'opacité des formes.",
+    children: "Contenu centré au-dessus du fond.",
     animated:
-      "Fait dériver lentement les formes. Sans effet quand un mouvement réduit est demandé.",
-    children: "Contenu centré au-dessus des formes décoratives.",
-    color: "Couleur de fond, exprimée via une clé de la palette du thème.",
+      "Fait onduler les masses. Sans effet quand un mouvement réduit est demandé : le fond reste alors une image fixe.",
+    color:
+      "Couleur unique du fond : un nom de palette (primary, secondary, accent, info, success, warning, error) ou une clé comme primary.main, dont seul le nom est retenu.",
+    intensity: "Multiplicateur de l'éclat des masses, des lueurs et des points. 1 rend la recette.",
+    density: "Nombre de masses de lave, de 1 à 10.",
+    variant:
+      "Disposition du contenu : hero et ambient le centrent sur 100vh, edge le pose en haut, sans hauteur minimale. Le rendu du fond est identique.",
     minHeight: "Hauteur minimale du conteneur ; utilisez 100% pour épouser un parent dimensionné.",
     component: "Élément HTML rendu, par exemple main pour la zone principale d'une page.",
     sx: "Styles additionnels appliqués au conteneur externe.",
-    contentSx: "Styles additionnels appliqués à la zone de contenu centrée.",
+    contentSx: "Styles additionnels appliqués à la zone de contenu.",
   },
 };
 
 const en: typeof fr = {
   intro:
-    "Decorative background animated with organic shapes (circles, triangles, capsules) derived from the palette. It centers its content and serves as a backdrop for authentication screens and portal pages. The shapes adapt automatically to mobile.",
+    "Lava dot grid background: a discreet grid of dots crossed by glowing masses, like a lava lamp, tinted with a single palette colour. It follows the light or dark theme, centres its content and happily hosts a frosted card. When animated, it flows at 30 frames per second and pauses off screen or in a hidden tab; without animation or with reduced motion, it stays a still image.",
   sections: {
     basic: "Basic usage",
-    color: "Color",
-    content: "Content area",
+    modes: "Light and dark",
+    color: "Colour",
+    tuning: "Density and intensity",
     api: "API",
   },
   demos: {
     basic: {
-      title: "Background with centered content",
+      title: "Background with a frosted card",
       description:
-        "Content is centered vertically and horizontally above the shapes. minHeight defaults to 100vh; here 100% fits the demo container.",
+        "Content is centred above the grid. minHeight defaults to 100vh; here 100% fits the demo container.",
+      cardTitle: "CanopUI",
+      cardBody: "A dot grid crossed by glowing lava masses.",
+    },
+    modes: {
+      title: "The same background, light then dark theme",
+      description:
+        "Nothing to set: the tint, the dot ink and the glows are read from the current theme variables.",
+      lightTitle: "Light theme",
+      darkTitle: "Dark theme",
+      cardBody: "The background follows the application theme.",
     },
     color: {
-      title: "Custom tint",
-      description: "color accepts any key of the theme palette to recolor the background.",
-    },
-    content: {
-      title: "contentSx",
+      title: "Lava in the accent colour",
       description:
-        "contentSx targets the centered content area, for example to constrain its width.",
+        "color picks the single colour of the background: glows, lit dots and the background tint follow it, in light as in dark; only the resting grid keeps the neutral text ink. Legacy keys such as accent.main are still accepted. In a template, PageScaffold and Layout go through backgroundTone, which this showcase sets to accent.",
+      lightTitle: "Accent, light theme",
+      darkTitle: "Accent, dark theme",
+      cardBody: "The masses take the accent hue of the palette.",
+    },
+    tuning: {
+      title: "density and intensity",
+      description:
+        "density sets the number of masses, from 1 to 10. intensity multiplies the glow of masses and dots.",
+      cardTitle: "Four masses",
+      cardBody: "Fewer masses, brighter ones.",
     },
   },
   props: {
+    children: "Content centred above the background.",
+    animated:
+      "Makes the masses flow. No effect when reduced motion is asked for: the background then stays a still image.",
+    color:
+      "Single colour of the background: a palette name (primary, secondary, accent, info, success, warning, error) or a key such as primary.main, of which only the name is kept.",
+    intensity: "Multiplier of the glow of masses, halos and dots. 1 renders the recipe.",
+    density: "Number of lava masses, from 1 to 10.",
     variant:
-      "Shape composition: hero fills the centre, ambient stays discreet behind content, edge keeps to the borders.",
-    density: "Number of shapes. Without it, density follows the variant and the screen width.",
-    intensity: "Opacity factor of the shapes.",
-    animated: "Makes the shapes drift slowly. No effect when reduced motion is asked for.",
-    children: "Content centered above the decorative shapes.",
-    color: "Background color, expressed via a key of the theme palette.",
+      "Content layout: hero and ambient centre it over 100vh, edge sets it at the top with no minimum height. The background looks the same.",
     minHeight: "Minimum height of the container; use 100% to fit a sized parent.",
     component: "Rendered HTML element, for example main for a page's main area.",
     sx: "Additional styles applied to the outer container.",
-    contentSx: "Additional styles applied to the centered content area.",
+    contentSx: "Additional styles applied to the content area.",
   },
 };
 
@@ -116,16 +163,16 @@ const texts = { fr, en };
 export default function ShapeBackgroundDoc() {
   const t = texts[useDocLocale()];
   const propRows: PropRow[] = [
+    { name: "children", type: "ReactNode", description: t.props.children },
+    { name: "animated", type: "boolean", defaultValue: "false", description: t.props.animated },
+    { name: "color", type: "string", defaultValue: '"primary.main"', description: t.props.color },
+    { name: "intensity", type: "number", defaultValue: "1", description: t.props.intensity },
+    { name: "density", type: "number", defaultValue: "10", description: t.props.density },
     {
-      name: "children",
-      type: "ReactNode",
-      description: t.props.children,
-    },
-    {
-      name: "color",
-      type: "string",
-      defaultValue: '"primary.main"',
-      description: t.props.color,
+      name: "variant",
+      type: '"hero" | "ambient" | "edge"',
+      defaultValue: '"hero"',
+      description: t.props.variant,
     },
     {
       name: "minHeight",
@@ -139,30 +186,8 @@ export default function ShapeBackgroundDoc() {
       defaultValue: '"div"',
       description: t.props.component,
     },
-    {
-      name: "sx",
-      type: "SxProps<Theme>",
-      description: t.props.sx,
-    },
-    {
-      name: "contentSx",
-      type: "SxProps<Theme>",
-      description: t.props.contentSx,
-    },
-    {
-      name: "variant",
-      type: '"hero" | "ambient" | "edge"',
-      defaultValue: '"hero"',
-      description: t.props.variant,
-    },
-    {
-      name: "density",
-      type: "number",
-      defaultValue: "selon la variante et le palier",
-      description: t.props.density,
-    },
-    { name: "intensity", type: "number", defaultValue: "1", description: t.props.intensity },
-    { name: "animated", type: "boolean", defaultValue: "false", description: t.props.animated },
+    { name: "sx", type: "SxProps<Theme>", description: t.props.sx },
+    { name: "contentSx", type: "SxProps<Theme>", description: t.props.contentSx },
   ];
 
   return (
@@ -174,20 +199,30 @@ export default function ShapeBackgroundDoc() {
           code={basicCode}
           align="stretch"
         >
-          <Box
-            sx={[
-              {
-                height: "24rem",
-                width: "100%",
-                overflow: "hidden",
-              },
-              squircleClip(tokens.radius.sm),
-            ]}
-          >
-            <ShapeBackground minHeight="100%">
-              <Card title="CanopUI">Fond décoratif composé de formes organiques.</Card>
-            </ShapeBackground>
-          </Box>
+          <DemoViewport>
+            <LavaShowcase title={t.demos.basic.cardTitle} body={t.demos.basic.cardBody} />
+          </DemoViewport>
+        </DemoCard>
+      </DocSection>
+      <DocSection title={t.sections.modes}>
+        <DemoCard
+          title={t.demos.modes.title}
+          description={t.demos.modes.description}
+          code={modesCode}
+          align="stretch"
+        >
+          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+            <DemoViewport height="22rem">
+              <ThemeScope mode="light">
+                <LavaShowcase title={t.demos.modes.lightTitle} body={t.demos.modes.cardBody} />
+              </ThemeScope>
+            </DemoViewport>
+            <DemoViewport height="22rem">
+              <ThemeScope mode="dark">
+                <LavaShowcase title={t.demos.modes.darkTitle} body={t.demos.modes.cardBody} />
+              </ThemeScope>
+            </DemoViewport>
+          </Stack>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.color}>
@@ -197,45 +232,43 @@ export default function ShapeBackgroundDoc() {
           code={colorCode}
           align="stretch"
         >
-          <Box
-            sx={[
-              {
-                height: "24rem",
-                width: "100%",
-                overflow: "hidden",
-              },
-              squircleClip(tokens.radius.sm),
-            ]}
-          >
-            <ShapeBackground minHeight="100%" color="secondary.main">
-              <Card>Le fond adopte la teinte fournie via la prop color.</Card>
-            </ShapeBackground>
-          </Box>
+          <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+            <DemoViewport height="22rem">
+              <ThemeScope mode="light">
+                <LavaShowcase
+                  color="accent"
+                  title={t.demos.color.lightTitle}
+                  body={t.demos.color.cardBody}
+                />
+              </ThemeScope>
+            </DemoViewport>
+            <DemoViewport height="22rem">
+              <ThemeScope mode="dark">
+                <LavaShowcase
+                  color="accent"
+                  title={t.demos.color.darkTitle}
+                  body={t.demos.color.cardBody}
+                />
+              </ThemeScope>
+            </DemoViewport>
+          </Stack>
         </DemoCard>
       </DocSection>
-      <DocSection title={t.sections.content}>
+      <DocSection title={t.sections.tuning}>
         <DemoCard
-          title={t.demos.content.title}
-          description={t.demos.content.description}
-          code={contentCode}
+          title={t.demos.tuning.title}
+          description={t.demos.tuning.description}
+          code={tuningCode}
           align="stretch"
         >
-          <Box
-            sx={[
-              {
-                height: "24rem",
-                width: "100%",
-                overflow: "hidden",
-              },
-              squircleClip(tokens.radius.sm),
-            ]}
-          >
-            <ShapeBackground minHeight="100%" contentSx={{ maxWidth: "18rem" }}>
-              <Card title="Contenu contraint">
-                contentSx limite ici la largeur de la zone de contenu centrée.
-              </Card>
-            </ShapeBackground>
-          </Box>
+          <DemoViewport>
+            <LavaShowcase
+              density={4}
+              intensity={1.3}
+              title={t.demos.tuning.cardTitle}
+              body={t.demos.tuning.cardBody}
+            />
+          </DemoViewport>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.api}>

@@ -9,4 +9,5 @@ export {
   type CanopStackJustify,
   type CanopStackPadding,
   type CanopStackSticky,
+  type CanopResponsiveValue,
 } from "./Stack";

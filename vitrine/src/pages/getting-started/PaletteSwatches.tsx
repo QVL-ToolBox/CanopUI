@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { palette, paletteDark, paletteHalloween, paletteHalloweenDark, Stack } from "@canop/ui";
 import { squircleClip, tokens } from "@canop/ui";
-import { monoFontFamily } from "../../kit/CodeBlock";
+import { monoFontFamily } from "../../kit/codeStyle";
 
 type PaletteFamily = { main: string; light: string; dark: string; contrastText: string };
 
@@ -30,8 +30,9 @@ function Swatch({ label, color, textColor }: { label: string; color: string; tex
     <Box
       sx={[
         {
-          flex: 1,
-          minWidth: "7rem",
+          flex: "1 1 7rem",
+          minWidth: 0,
+          overflowWrap: "anywhere",
           padding: "0.75rem",
           bgcolor: color,
           color: textColor,

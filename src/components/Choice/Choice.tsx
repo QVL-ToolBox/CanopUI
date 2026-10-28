@@ -39,7 +39,7 @@ const MARK = {
 /**
  * Une réponse proposée, qui sait dire si elle était la bonne.
  *
- * `Pressable` apporte déjà la forme, l'anneau de focus et le clavier, mais
+ * `Pressable` apporte déjà la forme et le clavier, mais
  * n'a pas d'état juste ou faux — or c'est l'interaction la plus fréquente d'un
  * questionnaire, et chaque application la redessinait à coups de classes CSS.
  *

@@ -2,7 +2,10 @@ import { useTranslation } from "../../i18n";
 import { isValidEmail } from "../../validation";
 import { Input, type CanopInputProps } from "./Input";
 
-export type CanopInputEmailProps = Omit<CanopInputProps, "type" | "icon" | "validate">;
+export type CanopInputEmailProps = Omit<
+  CanopInputProps,
+  "type" | "icon" | "validate" | "completion" | "completionNormalize" | "onCompletionAccept"
+>;
 
 export function InputEmail({ autoComplete = "email", required, ...rest }: CanopInputEmailProps) {
   const { t } = useTranslation();

@@ -5,6 +5,7 @@ import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
 import { PropsTable, type PropRow } from "../../kit/PropsTable";
 import { useDocLocale } from "../../i18n/useDocLocale";
+import { StickyHeaderBackdrops } from "./dataTable/StickyHeaderBackdrops";
 
 const importCode = `import { DataTable, type CanopColumn } from "@canop/ui";`;
 
@@ -207,13 +208,20 @@ const selectionCode = `function SelectableTable() {
   );
 }`;
 
-const loadingCode = `<DataTable columns={columns} rows={[]} getRowKey={(row) => row.id} loading />`;
+const loadingCode = `<DataTable
+  columns={columns}
+  rows={[]}
+  getRowKey={(row) => row.id}
+  loading
+  fixedLayout
+/>`;
 
 const emptyCode = `<DataTable
   columns={columns}
   rows={[]}
   getRowKey={(row) => row.id}
   emptyMessage="Aucun utilisateur"
+  fixedLayout
 />`;
 
 const scrollCode = `<DataTable
@@ -225,6 +233,56 @@ const scrollCode = `<DataTable
   animated
   enableKeyboardNav
 />`;
+
+const stickyBackdropsCode = `function StickyTable() {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  return (
+    <DataTable
+      columns={columns}
+      rows={rows}
+      getRowKey={(row) => row.id}
+      maxHeight="16rem"
+      stickyHeader
+      selectable
+      selectedKeys={selected}
+      onSelectionChange={setSelected}
+      actionsHeader="Actions"
+      actions={() => (
+        <Button size="small" variant="secondary" onClick={() => {}}>
+          Voir
+        </Button>
+      )}
+    />
+  );
+}
+
+<Card>
+  <StickyTable />
+</Card>`;
+
+function StickyTable() {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  return (
+    <DataTable
+      columns={columns}
+      rows={rows}
+      getRowKey={(row) => row.id}
+      maxHeight="16rem"
+      stickyHeader
+      selectable
+      selectedKeys={selected}
+      onSelectionChange={setSelected}
+      actionsHeader="Actions"
+      actions={() => (
+        <Button size="small" variant="secondary" onClick={() => {}}>
+          Voir
+        </Button>
+      )}
+    />
+  );
+}
 
 function EditableTable() {
   const [derniere, setDerniere] = useState<DemoUser | null>(null);
@@ -309,7 +367,7 @@ const fr = {
     basic: {
       title: "Tableau basique",
       description:
-        "Fournissez columns, rows et getRowKey. Chaque colonne lit par défaut le champ correspondant à sa clé.",
+        "Fournissez columns, rows et getRowKey. Chaque colonne lit par défaut le champ correspondant à sa clé. Trop large pour l'écran, le tableau défile horizontalement dans son propre conteneur, accessible au clavier, sans faire déborder la page.",
     },
     sort: {
       title: "Colonnes triables",
@@ -350,6 +408,17 @@ const fr = {
       description:
         "Avec maxHeight, le corps défile en interne ; stickyHeader fige l'en-tête et lui donne sa propre surface, animated anime l'apparition et enableKeyboardNav autorise les flèches haut/bas.",
     },
+    stickyBackdrops: {
+      title: "En-tête figée sur tous les fonds",
+      description:
+        "L'en-tête figée est une barre squircle opaque, du même rayon et de la même ombre que les lignes. Pendant le défilement interne, les lignes qui passent dessous sont découpées hors de ses coins arrondis : aucun rectangle de la couleur du thème n'apparaît autour, que le tableau repose sur le fond du thème, une carte, une image ou un verre liquide sur vidéo. Faites défiler chaque tableau pour le vérifier. Ce découpage exige une hauteur bornée (maxHeight ou fillHeight) : en défilement de page, la barre reste squircle mais ses coins ne découpent pas les lignes.",
+      backgrounds: {
+        theme: "Fond du thème",
+        card: "Carte",
+        image: "Image (affiche de la canopée)",
+        frosted: "Verre liquide sur vidéo de la canopée",
+      },
+    },
   },
   columnDescription:
     "Chaque entrée de columns décrit une colonne du tableau, de la clé d'accès au rendu personnalisé.",
@@ -371,7 +440,8 @@ const fr = {
     editLabel: "Nom accessible de l'action ; par défaut la traduction canop.dataTable.edit.",
     fixedLayout: "Applique table-layout: fixed pour figer la largeur des colonnes.",
     rowSx: "Styles conditionnels appliqués à une ligne selon ses données.",
-    stickyHeader: "Fige l'en-tête en haut lors du défilement interne.",
+    stickyHeader:
+      "Fige l'en-tête en haut lors du défilement. En défilement de page (sans maxHeight ni fillHeight), la barre reste squircle mais les lignes ne sont pas découpées sous ses coins, et le défilement horizontal intégré est coupé pour que l'en-tête colle à la page : pour un rendu parfait, bornez la hauteur.",
     fillHeight:
       "Étire le tableau pour occuper la hauteur de son conteneur flex et défiler en interne.",
     maxHeight: "Hauteur maximale ; au-delà, le corps du tableau défile en interne.",
@@ -391,6 +461,8 @@ const fr = {
     onRowActivate: "Appelé à l'activation d'une ligne au clavier (touche Entrée).",
     mobileBreakpoint:
       "Breakpoint sous lequel les colonnes hideOnMobile sont masquées et la mise en page passe en mode compact.",
+    ariaLabel:
+      "Nom accessible de la zone de défilement, annoncé quand le tableau déborde ; par défaut la traduction canop.dataTable.scrollRegion.",
   },
   columnProps: {
     key: "Identifiant de la colonne ; sert d'accesseur par défaut sur la ligne.",
@@ -435,7 +507,7 @@ const en: typeof fr = {
     basic: {
       title: "Basic table",
       description:
-        "Provide columns, rows and getRowKey. By default, each column reads the field matching its key.",
+        "Provide columns, rows and getRowKey. By default, each column reads the field matching its key. When too wide for the screen, the table scrolls horizontally inside its own container, reachable by keyboard, without overflowing the page.",
     },
     sort: {
       title: "Sortable columns",
@@ -475,6 +547,17 @@ const en: typeof fr = {
       description:
         "With maxHeight, the body scrolls internally; stickyHeader pins the header and gives it its own surface, animated animates the entrance and enableKeyboardNav enables the up/down arrows.",
     },
+    stickyBackdrops: {
+      title: "Sticky header on every background",
+      description:
+        "The sticky header is an opaque squircle bar, with the same radius and shadow as the rows. During internal scrolling, the rows passing beneath it are cut out of its rounded corners: no rectangle of the theme color shows around it, whether the table sits on the theme background, a card, an image or liquid glass over video. Scroll each table to check. This cut-out requires a bounded height (maxHeight or fillHeight): with page scrolling, the bar stays squircle but its corners do not cut the rows.",
+      backgrounds: {
+        theme: "Theme background",
+        card: "Card",
+        image: "Image (canopy poster)",
+        frosted: "Liquid glass over the canopy video",
+      },
+    },
   },
   columnDescription:
     "Each entry in columns describes a table column, from the access key to custom rendering.",
@@ -496,7 +579,8 @@ const en: typeof fr = {
     editLabel: "Accessible name of the action; defaults to the canop.dataTable.edit translation.",
     fixedLayout: "Applies table-layout: fixed to freeze the column widths.",
     rowSx: "Conditional styles applied to a row based on its data.",
-    stickyHeader: "Pins the header to the top during internal scrolling.",
+    stickyHeader:
+      "Pins the header to the top while scrolling. With page scrolling (no maxHeight or fillHeight), the bar stays squircle but the rows are not cut out beneath its corners, and the built-in horizontal scroll is turned off so the header sticks to the page: for a flawless result, bound the height.",
     fillHeight:
       "Stretches the table to fill the height of its flex container and scroll internally.",
     maxHeight: "Maximum height; beyond it, the table body scrolls internally.",
@@ -514,6 +598,8 @@ const en: typeof fr = {
     onRowActivate: "Called on keyboard activation of a row (Enter key).",
     mobileBreakpoint:
       "Breakpoint below which hideOnMobile columns are hidden and the layout switches to compact.",
+    ariaLabel:
+      "Accessible name of the scroll region, announced when the table overflows; defaults to the canop.dataTable.scrollRegion translation.",
   },
   columnProps: {
     key: "Column identifier; used as the default accessor on the row.",
@@ -648,6 +734,7 @@ export default function DataTableDoc() {
       defaultValue: '"md"',
       description: t.props.mobileBreakpoint,
     },
+    { name: "ariaLabel", type: "string", description: t.props.ariaLabel },
   ];
 
   const columnRows: PropRow[] = [
@@ -791,7 +878,7 @@ export default function DataTableDoc() {
           code={loadingCode}
           align="stretch"
         >
-          <DataTable columns={columns} rows={[]} getRowKey={(row) => row.id} loading />
+          <DataTable columns={columns} rows={[]} getRowKey={(row) => row.id} loading fixedLayout />
         </DemoCard>
         <DemoCard
           title={t.demos.empty.title}
@@ -804,6 +891,7 @@ export default function DataTableDoc() {
             rows={[]}
             getRowKey={(row) => row.id}
             emptyMessage="Aucun utilisateur"
+            fixedLayout
           />
         </DemoCard>
       </DocSection>
@@ -822,6 +910,17 @@ export default function DataTableDoc() {
             stickyHeader
             animated
             enableKeyboardNav
+          />
+        </DemoCard>
+        <DemoCard
+          title={t.demos.stickyBackdrops.title}
+          description={t.demos.stickyBackdrops.description}
+          code={stickyBackdropsCode}
+          align="stretch"
+        >
+          <StickyHeaderBackdrops
+            labels={t.demos.stickyBackdrops.backgrounds}
+            table={<StickyTable />}
           />
         </DemoCard>
       </DocSection>

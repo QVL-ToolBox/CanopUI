@@ -196,19 +196,13 @@ function ghostAnimation(motion: GhostGlyphMotion): string {
   return `${sway}, ${loop(GHOST_BREATHE, motion.breathe, motion.delay, "alternate")}`;
 }
 
-export function ghostGlyphSx(
-  depth: HalloweenDepth,
-  motion: GhostGlyphMotion,
-  animated: boolean,
-): CSSObject {
-  const breathing = animated && motion.breathe !== null;
+export function ghostGlyphSx(depth: HalloweenDepth): CSSObject {
   return {
     display: "block",
     width: "100%",
     height: "auto",
     overflow: "visible",
     color: halloweenTone("ghost"),
-    opacity: breathing ? `var(${HAUNT_MIN_VAR})` : `var(${HAUNT_MAX_VAR})`,
     filter: depthLook[depth].filter,
     "& [data-part='eye']": { fill: halloweenTone("ghostEye") },
     "& [data-part='line']": {
@@ -216,6 +210,14 @@ export function ghostGlyphSx(
       stroke: halloweenTone("ghostEye"),
       strokeLinecap: "round",
     },
+  };
+}
+
+export function ghostMotionSx(motion: GhostGlyphMotion, animated: boolean): CSSObject {
+  const breathing = animated && motion.breathe !== null;
+  return {
+    display: "block",
+    opacity: breathing ? `var(${HAUNT_MIN_VAR})` : `var(${HAUNT_MAX_VAR})`,
     ...when(animated, {
       animation: ghostAnimation(motion),
       ...keyframes(GHOST_SWAY, {

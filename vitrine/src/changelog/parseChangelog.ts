@@ -284,6 +284,20 @@ export function releaseStatus(version: string, published: string): ChangelogRele
   return "past";
 }
 
+export function releaseStatusInHistory(
+  version: string,
+  history: readonly string[],
+  published: string,
+): ChangelogReleaseStatus {
+  const index = history.indexOf(version);
+  const publishedIndex = history.findIndex(
+    (candidate) => releaseStatus(candidate, published) === "current",
+  );
+  if (publishedIndex === -1 || index === -1) return releaseStatus(version, published);
+  if (index === publishedIndex) return "current";
+  return index < publishedIndex ? "upcoming" : "past";
+}
+
 export function releaseAnchorId(version: string): string {
   return `release-${version.replace(/\./g, "-")}`;
 }

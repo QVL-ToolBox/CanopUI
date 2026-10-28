@@ -3,7 +3,7 @@ import { SEASONAL_DECOR_DENSITY } from "./seasonalDecorDensity";
 import { useHalloweenDecor } from "./useHalloweenDecor";
 
 export function HalloweenSeasonOverlay() {
-  const { witch, spiders, animated, paused, overlayZIndex, toneVariables } =
+  const { witch, spiders, animated, tabHidden, revealed, overlayZIndex, toneVariables } =
     useHalloweenDecor(SEASONAL_DECOR_DENSITY);
 
   return (
@@ -12,7 +12,8 @@ export function HalloweenSeasonOverlay() {
       spiders={spiders}
       scope="viewport"
       animated={animated}
-      paused={paused}
+      tabHidden={tabHidden}
+      revealed={revealed}
       zIndex={overlayZIndex}
       toneVariables={toneVariables}
     />

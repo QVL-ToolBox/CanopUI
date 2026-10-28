@@ -1,6 +1,8 @@
 import MuiLink from "@mui/material/Link";
 import type { ElementType, ReactNode } from "react";
+import { keyboardFocus, withoutFocusRing } from "../../interaction";
 import { tokens } from "../../tokens";
+import { singleLineEllipsis } from "../_shared/truncation";
 import { LinkNewTabHint } from "./LinkNewTabHint";
 import { linkTargetProps } from "./linkTargetProps";
 
@@ -36,6 +38,12 @@ const colorMapping = {
 
 const Root = MuiLink as ElementType;
 
+const TRUNCATED_INLINE = {
+  ...singleLineEllipsis,
+  display: "inline-block",
+  verticalAlign: "bottom",
+};
+
 export function Link({
   href,
   component,
@@ -55,7 +63,9 @@ export function Link({
       sx={{
         fontSize: sizeMapping[size],
         color: colorMapping[color],
-        whiteSpace: noWrap ? "nowrap" : undefined,
+        ...(noWrap ? TRUNCATED_INLINE : null),
+        ...withoutFocusRing,
+        [keyboardFocus()]: { textDecoration: "underline" },
       }}
     >
       {children}

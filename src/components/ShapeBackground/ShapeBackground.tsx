@@ -1,13 +1,11 @@
-import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import type { SxProps, Theme } from "@mui/material/styles";
 import type { ElementType, ReactNode } from "react";
-import { EdgeBand } from "./EdgeBand";
-import { ShapeLayer } from "./ShapeLayer";
-import { SurfaceVeil } from "../_shared/SurfaceVeil";
+import { LavaField } from "./LavaField";
+import type { CanopShapeVariant } from "./shapeLayout";
 import { useShapeBackground } from "./useShapeBackground";
-import type { CanopShapeVariant } from "./shapes";
 
-export type { CanopShapeVariant } from "./shapes";
+export type { CanopShapeVariant } from "./shapeLayout";
 
 export interface CanopShapeBackgroundProps {
   children?: ReactNode;
@@ -34,52 +32,47 @@ export function ShapeBackground({
   sx,
   contentSx,
 }: CanopShapeBackgroundProps) {
-  const { shapes, shapeBlur, showVeil, veilOpacity, backgroundColor, contentJustify } =
-    useShapeBackground({ variant, density, intensity, color });
-
-  const isEdge = variant === "edge";
-  const resolvedMinHeight = minHeight ?? (isEdge ? "auto" : "100vh");
+  const { layout, lava, motion, backgroundColor } = useShapeBackground({
+    variant,
+    density,
+    intensity,
+    color,
+    animated,
+  });
 
   return (
-    <Box
+    <Stack
+      ref={motion.ref}
       component={component}
       sx={[
         {
           position: "relative",
           overflow: "hidden",
-          minHeight: resolvedMinHeight,
-          display: "flex",
-          flexDirection: "column",
+          isolation: "isolate",
+          minHeight: minHeight ?? layout.minHeight,
           alignItems: "center",
-          justifyContent: contentJustify,
-          padding: isEdge ? 0 : "1rem",
+          justifyContent: layout.justifyContent,
+          padding: layout.framePadding,
           backgroundColor,
         },
         ...(Array.isArray(sx) ? sx : [sx]),
       ]}
     >
-      {isEdge ? (
-        <EdgeBand shapes={shapes} animated={animated} blur={shapeBlur} />
-      ) : (
-        <ShapeLayer shapes={shapes} animated={animated} blur={shapeBlur} />
-      )}
-      {showVeil && <SurfaceVeil opacity={veilOpacity} />}
-      <Box
+      <LavaField lava={lava} motion={motion} />
+      <Stack
         sx={[
           {
             position: "relative",
-            zIndex: 2,
+            zIndex: 1,
             width: "100%",
-            display: "flex",
-            flexDirection: "column",
             alignItems: "center",
-            padding: isEdge ? "1rem" : 0,
+            padding: layout.contentPadding,
           },
           ...(Array.isArray(contentSx) ? contentSx : [contentSx]),
         ]}
       >
         {children}
-      </Box>
-    </Box>
+      </Stack>
+    </Stack>
   );
 }

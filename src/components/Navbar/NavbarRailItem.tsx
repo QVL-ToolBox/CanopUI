@@ -1,4 +1,5 @@
 import { NavbarTileItem } from "./NavbarTileItem";
+import { RAIL_TILE_PLACEMENT } from "./navbarTilePlacement";
 import { type CanopNavbarItem } from "./navigation";
 
 export interface NavbarRailItemProps {
@@ -13,10 +14,7 @@ export function NavbarRailItem({ item, activeHref, onNavigate }: NavbarRailItemP
       item={item}
       activeHref={activeHref}
       onNavigate={onNavigate}
-      tooltipPlacement="right"
-      popoverAnchorOrigin={{ vertical: "center", horizontal: "right" }}
-      popoverTransformOrigin={{ vertical: "center", horizontal: "left" }}
-      popoverOffset={{ marginLeft: "0.5rem" }}
+      placement={RAIL_TILE_PLACEMENT}
     />
   );
 }

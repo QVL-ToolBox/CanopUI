@@ -1,9 +1,11 @@
 import Stack from "@mui/material/Stack";
-import { squircleSurface } from "../../squircle";
+import { squircleFill, squircleSurface } from "../../squircle";
 import IconButton from "@mui/material/IconButton";
 import ButtonBase from "@mui/material/ButtonBase";
+import type { CSSObject } from "@mui/material/styles";
 import { useState, type MouseEvent } from "react";
 import { useTranslation } from "../../i18n";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import { Icon } from "../Icon";
 import { Menu, MenuItem } from "../Menu";
 import type { CanopToolbarSortConfig } from "./toolbarTypes";
@@ -12,6 +14,12 @@ export interface ToolbarSortProps {
   config: CanopToolbarSortConfig;
   compact: boolean;
 }
+
+const SORT_SURFACE = squircleSurface({
+  radius: "1.375rem",
+  shape: "pill",
+  background: "transparent",
+});
 
 export function ToolbarSort({ config, compact }: ToolbarSortProps) {
   const { t } = useTranslation();
@@ -50,15 +58,18 @@ export function ToolbarSort({ config, compact }: ToolbarSortProps) {
           height: "2.75rem",
           gap: "0.5rem",
           paddingX: compact ? "0.75rem" : "1rem",
-          ...squircleSurface({ radius: "1.375rem", shape: "pill", background: "transparent" }),
+          ...SORT_SURFACE,
           color: "text.secondary",
           fontWeight: 600,
           fontSize: "0.8125rem",
           whiteSpace: "nowrap",
-          transition:
-            "background-color var(--canop-motion-duration-fast) var(--canop-motion-ease-standard)",
-          "&:hover": {
-            backgroundColor: (theme) => theme.palette.surface.sunken,
+          "&::before": {
+            ...(SORT_SURFACE["&::before"] as CSSObject),
+            transition:
+              "background-color var(--canop-motion-duration-fast) var(--canop-motion-ease-standard)",
+          },
+          [hoverOrKeyboardFocus()]: {
+            ...squircleFill("var(--canop-palette-surface-sunken)"),
             color: "text.primary",
           },
         }}

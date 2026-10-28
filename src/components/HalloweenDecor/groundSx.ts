@@ -38,9 +38,10 @@ export function treeAnchorSx(side: HalloweenSide): CSSObject {
 
 export function treeSx(side: HalloweenSide, animated: boolean): CSSObject {
   return {
-    ...SVG_BLOCK,
+    display: "block",
     color: halloweenTone("tree"),
     transformOrigin: "50% 100%",
+    "& > svg": SVG_BLOCK,
     ...when(animated, {
       animation: loop(TREE_SWAY, side === "left" ? 9.7 : 11.3, 0, "alternate"),
       ...keyframes(TREE_SWAY, {
@@ -67,46 +68,44 @@ export function graveyardSx(): CSSObject {
   };
 }
 
-const CAT_EYE: CSSObject = {
-  transformBox: "fill-box",
-  transformOrigin: "50% 50%",
-  fill: halloweenTone("catEye"),
-};
-
-const CAT_TAIL_STYLE: CSSObject = {
-  transformBox: "view-box",
-  transformOrigin: "69% 93%",
-  fill: "none",
-  stroke: halloweenTone("cat"),
-  strokeLinecap: "round",
-};
-
-export function catSx(animated: boolean): CSSObject {
+export function catSx(): CSSObject {
   return {
     position: "absolute",
     left: "55%",
     bottom: "76%",
     width: "15%",
-    "& svg": SVG_BLOCK,
+    aspectRatio: "26 / 28",
     "& [data-part='body']": {
       fill: halloweenTone("cat"),
       filter: `drop-shadow(0 0 0.2rem ${halloweenTone("ghostGlow")})`,
     },
-    "& [data-part='tail']": CAT_TAIL_STYLE,
-    "& [data-part='eye']": CAT_EYE,
+    "& [data-part='tail']": {
+      fill: "none",
+      stroke: halloweenTone("cat"),
+      strokeLinecap: "round",
+    },
+    "& [data-part='eye']": { fill: halloweenTone("catEye") },
+  };
+}
+
+export function catTailSx(animated: boolean): CSSObject {
+  return {
+    transformOrigin: "69% 93%",
     ...when(animated, {
-      "& [data-part='tail']": {
-        ...CAT_TAIL_STYLE,
-        animation: loop(CAT_TAIL, 3.7, 0, "alternate"),
-      },
-      "& [data-part='eye']": {
-        ...CAT_EYE,
-        animation: loop(CAT_BLINK, 6.1, -2, "normal", "linear"),
-      },
+      animation: loop(CAT_TAIL, 3.7, 0, "alternate"),
       ...keyframes(CAT_TAIL, {
         "0%": { transform: "rotate(-8deg)" },
         "100%": { transform: "rotate(6deg)" },
       }),
+    }),
+  };
+}
+
+export function catEyesSx(animated: boolean): CSSObject {
+  return {
+    transformOrigin: "50% 35.714%",
+    ...when(animated, {
+      animation: loop(CAT_BLINK, 6.1, -2, "normal", "linear"),
       ...keyframes(CAT_BLINK, {
         "0%, 92%, 100%": { transform: "scaleY(1)" },
         "95%": { transform: "scaleY(0.1)" },

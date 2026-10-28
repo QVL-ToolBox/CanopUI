@@ -1,12 +1,3 @@
-import type { CanopHeadingLevel, CanopHeadingTextElement } from "../Heading";
+import type { CanopTitleLevel } from "../_shared/titleLevel";
 
-export type CanopNavbarTitleLevel = CanopHeadingLevel | "text";
-
-export interface NavbarTitleSemantics {
-  level?: CanopHeadingLevel;
-  component?: CanopHeadingTextElement;
-}
-
-export function navbarTitleSemantics(titleLevel: CanopNavbarTitleLevel): NavbarTitleSemantics {
-  return titleLevel === "text" ? { component: "p" } : { level: titleLevel };
-}
+export type CanopNavbarTitleLevel = CanopTitleLevel;

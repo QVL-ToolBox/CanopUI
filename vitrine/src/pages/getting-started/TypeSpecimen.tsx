@@ -1,7 +1,8 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Stack, tokens } from "@canop/ui";
-import { monoFontFamily } from "../../kit/CodeBlock";
+import { monoFontFamily } from "../../kit/codeStyle";
+import { useTypeSpecimenSizing } from "./useTypeSpecimenSizing";
 
 export interface TypeSpecimenStyle {
   fontFamily?: string;
@@ -18,11 +19,31 @@ export interface TypeSpecimenProps {
   uppercase?: boolean;
 }
 
+const SUMMARY_SEPARATOR = "  ·  ";
+
 function specSummary(style: TypeSpecimenStyle): string {
-  return [style.fontSize, style.fontWeight, style.lineHeight, style.letterSpacing].join("  ·  ");
+  return [style.fontSize, style.fontWeight, style.lineHeight, style.letterSpacing].join(
+    SUMMARY_SEPARATOR,
+  );
+}
+
+interface ReducedSizeHintProps {
+  media: string;
+  label: string;
+}
+
+function ReducedSizeHint({ media, label }: ReducedSizeHintProps) {
+  return (
+    <Box component="span" sx={{ display: "none", [media]: { display: "inline" } }}>
+      {SUMMARY_SEPARATOR}
+      {label}
+    </Box>
+  );
 }
 
 export function TypeSpecimen({ token, style, sample, uppercase = false }: TypeSpecimenProps) {
+  const sizing = useTypeSpecimenSizing(style.fontSize);
+
   return (
     <Stack gap="xs">
       <Typography
@@ -31,6 +52,7 @@ export function TypeSpecimen({ token, style, sample, uppercase = false }: TypeSp
           color: "text.secondary",
           fontSize: "0.75rem",
           fontFamily: monoFontFamily,
+          overflowWrap: "anywhere",
         }}
       >
         {token}
@@ -40,6 +62,8 @@ export function TypeSpecimen({ token, style, sample, uppercase = false }: TypeSp
         sx={{
           color: "text.primary",
           ...style,
+          fontSize: sizing.sampleFontSize,
+          overflowWrap: "break-word",
           textTransform: uppercase ? "uppercase" : "none",
         }}
       >
@@ -54,6 +78,9 @@ export function TypeSpecimen({ token, style, sample, uppercase = false }: TypeSp
         }}
       >
         {specSummary(style)}
+        {sizing.reducedMedia ? (
+          <ReducedSizeHint media={sizing.reducedMedia} label={sizing.reducedLabel} />
+        ) : null}
       </Typography>
     </Stack>
   );

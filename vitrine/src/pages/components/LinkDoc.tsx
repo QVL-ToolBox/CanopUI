@@ -17,7 +17,7 @@ const colorsCode = `<Link href="#" color="accent">Accent</Link>
 <Link href="#" color="muted">Discret</Link>`;
 
 const noWrapCode = `<Link href="#" noWrap>
-  Un libellé long qui ne passera jamais à la ligne
+  Un libellé long qui ne passera jamais à la ligne et finira coupé d'une ellipse
 </Link>`;
 
 const externalCode = `<Link href="https://dev.azure.com/qvl-project" external>
@@ -46,7 +46,7 @@ const fr = {
       "accent porte les liens d'action, muted les liens discrets. Toutes les couleurs proviennent du thème.",
     noWrapTitle: "noWrap",
     noWrapDescription:
-      "Maintient le libellé sur une seule ligne, quelle que soit la largeur disponible.",
+      "Maintient le libellé sur une seule ligne et coupe le surplus d'une ellipse quand la largeur manque, sans jamais déborder de son conteneur.",
   },
   props: {
     children: "Contenu du lien.",
@@ -56,7 +56,7 @@ const fr = {
     to: "Destination transmise au composant de routeur fourni via component.",
     size: "Taille de police du lien.",
     color: "Couleur sémantique du lien, issue du thème.",
-    noWrap: "Empêche le retour à la ligne du libellé.",
+    noWrap: "Tient le libellé sur une ligne et le tronque d'une ellipse s'il manque de place.",
     external: "Ouvre le lien dans un nouvel onglet et l'annonce aux technologies d'assistance.",
   },
 };
@@ -81,7 +81,8 @@ const en: typeof fr = {
     colorsDescription:
       "accent carries action links, muted carries subtle links. All colors come from the theme.",
     noWrapTitle: "noWrap",
-    noWrapDescription: "Keeps the label on a single line, regardless of the available width.",
+    noWrapDescription:
+      "Keeps the label on a single line and cuts the excess with an ellipsis when width runs out, never overflowing its container.",
   },
   props: {
     children: "Link content.",
@@ -91,7 +92,7 @@ const en: typeof fr = {
     to: "Destination passed to the router component provided via component.",
     size: "Font size of the link.",
     color: "Semantic color of the link, taken from the theme.",
-    noWrap: "Prevents the label from wrapping.",
+    noWrap: "Keeps the label on one line and truncates it with an ellipsis when space runs out.",
     external: "Opens the link in a new tab and announces it to assistive technologies.",
   },
 };
@@ -195,7 +196,7 @@ export default function LinkDoc() {
           code={noWrapCode}
         >
           <Link href="#" noWrap>
-            Un libellé long qui ne passera jamais à la ligne
+            Un libellé long qui ne passera jamais à la ligne et finira coupé d'une ellipse
           </Link>
         </DemoCard>
       </DocSection>

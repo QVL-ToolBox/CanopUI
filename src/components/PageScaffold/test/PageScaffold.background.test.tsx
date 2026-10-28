@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render } from "@testing-library/react";
+import { render, waitFor } from "@testing-library/react";
 import { CanopThemeProvider } from "../../../theme";
 import { CanopI18nProvider } from "../../../i18n";
 import { PageScaffold } from "../PageScaffold";
@@ -38,23 +38,27 @@ describe("PageScaffold — fond", () => {
     mockMatchMedia(false);
   });
 
-  it("affiche la canopee par defaut", () => {
+  it("affiche la canopee par defaut", async () => {
     renderScaffold(
       <PageScaffold items={items}>
         <p>Contenu</p>
       </PageScaffold>,
     );
-    const element = document.querySelector("video");
-    expect(element).not.toBeNull();
+    const element = await waitFor(() => {
+      const video = document.querySelector("video");
+      expect(video).not.toBeNull();
+      return video;
+    });
     expect(element).toHaveAttribute("poster", CANOP_CANOPY_SCENES.light.poster);
   });
 
-  it("revient aux formes quand background vaut shapes", () => {
+  it("revient aux formes quand background vaut shapes", async () => {
     renderScaffold(
       <PageScaffold items={items} background="shapes">
         <p>Contenu</p>
       </PageScaffold>,
     );
+    await waitFor(() => expect(document.querySelector("main canvas")).not.toBeNull());
     expect(document.querySelector("video")).toBeNull();
   });
 

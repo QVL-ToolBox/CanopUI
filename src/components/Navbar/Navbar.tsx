@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { type CanopMainElement } from "../_shared/mainElement";
 import { NavbarMobileLayout } from "./NavbarMobileLayout";
 import { NavbarRail } from "./NavbarRail";
 import { NavbarSidebar } from "./NavbarSidebar";
@@ -6,7 +7,7 @@ import { useNavbarMode } from "./useNavbarMode";
 import { type CanopNavbarItem } from "./navigation";
 import { type CanopNavbarTitleLevel } from "./navbarTitle";
 
-export type { CanopNavbarItem } from "./navigation";
+export type { CanopNavbarGroup, CanopNavbarItem } from "./navigation";
 export type { CanopNavbarTitleLevel } from "./navbarTitle";
 
 export type CanopMobileFooterPlacement = "floating" | "settings";
@@ -27,6 +28,7 @@ export interface CanopNavbarProps {
   supportHref?: string;
   height?: string;
   mobileFooterPlacement?: CanopMobileFooterPlacement;
+  mainElement?: CanopMainElement;
   children: ReactNode;
 }
 
@@ -46,6 +48,7 @@ export function Navbar({
   supportHref,
   height = "100dvh",
   mobileFooterPlacement = "floating",
+  mainElement = "main",
   children,
 }: CanopNavbarProps) {
   const mode = useNavbarMode();
@@ -65,6 +68,7 @@ export function Navbar({
         supportHref={supportHref}
         sidebarWidget={sidebarWidget}
         actions={actions}
+        mainElement={mainElement}
       >
         {children}
       </NavbarMobileLayout>
@@ -80,7 +84,9 @@ export function Navbar({
         onNavigate={onNavigate}
         userName={userName}
         onLogout={onLogout}
+        sidebarWidget={sidebarWidget}
         actions={actions}
+        mainElement={mainElement}
       >
         {children}
       </NavbarRail>
@@ -99,6 +105,7 @@ export function Navbar({
       onLogout={onLogout}
       sidebarWidget={sidebarWidget}
       actions={actions}
+      mainElement={mainElement}
     >
       {children}
     </NavbarSidebar>

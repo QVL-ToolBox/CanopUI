@@ -1,6 +1,8 @@
 import Box from "@mui/material/Box";
-import { batGlyphSx } from "./batSx";
+import { batGlyphSx, batWingSx } from "./batSx";
+import { HalloweenGlyphLayer } from "./HalloweenGlyphLayer";
 
+const VIEW_BOX = "0 0 24 24";
 const LEFT_WING =
   "M11 9.6c-1.7-.5-4.1-.1-6.2 1.3c-1.2.8-2.3 1.95-3 3.2c1.15-.5 2.4-.45 3.4.25c.6-1 1.8-1.45 2.85-.95c.3-.95 1.4-1.4 2.35-.9z";
 const RIGHT_WING =
@@ -16,12 +18,18 @@ interface HalloweenBatGlyphProps {
 
 export function HalloweenBatGlyph({ mirrored, flap, animated }: HalloweenBatGlyphProps) {
   return (
-    <Box component="svg" viewBox="0 0 24 24" sx={batGlyphSx(mirrored, flap, animated)}>
-      <path data-part="wing-left" d={LEFT_WING} fill="currentColor" />
-      <path data-part="wing-right" d={RIGHT_WING} fill="currentColor" />
-      <path d={BODY} fill="currentColor" />
-      <circle data-part="eye" cx="11.3" cy="10" r="0.35" />
-      <circle data-part="eye" cx="12.7" cy="10" r="0.35" />
+    <Box component="span" sx={batGlyphSx(mirrored)}>
+      <HalloweenGlyphLayer viewBox={VIEW_BOX} sx={batWingSx("left", flap, animated)}>
+        <path d={LEFT_WING} fill="currentColor" />
+      </HalloweenGlyphLayer>
+      <HalloweenGlyphLayer viewBox={VIEW_BOX} sx={batWingSx("right", flap, animated)}>
+        <path d={RIGHT_WING} fill="currentColor" />
+      </HalloweenGlyphLayer>
+      <HalloweenGlyphLayer viewBox={VIEW_BOX}>
+        <path d={BODY} fill="currentColor" />
+        <circle data-part="eye" cx="11.3" cy="10" r="0.35" />
+        <circle data-part="eye" cx="12.7" cy="10" r="0.35" />
+      </HalloweenGlyphLayer>
     </Box>
   );
 }

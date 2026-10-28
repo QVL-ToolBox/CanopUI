@@ -1,7 +1,18 @@
 import Box from "@mui/material/Box";
+import { HalloweenGlyphLayer } from "./HalloweenGlyphLayer";
 import type { HalloweenWitchSpec } from "./halloweenSceneTypes";
-import { sparkleSx, witchAltitudeSx, witchBobSx, witchFigureSx, witchTrackSx } from "./witchSx";
+import {
+  sparkleSx,
+  witchAltitudeSx,
+  witchBobSx,
+  witchCapeSx,
+  witchFigureSx,
+  witchHatSx,
+  witchSilhouetteSx,
+  witchTrackSx,
+} from "./witchSx";
 
+const VIEW_BOX = "0 0 80 48";
 const BRISTLES = "M16 31.5L3 26.5L5 31L1 33.5L5.5 35L2.5 40L16.5 35.5z";
 const STICK = "M16 33.5L74 24.5";
 const ARM = "M46 20C49 22 52 24.5 55 26";
@@ -25,32 +36,44 @@ export function HalloweenWitch({ spec }: HalloweenWitchProps) {
       <Box sx={witchAltitudeSx(spec)}>
         <Box sx={witchBobSx()}>
           <Box sx={witchFigureSx()}>
+            <Box component="span" sx={witchSilhouetteSx()}>
+              <HalloweenGlyphLayer viewBox={VIEW_BOX} sx={witchCapeSx()}>
+                <path data-part="cape" d={CAPE} fill="currentColor" />
+              </HalloweenGlyphLayer>
+              <HalloweenGlyphLayer viewBox={VIEW_BOX}>
+                <path
+                  data-part="stick"
+                  d={STICK}
+                  fill="none"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+                <path d={BRISTLES} fill="currentColor" />
+                <path data-part="accent" d="M15.2 31.1l2.2-.3l.6 4.6l-2.2.3z" />
+                <path d={ROBE} fill="currentColor" />
+                <path d={BOOT} fill="currentColor" />
+                <path
+                  data-part="stick"
+                  d={ARM}
+                  fill="none"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                />
+                <path d={HAIR} fill="currentColor" />
+                <circle cx="45" cy="12" r="3.2" fill="currentColor" />
+                <path d={NOSE} fill="currentColor" />
+              </HalloweenGlyphLayer>
+              <HalloweenGlyphLayer viewBox={VIEW_BOX} sx={witchHatSx()}>
+                <g data-part="hat">
+                  <path d={HAT_CONE} fill="currentColor" />
+                  <path d={HAT_BRIM} fill="currentColor" />
+                  <path data-part="accent" d={HAT_BAND} />
+                </g>
+              </HalloweenGlyphLayer>
+            </Box>
             {spec.sparkles.map((sparkle) => (
               <Box key={sparkle.id} sx={sparkleSx(sparkle)} />
             ))}
-            <svg viewBox="0 0 80 48">
-              <path data-part="cape" d={CAPE} fill="currentColor" />
-              <path
-                data-part="stick"
-                d={STICK}
-                fill="none"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              />
-              <path d={BRISTLES} fill="currentColor" />
-              <path data-part="accent" d="M15.2 31.1l2.2-.3l.6 4.6l-2.2.3z" />
-              <path d={ROBE} fill="currentColor" />
-              <path d={BOOT} fill="currentColor" />
-              <path data-part="stick" d={ARM} fill="none" strokeWidth="1.8" strokeLinecap="round" />
-              <path d={HAIR} fill="currentColor" />
-              <circle cx="45" cy="12" r="3.2" fill="currentColor" />
-              <path d={NOSE} fill="currentColor" />
-              <g data-part="hat">
-                <path d={HAT_CONE} fill="currentColor" />
-                <path d={HAT_BRIM} fill="currentColor" />
-                <path data-part="accent" d={HAT_BAND} />
-              </g>
-            </svg>
           </Box>
         </Box>
       </Box>

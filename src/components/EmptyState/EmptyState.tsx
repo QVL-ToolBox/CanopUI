@@ -1,10 +1,14 @@
 import type { ReactNode } from "react";
+import { Card } from "../Card";
 import { type CanopHeadingLevel } from "../Heading";
-import { ShapeBackground } from "../ShapeBackground";
 import { EmptyStateContent } from "./EmptyStateContent";
-import { EmptyStatePlainSurface } from "./EmptyStatePlainSurface";
+import { EmptyStateFrame } from "./EmptyStateFrame";
+import type { CanopEmptyStateSize } from "./emptyStateSizes";
+import type { CanopEmptyStateSurface } from "./emptyStateSurface";
+import { useEmptyState } from "./useEmptyState";
 
-export type CanopEmptyStateSurface = "ambient" | "plain";
+export type { CanopEmptyStateSize } from "./emptyStateSizes";
+export type { CanopEmptyStateSurface } from "./emptyStateSurface";
 
 export interface CanopEmptyStateProps {
   title: string;
@@ -19,7 +23,13 @@ export interface CanopEmptyStateProps {
   headingLevel?: CanopHeadingLevel;
   minHeight?: string;
   animated?: boolean;
+  /**
+   * `ambient` pose le contenu dans une `Card` en verre liquide, pour un etat
+   * vide seul sur sa page. `plain` n'a aucune surface et se fond dans son
+   * conteneur : a utiliser dans une carte, un tableau ou une zone deja peinte.
+   */
   surface?: CanopEmptyStateSurface;
+  size?: CanopEmptyStateSize;
 }
 
 export function EmptyState({
@@ -28,10 +38,13 @@ export function EmptyState({
   icon,
   action,
   headingLevel = 2,
-  minHeight = "22rem",
+  minHeight,
   animated = true,
   surface = "ambient",
+  size = "md",
 }: CanopEmptyStateProps) {
+  const state = useEmptyState({ size, surface, minHeight, animated });
+
   const content = (
     <EmptyStateContent
       title={title}
@@ -39,22 +52,15 @@ export function EmptyState({
       icon={icon}
       action={action}
       headingLevel={headingLevel}
-      animated={animated}
+      recipe={state.recipe}
+      choreography={state.choreography}
+      illustrationSx={state.illustrationSx}
     />
   );
 
-  if (surface === "plain") {
-    return <EmptyStatePlainSurface minHeight={minHeight}>{content}</EmptyStatePlainSurface>;
-  }
-
   return (
-    <ShapeBackground
-      variant="ambient"
-      intensity={0.7}
-      minHeight={minHeight}
-      contentSx={{ maxWidth: "32rem", paddingX: "1.5rem" }}
-    >
-      {content}
-    </ShapeBackground>
+    <EmptyStateFrame minHeight={state.minHeight} recipe={state.recipe}>
+      {surface === "ambient" ? <Card variant="frosted">{content}</Card> : content}
+    </EmptyStateFrame>
   );
 }

@@ -6,7 +6,7 @@ Design system QVL-Studio — librairie de composants React partagée entre les p
 
 Paquet **`@canop/ui`** — dépôt [Azure DevOps](https://dev.azure.com/qvl-project/QVL-ToolBox/_git/CanopUI).
 Miroir public à chaque release : [GitHub `QVL-ToolBox/CanopUI`](https://github.com/QVL-ToolBox/CanopUI) (un commit par version) et [npmjs](https://www.npmjs.com/package/@canop/ui).
-2026-10-01 : renommage de `canopui` en `@canop/ui`, versions remises à 1.0.0 (API identique à `canopui` 3.1.1).
+2026-10-01 : renommage de `canopui` en `@canop/ui`, versions remises à 1.0.0 (API identique à `canopui` 0.1.1).
 
 ## Architecture
 
@@ -130,12 +130,25 @@ montage, sans décalage en cascade ; seul le mouvement réduit la coupe. `column
 La flèche de `Card` (`arrow`) n'est rendue que sur `variant="interactive"` ; sur toute autre
 variante, la prop est ignorée (#57).
 
-### Verre dépoli et action d'accent — `Card variant="frosted"`, `IconActionButton variant="accent"`
+### Verre liquide et action d'accent — `Card variant="frosted"`, `IconActionButton variant="accent"`
 
-Pour poser du texte sur `CanopyBackground`, `Card variant="frosted"` est un verre dépoli : voile
-translucide teinté, fond flouté, sans ombre, rayon `xl`, rembourrage `md` puis `xl` dès `md`. Un
-navigateur sans `backdrop-filter` reçoit la même teinte sur une surface opaque, et le texte du thème
-y tient l'AA en clair comme en sombre. `tone` n'en change pas le fond. Pour détacher une action
+Pour poser du texte sur `CanopyBackground`, `Card variant="frosted"` est un verre liquide : teinte
+translucide de `primary.light` à 15 % vers `accent.light` à 12 %, sans voile, fond flouté en
+`blur(0.25rem) saturate(1.8)`, liseré spéculaire et ombre interne qui suivent le squircle, sans
+ombre, rayon `xl`, rembourrage `md` puis `xl` dès `md`. Sous Chromium, les bords réfractent le fond
+(filtre SVG dans `backdrop-filter`) ; ailleurs, le même verre sans réfraction. Un navigateur sans
+`backdrop-filter` reçoit la même teinte sur une surface opaque. Sans `elevation`, tout est découpé
+au squircle ; avec une `elevation` explicite, l'ombre prime et la réfraction est coupée. `tone`
+n'en change pas le fond. La recette est réutilisable hors `Card` via les exports de
+`src/liquidGlass/`, importables depuis `@canop/ui` : la recette de la carte
+`FROSTED_CARD_LIQUID_GLASS` (en lecture seule), les valeurs `liquidGlassBackground`,
+`liquidGlassBackdropFilter`, `liquidGlassFallbackBackground`, `LiquidGlassLayers`,
+`useRefractionFilter`, `useRefractionSupport` et les types `CanopLiquidGlassParams`,
+`CanopLiquidGlassLayersProps`, `CanopRefractionFilter`, `UseRefractionFilterOptions`,
+`UseRefractionFilterResult`, `CanopRefractionSupport`. La carte de déplacement n'est calculée que
+sur la bande du biseau, une fois par frame au redimensionnement, et partagée entre surfaces de même
+géométrie ; le `url(#id)` propre à chaque surface passe en `style` inline pour que le `sx` reste
+commun à toutes les cartes. Pour détacher une action
 secondaire mais désirable, `IconActionButton variant="accent"` : fond `accent.main`, glyphe
 `accent.contrastText`, même rendu dans les deux thèmes (#88).
 
@@ -146,6 +159,14 @@ secondaire mais désirable, `IconActionButton variant="accent"` : fond `accent.m
   </Card>
 </CanopyBackground>
 ```
+
+### Focus — pas de style propre, le survol au clavier
+
+Les composants n'ont aucun style de focus : un clic ne laisse ni anneau ni halo. Au clavier,
+un composant prend exactement son style de survol ; sans survol, il ne change pas. Un champ en
+cours de saisie garde son aspect. Pour un élément maison, `withoutFocusRing` et
+`hoverOrKeyboardFocus()` appliquent la même règle. Détails :
+[docs/THEMING.md](docs/THEMING.md#focus--le-survol-rien-de-plus), démonstration : vitrine `#/docs/focus`.
 
 ### Thème saisonnier — `season` et `HalloweenDecor`
 
@@ -180,7 +201,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 ```
 
 > ⚠️ **Le greffon `canopyVideo()` est aussi nécessaire à la carte** (voir « Fond de canopée » plus
-> bas). Depuis `canopui` 3.0.1, il sert les deux fichiers du *worker* de MapLibre, que **l'empaqueteur
+> bas). Depuis `canopui` 0.0.1, il sert les deux fichiers du *worker* de MapLibre, que **l'empaqueteur
 > n'émet pas** : MapLibre 6 les résout comme fichiers voisins de son propre module, par une forme
 > qu'aucun empaqueteur ne sait analyser statiquement. Sans lui, la carte **se dessine vide en
 > production** — fond et boutons de zoom, aucune tuile — alors qu'elle marche parfaitement en
@@ -210,14 +231,16 @@ défiler la page ; `gestures="direct"` convient quand la carte est le contenu pr
 
 ### Fond de canopée — un greffon Vite, rien à recopier
 
-Depuis `canopui` 3.0, `PageScaffold` est habillé par défaut par `CanopyBackground` : une canopée filmée
-du sol vers le zénith, rendue sous Blender, en deux scènes — une par thème. Les six fichiers
-(WebM, MP4 et image d'affiche pour chaque thème) sont **livrés dans le paquet** sous
-`dist/assets/video/`.
+Depuis `canopui` 0.0, `PageScaffold` est habillé par défaut par `CanopyBackground` : une canopée filmée
+du sol vers le zénith, rendue sous Blender, en deux scènes — une par thème. Les dix fichiers
+sont **livrés dans le paquet** sous `dist/assets/video/` : pour chaque thème, un WebM et un MP4
+en 1080p (`canopy-<mode>.webm/.mp4`, WebM de 4,8 Mo en sombre et 6,4 Mo en clair), un WebM et
+un MP4 en 720p (`canopy-<mode>-720.webm/.mp4`, de 1,4 à 2,1 Mo chacun) et l'image d'affiche
+(`canopy-<mode>-poster.jpg`).
 
 Ils ne peuvent pas passer par le bundle du consommateur : Vite **inline en base64 tout asset
-qu'un module référence**, et 32 Mo de vidéo en deviendraient 43 Mo de chaîne de caractères
-chargés d'un bloc. Ils sont donc servis comme des fichiers, depuis `CANOPY_ASSET_BASE`, soit
+qu'un module référence**, et une quarantaine de Mo de vidéo deviendraient plus de 50 Mo de
+chaîne de caractères chargés d'un bloc. Ils sont donc servis comme des fichiers, depuis `CANOPY_ASSET_BASE`, soit
 `/canopui/video` — et c'est **le greffon livré avec la librairie** qui s'en charge, en
 développement comme au build :
 
@@ -251,14 +274,35 @@ const scenes = canopyScenesFrom("https://cdn.qvl-project.com/canopy");
 <CanopyBackground scenes={scenes} />;
 ```
 
-Un navigateur ne télécharge qu'**un seul fichier** : le WebM du thème actif, 4,8 Mo en sombre et
-6,4 Mo en clair. Le MP4 ne sert que de repli pour les Safari anciens. Rien n'est joué quand
+Un portail qui sert les scènes depuis un CDN doit y héberger **les dix fichiers**, variantes
+`-720.*` comprises : `canopyScenesFrom` les référence d'office comme palier intermédiaire.
+
+Un navigateur ne lit qu'**une seule vidéo** à la fois, celle du thème actif au niveau retenu.
+L'ordre des sources est décidé par `mediaCapabilities` : le WebM (VP9, plus léger) passe en
+premier, sauf quand le navigateur annonce, en `quality="auto"`, que le VP9 n'est pas décodé de
+façon économe (`powerEfficient`, autrement dit sans la carte graphique) alors que le H.264 l'est.
+Le MP4 passe alors devant : quelques Mo de plus, mais une lecture qui ne sollicite pas le
+processeur.
+Les MP4 sont en faststart, lisibles avant la fin du téléchargement. Rien n'est joué quand
 l'utilisateur a demandé un mouvement réduit : l'image d'affiche est rendue à la place.
 
-Un portail qui ne veut pas de ce fond garde l'ancien en un mot :
+La prop `quality` (`"auto"` par défaut, `"high"`, `"low"`) règle le coût du fond. En `auto`,
+l'affiche est peinte d'abord, la vidéo ne se télécharge qu'à l'approche de l'écran, apparaît en
+fondu, se met en pause hors écran ou onglet masqué, et descend d'un cran — vers la variante 720p,
+fournie par défaut (`scenes.lite`), puis vers l'affiche — sur connexion limitée, appareil
+modeste, images perdues à la lecture ou blocages répétés de mise en mémoire tampon ; économiseur
+de données et 2G passent directement à l'affiche. Une décision de descente n'est jamais annulée
+pendant la vie du composant. `onQualityChange` remonte le niveau servi et sa raison, y compris
+l'affiche imposée par `animated={false}` (`disabled`) ou le mouvement réduit (`reduced-motion`).
+
+Un portail qui ne veut pas de ce fond passe en un mot au `ShapeBackground`, une trame de points
+traversée de masses lumineuses façon lampe à lave, teintée de `primary` (ou d'`accent` avec
+`backgroundTone="accent"`, également accepté par `Layout`) et calée sur le thème clair ou sombre
+courant (animée à 30 images par seconde, en pause hors écran ou onglet masqué, image fixe en
+mouvement réduit) :
 
 ```tsx
-<PageScaffold items={items} background="shapes">
+<PageScaffold items={items} background="shapes" backgroundTone="accent">
   {children}
 </PageScaffold>
 ```
@@ -288,10 +332,10 @@ npm test         # tests unitaires
 npm run build    # build de la lib (dist/)
 ```
 
-La version **3.0** de `canopui` est une version **majeure** : l'API publique est rebrandée (`Ch*` → `Canop*`)
+La version **0.0** de `canopui` est une version **majeure** : l'API publique est rebrandée (`Ch*` → `Canop*`)
 **sans alias de rétrocompatibilité**, et l'essentiel des ruptures est automatisable par le codemod.
 Ce qu'elle change, rupture par rupture, est dans [`CHANGELOG.md`](CHANGELOG.md) — section
-`## [3.0.0]`, sous « Migration » pour la marche à suivre. Le journal du chantier, ses pièges et ses
+`## [0.0.0]`, sous « Migration » pour la marche à suivre. Le journal du chantier, ses pièges et ses
 décisions tranchées : [`docs/CHANTIER-3.0.md`](docs/CHANTIER-3.0.md).
 
 ## Jalons franchis
@@ -302,4 +346,4 @@ décisions tranchées : [`docs/CHANTIER-3.0.md`](docs/CHANTIER-3.0.md).
 4. Vitrine CanopUI (site de doc maison)
 5. Distribution via registry npm privé (Verdaccio) + compatibilité Module Federation
 6. Adoption par les portails CustHome et ProjectCenter
-7. Identité propre en 3.0 : squircles, typographie, carte, fond de canopée, pièces de jeu
+7. Identité propre en 0.0 : squircles, typographie, carte, fond de canopée, pièces de jeu

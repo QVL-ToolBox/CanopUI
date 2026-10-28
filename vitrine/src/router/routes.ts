@@ -1,3 +1,5 @@
+export const HOME_PATH = "/";
+
 export function routeHref(path: string): string {
   return `#/${path.replace(/^\/+/, "")}`;
 }

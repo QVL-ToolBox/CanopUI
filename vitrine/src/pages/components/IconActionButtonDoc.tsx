@@ -73,7 +73,7 @@ const fr = {
       "default pour l'action principale, secondary pour les actions de second plan, danger pour les actions destructives, accent pour détacher une action secondaire mais désirable.",
     accentTitle: "La variante accent et ses états",
     accentDescription:
-      "Fond accent.main, glyphe accent.contrastText (8,85:1), survol accent.dark (5,91:1), identiques en clair et en sombre. Au focus clavier, le fond reste accent.main sous l'anneau de la librairie, le Spinner de loading prend la couleur du glyphe et l'état désactivé est celui des autres variantes.",
+      "Fond accent.main, glyphe accent.contrastText (8,85:1), survol accent.dark (5,91:1), identiques en clair et en sombre. Au focus clavier, le bouton prend son survol accent.dark, sans anneau, le Spinner de loading prend la couleur du glyphe et l'état désactivé est celui des autres variantes.",
     iconsTitle: "Prop icon",
     iconsDescription:
       "Utilisez n'importe quelle icône du catalogue CanopUI selon l'action représentée.",
@@ -131,7 +131,7 @@ const en: typeof fr = {
       "default for the primary action, secondary for background actions, danger for destructive actions, accent to make a secondary yet desirable action stand out.",
     accentTitle: "The accent variant and its states",
     accentDescription:
-      "accent.main background, accent.contrastText glyph (8.85:1), accent.dark on hover (5.91:1), identical in light and dark themes. On keyboard focus the background stays accent.main under the library ring, the loading Spinner takes the glyph colour and the disabled state is the one of the other variants.",
+      "accent.main background, accent.contrastText glyph (8.85:1), accent.dark on hover (5.91:1), identical in light and dark themes. On keyboard focus the button takes its accent.dark hover, with no ring, the loading Spinner takes the glyph colour and the disabled state is the one of the other variants.",
     iconsTitle: "icon prop",
     iconsDescription: "Use any icon from the CanopUI catalog depending on the action represented.",
     sizeTitle: "size prop",

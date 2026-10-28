@@ -44,6 +44,12 @@
     U+A720-A7FF;
 }
 
+@property --canop-glow-lit {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
 @media (max-width: 48rem) {
   :root {
     font-size: 1.125rem;

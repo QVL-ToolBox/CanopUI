@@ -5,6 +5,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import type { ReactNode } from "react";
 import { Button } from "../Button";
+import { SkeletonScope } from "../Skeleton/SkeletonScope";
 
 export interface CanopConfirmDialogProps {
   open: boolean;
@@ -30,21 +31,32 @@ export function ConfirmDialog({
   onCancel,
 }: CanopConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel} aria-labelledby="canop-confirm-dialog-title">
-      <DialogTitle id="canop-confirm-dialog-title">{title}</DialogTitle>
-      {message ? (
-        <DialogContent>
-          <DialogContentText>{message}</DialogContentText>
-        </DialogContent>
-      ) : null}
-      <DialogActions>
-        <Button variant="secondary" onClick={onCancel} disabled={loading}>
-          {cancelLabel}
-        </Button>
-        <Button variant={destructive ? "danger" : "primary"} onClick={onConfirm} loading={loading}>
-          {confirmLabel}
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <SkeletonScope surface={null}>
+      <Dialog
+        open={open}
+        onClose={onCancel}
+        aria-labelledby="canop-confirm-dialog-title"
+        slotProps={{ paper: { elevation: 0 } }}
+      >
+        <DialogTitle id="canop-confirm-dialog-title">{title}</DialogTitle>
+        {message ? (
+          <DialogContent>
+            <DialogContentText>{message}</DialogContentText>
+          </DialogContent>
+        ) : null}
+        <DialogActions>
+          <Button variant="secondary" onClick={onCancel} disabled={loading}>
+            {cancelLabel}
+          </Button>
+          <Button
+            variant={destructive ? "danger" : "primary"}
+            onClick={onConfirm}
+            loading={loading}
+          >
+            {confirmLabel}
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </SkeletonScope>
   );
 }

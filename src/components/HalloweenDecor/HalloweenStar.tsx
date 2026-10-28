@@ -11,10 +11,13 @@ interface HalloweenStarProps {
 }
 
 export function HalloweenStar({ spec, animated }: HalloweenStarProps) {
-  if (!spec.glint) return <Box sx={starSx(spec, animated)} />;
   return (
-    <Box component="svg" viewBox="0 0 24 24" sx={starSx(spec, animated)}>
-      <path d={GLINT} fill="currentColor" />
+    <Box sx={starSx(spec, animated)}>
+      {spec.glint ? (
+        <svg viewBox="0 0 24 24">
+          <path d={GLINT} fill="currentColor" />
+        </svg>
+      ) : null}
     </Box>
   );
 }

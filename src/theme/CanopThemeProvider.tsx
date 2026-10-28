@@ -1,9 +1,9 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { HalloweenSeasonBackdrop } from "../components/HalloweenDecor/HalloweenSeasonBackdrop";
-import { HalloweenSeasonOverlay } from "../components/HalloweenDecor/HalloweenSeasonOverlay";
 import { SeasonalDecorContext } from "../components/HalloweenDecor/SeasonalDecorContext";
+import { LazyHalloweenSeasonBackdrop } from "../components/_shared/LazyHalloweenSeasonBackdrop";
+import { LazyHalloweenSeasonOverlay } from "../components/_shared/LazyHalloweenSeasonOverlay";
 import {
   canopTheme,
   createCanopTheme,
@@ -107,12 +107,12 @@ export function CanopThemeProvider({
       <ThemeProvider theme={theme}>
         <CssBaseline />
         {seasonalDecorState.rendersFallbackBackdrop ? (
-          <HalloweenSeasonBackdrop behindPageContent />
+          <LazyHalloweenSeasonBackdrop behindPageContent />
         ) : null}
         <SeasonalDecorContext.Provider value={seasonalDecorState.contextValue}>
           {children}
         </SeasonalDecorContext.Provider>
-        {seasonalDecorState.rendersOverlay ? <HalloweenSeasonOverlay /> : null}
+        {seasonalDecorState.rendersOverlay ? <LazyHalloweenSeasonOverlay /> : null}
       </ThemeProvider>
     </CanopThemeContext.Provider>
   );

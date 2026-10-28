@@ -3,28 +3,35 @@ import { motion } from "framer-motion";
 import type { ReactNode } from "react";
 import { Card } from "../Card";
 import { ShapeBackground } from "../ShapeBackground";
+import type { CanopBackgroundTone } from "../_shared/backgroundTone";
+import type { CanopMainElement } from "../_shared/mainElement";
+import type { CanopTitleLevel } from "../_shared/titleLevel";
 import { LayoutBrand } from "./LayoutBrand";
 import { LayoutUtilities } from "./LayoutUtilities";
 import { useLayout } from "./useLayout";
 
-const HERO_INTENSITY = 1.05;
-
 export interface CanopLayoutProps {
   brand?: string;
+  brandLevel?: CanopTitleLevel;
   logo?: ReactNode;
   header?: ReactNode;
   maxWidth?: string;
   animatedShapes?: boolean;
+  backgroundTone?: CanopBackgroundTone;
+  mainElement?: CanopMainElement;
   showUtilities?: boolean;
   children: ReactNode;
 }
 
 export function Layout({
   brand = "CustHome",
+  brandLevel = 1,
   logo,
   header,
   maxWidth = "23.75rem",
   animatedShapes = false,
+  backgroundTone = "primary",
+  mainElement = "main",
   showUtilities = true,
   children,
 }: CanopLayoutProps) {
@@ -36,16 +43,11 @@ export function Layout({
         position: "relative",
       }}
     >
-      <ShapeBackground
-        component="main"
-        variant="hero"
-        intensity={HERO_INTENSITY}
-        animated={animatedShapes}
-      >
+      <ShapeBackground component={mainElement} animated={animatedShapes} color={backgroundTone}>
         {header !== undefined ? (
           header
         ) : (
-          <LayoutBrand brand={brand} logo={logo} entry={brandEntry} />
+          <LayoutBrand brand={brand} level={brandLevel} logo={logo} entry={brandEntry} />
         )}
         <motion.div
           style={{ width: "100%", maxWidth }}

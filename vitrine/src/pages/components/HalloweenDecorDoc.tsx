@@ -8,7 +8,7 @@ import { useDocLocale } from "../../i18n/useDocLocale";
 import { useHiddenSeasonalDecor } from "../../season/useHiddenSeasonalDecor";
 import { HalloweenIcons } from "./halloween/HalloweenIcons";
 import { HalloweenStage } from "./halloween/HalloweenStage";
-import { SeasonSwitch } from "./halloween/SeasonSwitch";
+import { SeasonChoiceControl } from "./halloween/SeasonChoiceControl";
 
 const importCode = `import { HalloweenDecor } from "@canop/ui";`;
 
@@ -50,9 +50,12 @@ const fr = {
     icons: "Icônes",
     api: "API",
   },
-  seasonSwitch: 'Forcer season="halloween" sur toute la vitrine',
+  seasonChoice: {
+    label: "Saison de la vitrine",
+    options: { auto: "Calendrier", halloween: "Halloween", off: "Aucune" },
+  },
   seasonDescription:
-    "Le toggle passe la saison halloween au CanopThemeProvider de la vitrine : palettes, surfaces et lueur des titres en sombre basculent sur toutes les pages, et le décor du provider apparaît sur les autres pages. Sans lui, le provider suit le calendrier et habille seul la vitrine du 15 octobre au 1er novembre. Sur cette page, le décor du provider est masqué pour laisser voir les deux démos.",
+    'Ce choix règle la saison du CanopThemeProvider de toute la vitrine. Calendrier n\'impose rien : le provider habille seul la vitrine du 15 octobre au 1er novembre. Halloween passe season="halloween" et Aucune season={null}. La citrouille de la barre partage ce choix : elle bascule sur Halloween ou sur Aucune selon ce qui est affiché. Palettes, surfaces et lueur des titres en sombre suivent sur toutes les pages, et le décor du provider apparaît sur les autres pages ; sur celle-ci, il est masqué pour laisser voir les deux démos.',
   demos: {
     low: {
       title: "Densité low",
@@ -92,9 +95,12 @@ const en: typeof fr = {
     icons: "Icons",
     api: "API",
   },
-  seasonSwitch: 'Force season="halloween" across the showcase',
+  seasonChoice: {
+    label: "Showcase season",
+    options: { auto: "Calendar", halloween: "Halloween", off: "None" },
+  },
   seasonDescription:
-    "The toggle passes the halloween season to the showcase CanopThemeProvider: palettes, surfaces and the dark heading glow switch on every page, and the provider decor shows on the other pages. Without it, the provider follows the calendar and dresses the showcase up on its own from 15 October to 1 November. On this page, the provider decor is hidden so the two demos stay readable.",
+    'This choice sets the season of the CanopThemeProvider across the showcase. Calendar forces nothing: the provider dresses the showcase up on its own from 15 October to 1 November. Halloween passes season="halloween" and None season={null}. The pumpkin in the bar shares this choice: it switches to Halloween or to None depending on what is shown. Palettes, surfaces and the dark heading glow follow on every page, and the provider decor shows on the other pages; on this one, it is hidden so the two demos stay readable.',
   demos: {
     low: {
       title: "Low density",
@@ -147,7 +153,7 @@ export default function HalloweenDecorDoc() {
   return (
     <DocPage title="HalloweenDecor" intro={t.intro} importCode={importCode}>
       <DocSection title={t.sections.season} description={t.seasonDescription}>
-        <SeasonSwitch label={t.seasonSwitch} />
+        <SeasonChoiceControl ariaLabel={t.seasonChoice.label} labels={t.seasonChoice.options} />
       </DocSection>
       <DocSection title={t.sections.density}>
         <DemoCard

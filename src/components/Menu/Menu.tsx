@@ -2,6 +2,7 @@ import MuiMenu from "@mui/material/Menu";
 import { squircleSurface } from "../../squircle";
 import type { ReactNode } from "react";
 import { Icon, type CanopIconName } from "../Icon";
+import { SkeletonScope } from "../Skeleton/SkeletonScope";
 import { MenuItem } from "./MenuItem";
 
 export interface CanopMenuPosition {
@@ -53,37 +54,40 @@ export function Menu({
   const usePosition = !anchorEl && Boolean(position);
 
   return (
-    <MuiMenu
-      open={open}
-      onClose={onClose}
-      anchorEl={anchorEl ?? undefined}
-      anchorReference={usePosition ? "anchorPosition" : "anchorEl"}
-      anchorPosition={position ? { top: position.top, left: position.left } : undefined}
-      slotProps={{
-        list: { role: "menu", "aria-label": ariaLabel, onClick: onItemClick },
-        paper: {
-          sx: squircleSurface({
-            radius: "var(--canop-radius-sm)",
-            background: "var(--canop-palette-surface-overlay)",
-            shadow: "var(--canop-drop-shadow-e2)",
-          }),
-        },
-      }}
-    >
-      {items?.map((item) => (
-        <MenuItem
-          key={item.key ?? item.label}
-          label={item.label}
-          icon={item.icon ? <Icon name={item.icon} size="sm" /> : undefined}
-          disabled={item.disabled}
-          danger={item.danger}
-          onClick={function closeBeforeActingSoAnchorStillExists() {
-            onClose();
-            item.onClick?.();
-          }}
-        />
-      ))}
-      {children}
-    </MuiMenu>
+    <SkeletonScope surface={null}>
+      <MuiMenu
+        open={open}
+        onClose={onClose}
+        anchorEl={anchorEl ?? undefined}
+        anchorReference={usePosition ? "anchorPosition" : "anchorEl"}
+        anchorPosition={position ? { top: position.top, left: position.left } : undefined}
+        elevation={0}
+        slotProps={{
+          list: { role: "menu", "aria-label": ariaLabel, onClick: onItemClick },
+          paper: {
+            sx: squircleSurface({
+              radius: "var(--canop-radius-sm)",
+              background: "var(--canop-palette-surface-overlay)",
+              shadow: "var(--canop-drop-shadow-e2)",
+            }),
+          },
+        }}
+      >
+        {items?.map((item) => (
+          <MenuItem
+            key={item.key ?? item.label}
+            label={item.label}
+            icon={item.icon ? <Icon name={item.icon} size="sm" /> : undefined}
+            disabled={item.disabled}
+            danger={item.danger}
+            onClick={function closeBeforeActingSoAnchorStillExists() {
+              onClose();
+              item.onClick?.();
+            }}
+          />
+        ))}
+        {children}
+      </MuiMenu>
+    </SkeletonScope>
   );
 }

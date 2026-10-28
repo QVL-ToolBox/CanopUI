@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import type { ReactNode } from "react";
-import { squircleSurface } from "../../squircle";
+import { type CanopMainElement } from "../_shared/mainElement";
 import { reservePageBottom } from "../_shared/pageBottomInset";
 import { reservePageTopRight } from "../_shared/pageTopRightInset";
 import { SettingsMenu } from "../SettingsMenu";
@@ -11,6 +11,8 @@ import {
   NAVBAR_MOBILE_SETTINGS_FOOTPRINT,
   NAVBAR_MOBILE_WIDGET_OFFSET,
 } from "./navbarStyles";
+import { navbarFloatingSurfaceSx } from "./navbarSurface";
+import { NAVBAR_BG_BOTTOM, NAVBAR_TEXT } from "./navbarTone";
 import { type CanopNavbarItem } from "./navigation";
 
 export interface NavbarMobileLayoutProps {
@@ -24,6 +26,7 @@ export interface NavbarMobileLayoutProps {
   sidebarWidget?: ReactNode;
   actions?: ReactNode;
   height: string;
+  mainElement?: CanopMainElement;
   children: ReactNode;
 }
 
@@ -38,6 +41,7 @@ export function NavbarMobileLayout({
   sidebarWidget,
   actions,
   height,
+  mainElement = "main",
   children,
 }: NavbarMobileLayoutProps) {
   return (
@@ -60,7 +64,7 @@ export function NavbarMobileLayout({
       {actions ? <NavbarMobileActionDock>{actions}</NavbarMobileActionDock> : null}
 
       <Box
-        component="main"
+        component={mainElement}
         sx={{
           flex: 1,
           minWidth: 0,
@@ -81,13 +85,8 @@ export function NavbarMobileLayout({
             right: "1rem",
             zIndex: (theme) => theme.zIndex.appBar,
             padding: "0.75rem 1rem",
-            ...squircleSurface({
-              radius: "var(--canop-radius-xl)",
-              background: "var(--canop-palette-primary-main)",
-              shadow: "var(--canop-drop-shadow-e3)",
-              position: "fixed",
-            }),
-            color: "primary.contrastText",
+            ...navbarFloatingSurfaceSx({ background: NAVBAR_BG_BOTTOM, position: "fixed" }),
+            color: NAVBAR_TEXT,
           }}
         >
           {sidebarWidget}

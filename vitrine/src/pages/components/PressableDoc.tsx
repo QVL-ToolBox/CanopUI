@@ -14,7 +14,7 @@ const ICONES = ["home", "folder", "image", "mail", "settings"] as const;
 const couleursCode = `function ChoixCouleur() {
   const [valeur, setValeur] = useState(COULEURS[0]);
   return (
-    <Stack direction="row" gap="sm" role="radiogroup" ariaLabel="Couleur">
+    <Stack direction="row" gap="sm" wrap role="radiogroup" ariaLabel="Couleur">
       {COULEURS.map((couleur, index) => (
         <Pressable
           key={couleur}
@@ -35,7 +35,7 @@ const couleursCode = `function ChoixCouleur() {
 function ChoixCouleur() {
   const [valeur, setValeur] = useState(COULEURS[0]);
   return (
-    <Stack direction="row" gap="sm" role="radiogroup" ariaLabel="Couleur">
+    <Stack direction="row" gap="sm" wrap role="radiogroup" ariaLabel="Couleur">
       {COULEURS.map((couleur, index) => (
         <Pressable
           key={couleur}
@@ -56,7 +56,7 @@ function ChoixCouleur() {
 const iconesCode = `function ChoixIcone() {
   const [valeur, setValeur] = useState("home");
   return (
-    <Stack direction="row" gap="sm" role="radiogroup" ariaLabel="Icône">
+    <Stack direction="row" gap="sm" wrap role="radiogroup" ariaLabel="Icône">
       {ICONES.map((nom) => (
         <Pressable
           key={nom}
@@ -79,7 +79,7 @@ const iconesCode = `function ChoixIcone() {
 function ChoixIcone() {
   const [valeur, setValeur] = useState<(typeof ICONES)[number]>("home");
   return (
-    <Stack direction="row" gap="sm" role="radiogroup" ariaLabel="Icône">
+    <Stack direction="row" gap="sm" wrap role="radiogroup" ariaLabel="Icône">
       {ICONES.map((nom) => (
         <Pressable
           key={nom}
@@ -114,7 +114,7 @@ function PaliersDemo() {
 
 const fr = {
   intro:
-    "Une surface cliquable sans apparence. Pressable apporte la forme en squircle, l'anneau de focus, l'état de sélection et l'accessibilité, et laisse son contenu entièrement libre. C'est la pièce à utiliser quand ce qu'on rend cliquable n'est pas un bouton : une pastille de couleur, une tuile de galerie, un choix d'icône.",
+    "Une surface cliquable sans apparence. Pressable apporte la forme en squircle, l'état de sélection et l'accessibilité, et laisse son contenu entièrement libre. C'est la pièce à utiliser quand ce qu'on rend cliquable n'est pas un bouton : une pastille de couleur, une tuile de galerie, un choix d'icône.",
   sections: {
     couleurs: "Choix d'une couleur",
     icones: "Choix d'une icône",
@@ -159,7 +159,7 @@ const fr = {
 
 const en: typeof fr = {
   intro:
-    "A clickable surface with no look of its own. Pressable brings the squircle shape, the focus ring, the selected state and accessibility, and leaves its content entirely free. Reach for it when the thing you make clickable is not a button: a colour swatch, a gallery tile, an icon choice.",
+    "A clickable surface with no look of its own. Pressable brings the squircle shape, the selected state and accessibility, and leaves its content entirely free. Reach for it when the thing you make clickable is not a button: a colour swatch, a gallery tile, an icon choice.",
   sections: {
     couleurs: "Picking a colour",
     icones: "Picking an icon",

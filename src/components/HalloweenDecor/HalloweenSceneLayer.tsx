@@ -4,12 +4,14 @@ import { HalloweenForeground } from "./HalloweenForeground";
 import { HalloweenMidground } from "./HalloweenMidground";
 import { decorLayerSx } from "./halloweenLayerSx";
 import type { CanopHalloweenDecorScope, HalloweenScene } from "./halloweenSceneTypes";
+import { useHalloweenLayerPause } from "./useHalloweenLayerPause";
 
 interface HalloweenSceneLayerProps {
   scene: HalloweenScene;
   scope: CanopHalloweenDecorScope;
   animated: boolean;
-  paused: boolean;
+  tabHidden: boolean;
+  revealed: boolean;
   toneVariables: Record<string, string>;
 }
 
@@ -17,18 +19,26 @@ export function HalloweenSceneLayer({
   scene,
   scope,
   animated,
-  paused,
+  tabHidden,
+  revealed,
   toneVariables,
 }: HalloweenSceneLayerProps) {
+  const { ref, paused } = useHalloweenLayerPause(tabHidden);
+
   return (
     <Box
+      ref={ref}
       aria-hidden="true"
       data-paused={paused ? "true" : "false"}
-      sx={[decorLayerSx(scope, paused), toneVariables]}
+      sx={[decorLayerSx({ scope, paused, revealed }), toneVariables]}
     >
-      <HalloweenBackdrop scene={scene} animated={animated} />
-      <HalloweenMidground scene={scene} animated={animated} />
-      <HalloweenForeground scene={scene} animated={animated} />
+      {revealed ? (
+        <>
+          <HalloweenBackdrop scene={scene} animated={animated} />
+          <HalloweenMidground scene={scene} animated={animated} />
+          <HalloweenForeground scene={scene} animated={animated} />
+        </>
+      ) : null}
     </Box>
   );
 }

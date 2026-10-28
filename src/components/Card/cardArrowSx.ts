@@ -1,4 +1,5 @@
 import type { CSSObject } from "@mui/material/styles";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import { CARD_TRANSFORM_TRANSITION } from "./cardTransitions";
 
 export const CARD_ARROW_CLASS = "CanopCard-arrow";
@@ -13,7 +14,7 @@ export function cardArrowSx(animated: boolean): CSSObject {
     ...(animated
       ? {
           [`& ${ARROW}`]: { transition: CARD_TRANSFORM_TRANSITION },
-          [`&:hover ${ARROW}, &:focus-visible ${ARROW}`]: { transform: ARROW_NUDGE },
+          [hoverOrKeyboardFocus(` ${ARROW}`)]: { transform: ARROW_NUDGE },
         }
       : {}),
   };

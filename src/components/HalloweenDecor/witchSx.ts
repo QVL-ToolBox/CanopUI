@@ -1,4 +1,5 @@
 import type { CSSObject } from "@mui/material/styles";
+import { glyphFrameSx } from "./glyphLayerSx";
 import { keyframes, loop } from "./halloweenMotion";
 import type { HalloweenSparkleSpec, HalloweenWitchSpec } from "./halloweenSceneTypes";
 import { halloweenTone } from "./halloweenTones";
@@ -11,10 +12,6 @@ const WITCH_BOB = "canop-halloween-witch-bob";
 const CAPE_FLUTTER = "canop-halloween-cape-flutter";
 const HAT_WOBBLE = "canop-halloween-hat-wobble";
 const SPARKLE_TRAIL = "canop-halloween-sparkle-trail";
-
-const CAPE_PIVOT = { transformBox: "fill-box", transformOrigin: "100% 0%" } as const;
-
-const HAT_PIVOT = { transformBox: "fill-box", transformOrigin: "80% 100%" } as const;
 
 function flight(lift: string, tilt: number): CSSObject {
   return { transform: `translateY(${lift}) rotate(${tilt}deg)` };
@@ -65,28 +62,34 @@ export function witchFigureSx(): CSSObject {
     position: "relative",
     width: WITCH_SIZE,
     transform: "translate(-50%, -50%)",
-    "& svg": {
-      display: "block",
-      width: "100%",
-      height: "auto",
-      overflow: "visible",
-      color: halloweenTone("witch"),
-      filter: `drop-shadow(0 0 0.4rem ${halloweenTone("witchGlow")})`,
-    },
+  };
+}
+
+export function witchSilhouetteSx(): CSSObject {
+  return {
+    ...glyphFrameSx("80 / 48"),
+    color: halloweenTone("witch"),
+    filter: `drop-shadow(0 0 0.4rem ${halloweenTone("witchGlow")})`,
     "& [data-part='accent']": { fill: halloweenTone("witchAccent") },
     "& [data-part='stick']": { stroke: "currentColor" },
-    "& [data-part='cape']": {
-      ...CAPE_PIVOT,
-      animation: loop(CAPE_FLUTTER, 0.62, 0, "alternate"),
-    },
-    "& [data-part='hat']": {
-      ...HAT_PIVOT,
-      animation: loop(HAT_WOBBLE, 1.3, 0, "alternate"),
-    },
+  };
+}
+
+export function witchCapeSx(): CSSObject {
+  return {
+    transformOrigin: "50.625% 32.292%",
+    animation: loop(CAPE_FLUTTER, 0.62, 0, "alternate"),
     ...keyframes(CAPE_FLUTTER, {
       "0%": { transform: "scaleX(1) skewY(0deg)" },
       "100%": { transform: "scaleX(1.12) skewY(-6deg)" },
     }),
+  };
+}
+
+export function witchHatSx(): CSSObject {
+  return {
+    transformOrigin: "62% 22.431%",
+    animation: loop(HAT_WOBBLE, 1.3, 0, "alternate"),
     ...keyframes(HAT_WOBBLE, {
       "0%": { transform: "rotate(-4deg)" },
       "100%": { transform: "rotate(5deg)" },

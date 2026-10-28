@@ -2,7 +2,7 @@ import TableRow from "@mui/material/TableRow";
 import { useEffect } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { useReducedMotion } from "../../motion";
-import { useInView } from "./useInView";
+import { useInView } from "../_shared/useInView";
 
 export interface AnimatedRowProps extends ComponentProps<typeof TableRow> {
   animate: boolean;

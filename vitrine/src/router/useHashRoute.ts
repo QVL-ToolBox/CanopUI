@@ -15,10 +15,7 @@ export function useHashRoute(): HashRoute {
   const [route, setRoute] = useState(parseHash);
 
   useEffect(() => {
-    const onHashChange = () => {
-      setRoute(parseHash());
-      window.scrollTo({ top: 0 });
-    };
+    const onHashChange = () => setRoute(parseHash());
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);

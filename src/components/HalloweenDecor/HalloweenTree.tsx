@@ -17,13 +17,15 @@ interface HalloweenTreeProps {
 export function HalloweenTree({ side, animated }: HalloweenTreeProps) {
   return (
     <Box sx={treeAnchorSx(side)}>
-      <Box component="svg" viewBox="0 0 100 140" sx={treeSx(side, animated)}>
-        <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
-          <path d={TRUNK} strokeWidth="9" />
-          <path d={BOUGHS} strokeWidth="5" />
-          <path d={CROWN} strokeWidth="4" />
-          <path d={TWIGS} strokeWidth="2" />
-        </g>
+      <Box component="span" sx={treeSx(side, animated)}>
+        <svg viewBox="0 0 100 140">
+          <g fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round">
+            <path d={TRUNK} strokeWidth="9" />
+            <path d={BOUGHS} strokeWidth="5" />
+            <path d={CROWN} strokeWidth="4" />
+            <path d={TWIGS} strokeWidth="2" />
+          </g>
+        </svg>
       </Box>
     </Box>
   );

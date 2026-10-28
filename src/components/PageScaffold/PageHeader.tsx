@@ -3,6 +3,7 @@ import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 import { tokens } from "../../tokens";
 import { avoidPageTopRight } from "../_shared/pageTopRightInset";
+import { titleTag, type CanopTitleLevel } from "../_shared/titleLevel";
 
 const { app } = tokens.typography;
 
@@ -10,6 +11,7 @@ const GUTTER = { xs: "1rem", md: "2.5rem" };
 
 export interface CanopPageHeaderProps {
   title?: string;
+  titleLevel?: CanopTitleLevel;
   context?: string;
   subtitle?: string;
   actions?: ReactNode;
@@ -18,6 +20,7 @@ export interface CanopPageHeaderProps {
 
 export function PageHeader({
   title,
+  titleLevel = 1,
   context,
   subtitle,
   actions,
@@ -65,7 +68,10 @@ export function PageHeader({
           </Typography>
         ) : null}
         {title ? (
-          <Typography component="h1" sx={compact ? app["title-md"] : app["title-lg"]}>
+          <Typography
+            component={titleTag(titleLevel)}
+            sx={compact ? app["title-md"] : app["title-lg"]}
+          >
             {title}
           </Typography>
         ) : null}

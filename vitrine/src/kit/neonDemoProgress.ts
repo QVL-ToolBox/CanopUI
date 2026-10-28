@@ -1,0 +1,1 @@
+export const NEON_DEMO_UPLOAD_PROGRESS = 64;

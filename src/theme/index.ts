@@ -11,3 +11,12 @@ export {
   type CanopThemeMode,
 } from "./createCanopTheme";
 export { canopSeasonAt } from "./canopSeasonAt";
+export {
+  glow,
+  glowFilter,
+  innerGlow,
+  NEON_GLOW_VAR,
+  useNeonGlow,
+  type NeonGlowColor,
+  type NeonGlowLevel,
+} from "./neonGlow";

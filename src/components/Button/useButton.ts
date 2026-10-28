@@ -1,7 +1,9 @@
 import { useMemo } from "react";
 import { useTheme } from "@mui/material/styles";
 import type { SxProps, Theme } from "@mui/material/styles";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import { squircleFill, squircleShadow, squircleSurface } from "../../squircle";
+import { BUTTON_GLOW_SLOT } from "../../theme/neonGlow";
 import type { CanopButtonSize, CanopButtonVariant } from "./Button";
 
 type MuiButtonVariant = "contained" | "outlined" | "text";
@@ -127,18 +129,17 @@ function buildButtonSx(
     ...(variant === "ghost" || variant === "text"
       ? { color: UNFILLED_VARIANT_TEXT_FOLLOWS_THEME }
       : {}),
-    "&:hover": {
+    [hoverOrKeyboardFocus()]: {
       boxShadow: "none",
       ...(fill.border ? { "&::after": { backgroundColor: fill.hover } } : squircleFill(fill.hover)),
       ...(fill.hoverShadow
-        ? { ...squircleShadow(fill.hoverShadow), transform: "translateY(-0.0625rem)" }
+        ? {
+            ...squircleShadow(`${BUTTON_GLOW_SLOT} ${fill.hoverShadow}`),
+            transform: "translateY(-0.0625rem)",
+          }
         : {}),
     },
     "&:active": { boxShadow: "none", transform: "scale(0.97)" },
-    "&:focus-visible": {
-      outline: "0.1875rem solid var(--canop-palette-primary-main)",
-      outlineOffset: "0.1875rem",
-    },
     "&.Mui-disabled, &.MuiButton-loading": {
       backgroundColor: "transparent",
       boxShadow: "none",
@@ -151,7 +152,7 @@ function buildButtonSx(
     },
     "@media (prefers-reduced-motion: reduce)": {
       transition: "none",
-      "&:hover": { transform: "none" },
+      [hoverOrKeyboardFocus()]: { transform: "none" },
       "&:active": { transform: "none" },
     },
   };

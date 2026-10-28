@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import { squircleSurface } from "../../squircle";
-import { focusRingSx } from "../_shared/focusRing";
+import { withoutFocusRing } from "../../interaction";
 import { Icon, type CanopIconColor } from "../Icon";
 import type { CanopThemeMode } from "../../theme";
 import {
@@ -51,7 +51,7 @@ export function ThemeToggle() {
           ? "none"
           : "background-color var(--canop-motion-duration-base) var(--canop-motion-ease-standard)",
 
-        "&:focus-visible": focusRingSx,
+        ...withoutFocusRing,
       }}
     >
       <ThemeToggleThumb activeIndex={activeIndex} reducedMotion={reducedMotion} />

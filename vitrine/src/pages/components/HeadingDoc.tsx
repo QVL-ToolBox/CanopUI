@@ -1,4 +1,5 @@
-import { Heading, Stack } from "@canop/ui";
+import { useRef } from "react";
+import { Button, Heading, Stack } from "@canop/ui";
 import { DemoCard } from "../../kit/DemoCard";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
@@ -29,6 +30,39 @@ const tonesCode = `<Heading size={4} tone="primary">Titre primary</Heading>
 <Heading size={4} tone="accent">Titre accent</Heading>
 <Heading size={4} tone="error">Titre error</Heading>
 <Heading size={4} tone="muted">Titre secondaire</Heading>`;
+
+const focusCode = `function Results() {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  return (
+    <>
+      <Heading ref={headingRef} tabIndex={-1} level={3} size={5}>
+        Résultats de la recherche
+      </Heading>
+      <Button onClick={() => headingRef.current?.focus()}>Aller aux résultats</Button>
+    </>
+  );
+}`;
+
+interface FocusableHeadingDemoProps {
+  title: string;
+  action: string;
+}
+
+function FocusableHeadingDemo({ title, action }: FocusableHeadingDemoProps) {
+  const headingRef = useRef<HTMLHeadingElement>(null);
+
+  return (
+    <Stack gap="sm" alignItems="start">
+      <Heading ref={headingRef} tabIndex={-1} level={3} size={5} gutterBottom={false}>
+        {title}
+      </Heading>
+      <Button variant="secondary" size="small" onClick={() => headingRef.current?.focus()}>
+        {action}
+      </Button>
+    </Stack>
+  );
+}
 
 const paletteTones = [
   "primary",
@@ -72,6 +106,14 @@ const fr = {
       demoDescription:
         "Sans tonalité, le titre reste sur la couleur de texte du thème — noir sur fond clair, blanc sur fond sombre. Les sept familles de la palette sont disponibles pour les titres qui portent un statut.",
     },
+    focus: {
+      title: "Focus programmatique",
+      demoTitle: "tabIndex={-1} et ref",
+      demoDescription:
+        "Après une navigation ou une recherche, déplacez le focus sur le titre pour que les lecteurs d'écran annoncent le nouveau contenu. tabIndex={-1} le rend focalisable sans l'ajouter à l'ordre de tabulation, ref donne accès à l'élément h.",
+      headingSample: "Résultats de la recherche",
+      action: "Aller aux résultats",
+    },
     api: "API",
   },
   props: {
@@ -84,6 +126,9 @@ const fr = {
     color: "Couleur explicite, prioritaire sur tone.",
     component:
       "Balise non titre (p, span, div) qui remplace h{level} : l'apparence d'un titre sans sa sémantique.",
+    tabIndex:
+      "Ordre de tabulation ; -1 rend le titre focalisable par programme sans l'ajouter à la tabulation.",
+    ref: "Référence vers l'élément rendu, pour lui donner le focus.",
   },
 };
 
@@ -118,6 +163,14 @@ const en: typeof fr = {
       demoDescription:
         "With no tone, the heading stays on the theme text color — black on a light background, white on a dark one. The seven palette families are available for headings that carry a status.",
     },
+    focus: {
+      title: "Programmatic focus",
+      demoTitle: "tabIndex={-1} and ref",
+      demoDescription:
+        "After a navigation or a search, move focus to the heading so screen readers announce the new content. tabIndex={-1} makes it focusable without adding it to the tab order, ref gives access to the h element.",
+      headingSample: "Search results",
+      action: "Go to results",
+    },
     api: "API",
   },
   props: {
@@ -130,6 +183,8 @@ const en: typeof fr = {
     color: "Explicit color, taking precedence over tone.",
     component:
       "Non-heading tag (p, span, div) replacing h{level}: the look of a heading without its semantics.",
+    tabIndex: "Tab order; -1 makes the heading focusable by script, outside the tab sequence.",
+    ref: "Reference to the rendered element, to move focus to it.",
   },
 };
 
@@ -186,6 +241,8 @@ export default function HeadingDoc() {
       type: '"p" | "span" | "div"',
       description: t.props.component,
     },
+    { name: "tabIndex", type: "number", description: t.props.tabIndex },
+    { name: "ref", type: "Ref<HTMLHeadingElement>", description: t.props.ref },
   ];
 
   return (
@@ -273,6 +330,19 @@ export default function HeadingDoc() {
               </Heading>
             ))}
           </Stack>
+        </DemoCard>
+      </DocSection>
+      <DocSection title={t.sections.focus.title}>
+        <DemoCard
+          title={t.sections.focus.demoTitle}
+          description={t.sections.focus.demoDescription}
+          code={focusCode}
+          align="stretch"
+        >
+          <FocusableHeadingDemo
+            title={t.sections.focus.headingSample}
+            action={t.sections.focus.action}
+          />
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.api}>

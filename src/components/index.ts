@@ -1,4 +1,9 @@
 export type { CanopPaletteColorName } from "./_shared/paletteColorVar";
+export type { CanopBackgroundTone } from "./_shared/backgroundTone";
+export type { CanopMainElement } from "./_shared/mainElement";
+export type { CanopTitleLevel } from "./_shared/titleLevel";
+export { avoidPageTopRight, reservePageTopRight } from "./_shared/pageTopRightInset";
+export { resetPageInsets } from "./_shared/pageInsets";
 export { AddButton, type CanopAddButtonProps } from "./AddButton";
 export { ApproveButton, type CanopApproveButtonProps } from "./ApproveButton";
 export {
@@ -76,7 +81,16 @@ export {
   CommandPalette,
   type CanopCommandPaletteProps,
   type CanopCommandItem,
+  CommandList,
+  type CanopCommandListProps,
+  CommandGroup,
+  type CanopCommandGroupProps,
+  CommandOption,
+  type CanopCommandOptionProps,
+  CommandEmpty,
+  type CanopCommandEmptyProps,
   useCommandPalette,
+  type UseCommandPaletteOptions,
   type UseCommandPaletteResult,
 } from "./CommandPalette";
 export { DeleteButton, type CanopDeleteButtonProps } from "./DeleteButton";
@@ -160,6 +174,8 @@ export {
   type CanopInputProps,
   type CanopInputSize,
   type CanopInputType,
+  type CanopCompletionResolver,
+  type CanopCompletionSource,
   InputText,
   type CanopInputTextProps,
   InputEmail,
@@ -207,6 +223,7 @@ export {
   type CanopStackJustify,
   type CanopStackPadding,
   type CanopStackRole,
+  type CanopResponsiveValue,
 } from "./Stack";
 export {
   Menu,
@@ -221,6 +238,7 @@ export {
 export {
   Navbar,
   type CanopMobileFooterPlacement,
+  type CanopNavbarGroup,
   type CanopNavbarItem,
   type CanopNavbarProps,
 } from "./Navbar";
@@ -244,6 +262,7 @@ export {
   SegmentedControl,
   type CanopSegmentedControlProps,
   type CanopSegmentedControlOption,
+  type CanopSegmentedControlIconOption,
   type CanopSegmentedControlSize,
 } from "./SegmentedControl";
 export {
@@ -254,7 +273,6 @@ export {
   type CanopBadgeVariant,
 } from "./Badge";
 export { StatCard, type CanopStatCardProps } from "./StatCard";
-export { SlidingIndicator, type CanopSlidingIndicatorProps } from "./SlidingIndicator";
 export { Separator, type CanopSeparatorProps, type CanopSeparatorVariant } from "./Separator";
 export { SettingsMenu, type CanopSettingsMenuProps } from "./SettingsMenu";
 export {
@@ -263,6 +281,12 @@ export {
   type CanopSkeletonLinesProps,
   type CanopSkeletonProps,
   type CanopSkeletonVariant,
+  ContentSkeleton,
+  type CanopContentSkeletonProps,
+  type CanopContentSkeletonShape,
+  SkeletonScope,
+  type CanopSkeletonScopeProps,
+  type CanopSkeletonSurface,
 } from "./Skeleton";
 export {
   ThemeToggle,
@@ -318,6 +342,11 @@ export {
   canopyScenesFrom,
   resolveCanopyScene,
   type CanopCanopyBackgroundProps,
+  type CanopCanopyLiteScene,
+  type CanopCanopyQuality,
+  type CanopCanopyQualityLevel,
+  type CanopCanopyQualityReason,
+  type CanopCanopyQualityState,
   type CanopCanopyScene,
   type CanopCanopySceneMode,
   type CanopCanopySceneOverride,
@@ -334,7 +363,12 @@ export {
   type CanopDonutGeometry,
   type UseDonutResult,
 } from "./Donut";
-export { EmptyState, type CanopEmptyStateProps, type CanopEmptyStateSurface } from "./EmptyState";
+export {
+  EmptyState,
+  type CanopEmptyStateProps,
+  type CanopEmptyStateSize,
+  type CanopEmptyStateSurface,
+} from "./EmptyState";
 export {
   Toolbar,
   type CanopToolbarProps,

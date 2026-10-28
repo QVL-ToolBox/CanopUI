@@ -3,9 +3,11 @@ import { motion } from "framer-motion";
 import type { CSSProperties, ReactNode } from "react";
 import { scrollbarSx } from "../../scrollbar";
 import { Heading } from "../Heading";
+import { SkeletonScope } from "../Skeleton/SkeletonScope";
 import { Stack } from "../Stack";
 import { tokens } from "../../tokens";
 import { keepAbovePageBottom } from "../_shared/pageBottomInset";
+import { pageGutters } from "../_shared/pageGutters";
 import { usePageContent, type CanopPageContentMaxWidth } from "./usePageContent";
 
 export type { CanopPageContentMaxWidth } from "./usePageContent";
@@ -17,15 +19,9 @@ export interface CanopPageContentProps {
   fillHeight?: boolean;
   hugContent?: boolean;
   maxWidth?: CanopPageContentMaxWidth;
+  skeleton?: boolean;
   children: ReactNode;
 }
-
-const gutters = {
-  xs: tokens.spacing.sm,
-  sm: tokens.spacing.lg,
-  md: tokens.spacing.xl,
-  lg: tokens.spacing["2xl"],
-};
 
 export function PageContent({
   title,
@@ -34,6 +30,7 @@ export function PageContent({
   fillHeight = false,
   hugContent = false,
   maxWidth = "lg",
+  skeleton = true,
   children,
 }: CanopPageContentProps) {
   const { isCompact, contentMaxWidth, enter } = usePageContent({ maxWidth });
@@ -56,7 +53,7 @@ export function PageContent({
           ...(fillHeight && !hugContent ? { display: "flex", flexDirection: "column" } : {}),
           flex: hugContent ? undefined : 1,
           minHeight: 0,
-          paddingX: gutters,
+          paddingX: pageGutters,
           paddingTop: { xs: tokens.spacing.md, md: tokens.spacing.xl },
 
           paddingBottom: hugContent
@@ -85,7 +82,9 @@ export function PageContent({
           </Heading>
         ) : null}
         <Stack gap="md" fill={fillHeight}>
-          {children}
+          <SkeletonScope surface="page" enabled={skeleton}>
+            {children}
+          </SkeletonScope>
         </Stack>
         {footer}
       </motion.div>

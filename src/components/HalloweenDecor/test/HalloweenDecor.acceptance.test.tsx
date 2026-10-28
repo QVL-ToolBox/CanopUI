@@ -1,9 +1,11 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { HalloweenDecor, Icon } from "../../../index";
 import {
   mockMatchMedia,
+  preparerDecorDeterministe,
+  quitterDecor,
   renderDecor,
   runningAnimations,
 } from "../../../test/halloweenDecorTestKit";
@@ -20,8 +22,12 @@ function decorElementCount(container: HTMLElement): number {
   return decorLayer(container).querySelectorAll("svg").length;
 }
 
+beforeEach(() => {
+  preparerDecorDeterministe();
+});
+
 afterEach(() => {
-  vi.unstubAllGlobals();
+  quitterDecor();
 });
 
 describe("icones Halloween", () => {

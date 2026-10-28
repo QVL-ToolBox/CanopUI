@@ -1,19 +1,36 @@
-import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Popover from "@mui/material/Popover";
-import { useId, useState, type ReactNode } from "react";
+import Stack from "@mui/material/Stack";
+import type { ReactNode } from "react";
 import { Icon } from "../Icon";
 import { LanguageSelector } from "../LanguageSelector";
 import { ThemeToggle } from "../ThemeToggle";
-import { Divider } from "../Divider";
+import { SkeletonScope } from "../Skeleton/SkeletonScope";
 import { useTranslation } from "../../i18n";
-import { logoutButtonSx } from "../_shared/logoutButtonSx";
+import { navbarControlsSx } from "../Navbar/navbarControls";
+import { navbarLogoutSx } from "../Navbar/navbarLogout";
 import {
   NAVBAR_MOBILE_SETTINGS_RIGHT,
   NAVBAR_MOBILE_SETTINGS_SIZE,
   NAVBAR_MOBILE_SETTINGS_TOP,
 } from "../Navbar/navbarStyles";
+import { navbarPopoverSurfaceSx } from "../Navbar/navbarSurface";
+import {
+  NAVBAR_HOVER_FILL,
+  NAVBAR_SURFACE,
+  NAVBAR_TEXT,
+  NAVBAR_TEXT_STRONG,
+} from "../Navbar/navbarTone";
 import { squircleFill, squircleSurface } from "../../squircle";
+import { hoverOrKeyboardFocus } from "../../interaction";
+import { tokens } from "../../tokens";
+import { SettingsMenuFooter } from "./SettingsMenuFooter";
+import {
+  SETTINGS_BUTTON_RADIUS,
+  SETTINGS_CONTROL_HEIGHT,
+  SETTINGS_CONTROL_WIDTH,
+} from "./settingsMenuSizes";
+import { useSettingsMenu } from "./useSettingsMenu";
 
 export interface CanopSettingsMenuProps {
   onLogout?: () => void;
@@ -22,41 +39,25 @@ export interface CanopSettingsMenuProps {
   supportHref?: string;
 }
 
-const ICON_BUTTON_SIZE = "2.25rem";
-const LINK_GAP = "0.5rem";
-const CONTROL_HEIGHT = "2.25rem";
-
-const CONTROL_WIDTH = `calc(2 * ${ICON_BUTTON_SIZE} + ${LINK_GAP})`;
-
-const linkButtonSx = {
-  width: ICON_BUTTON_SIZE,
-  height: ICON_BUTTON_SIZE,
-  ...squircleSurface({ radius: "0.625rem", background: "transparent" }),
-  color: "secondary.contrastText",
-  "&:hover": squircleFill("var(--canop-palette-action-hover)"),
-};
+const TRIGGER_ENGAGED_SURFACE = `linear-gradient(${NAVBAR_HOVER_FILL}, ${NAVBAR_HOVER_FILL}), ${NAVBAR_SURFACE}`;
 
 export function SettingsMenu({ onLogout, footer, infoHref, supportHref }: CanopSettingsMenuProps) {
   const { t } = useTranslation();
-  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
-  const triggerId = useId();
-  const panelId = useId();
-  const open = Boolean(anchor);
-  const showInfo = Boolean(footer && infoHref);
-
-  function closeMenu() {
-    setAnchor(null);
-  }
+  const { popover, triggerId, infoLink, showFooter } = useSettingsMenu({
+    footer,
+    infoHref,
+    supportHref,
+  });
 
   return (
     <>
       <IconButton
         id={triggerId}
-        onClick={(e) => setAnchor(e.currentTarget)}
+        onClick={popover.openFrom}
         aria-label={t("canop.navbar.openMenu")}
         aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls={open ? panelId : undefined}
+        aria-expanded={popover.open}
+        aria-controls={popover.open ? popover.panelId : undefined}
         sx={{
           top: NAVBAR_MOBILE_SETTINGS_TOP,
           right: NAVBAR_MOBILE_SETTINGS_RIGHT,
@@ -64,113 +65,81 @@ export function SettingsMenu({ onLogout, footer, infoHref, supportHref }: CanopS
           width: NAVBAR_MOBILE_SETTINGS_SIZE,
           height: NAVBAR_MOBILE_SETTINGS_SIZE,
           ...squircleSurface({
-            radius: "0.625rem",
-            background: "var(--canop-palette-primary-main)",
+            radius: SETTINGS_BUTTON_RADIUS,
+            background: NAVBAR_SURFACE,
             shadow: "var(--canop-drop-shadow-e2)",
             position: "fixed",
           }),
-          color: "primary.contrastText",
-          "&:hover": squircleFill("var(--canop-palette-primary-dark)"),
+          color: NAVBAR_TEXT,
+          [hoverOrKeyboardFocus()]: {
+            ...squircleFill(TRIGGER_ENGAGED_SURFACE),
+            color: NAVBAR_TEXT_STRONG,
+          },
         }}
       >
         <Icon name="settings" size="sm" />
       </IconButton>
 
-      <Popover
-        open={open}
-        anchorEl={anchor}
-        onClose={closeMenu}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        slotProps={{
-          paper: {
-            id: panelId,
-            role: "dialog",
-            "aria-labelledby": triggerId,
-            sx: {
-              marginTop: "0.5rem",
-              width: "max-content",
-              maxWidth: "calc(100% - 2rem)",
-              ...squircleSurface({
-                radius: "0.75rem",
-                background: "var(--canop-palette-secondary-main)",
-                position: "absolute",
-              }),
+      <SkeletonScope surface={null}>
+        <Popover
+          open={popover.open}
+          anchorEl={popover.anchor}
+          onClose={popover.close}
+          anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+          slotProps={{
+            paper: {
+              id: popover.panelId,
+              role: "dialog",
+              "aria-labelledby": triggerId,
+              sx: {
+                marginTop: "0.5rem",
+                width: "max-content",
+                maxWidth: "calc(100% - 2rem)",
+                ...navbarPopoverSurfaceSx("0.75rem"),
+              },
             },
-          },
-        }}
-      >
-        <Box
-          sx={{
-            padding: "1rem",
-            display: "flex",
-            flexDirection: "column",
-            gap: "0.75rem",
-            alignItems: "center",
           }}
         >
-          <LanguageSelector width={CONTROL_WIDTH} />
-          <ThemeToggle />
-          {onLogout && (
-            <IconButton
-              onClick={() => {
-                closeMenu();
-                onLogout();
-              }}
-              aria-label={t("canop.navbar.logout")}
-              sx={(theme) => ({
-                width: CONTROL_WIDTH,
-                height: CONTROL_HEIGHT,
-                ...logoutButtonSx(theme, "0.625rem"),
-              })}
-            >
-              <Icon name="logout" size="sm" />
-            </IconButton>
-          )}
-          {(showInfo || supportHref) && (
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "column",
-                gap: "0.5rem",
-                alignSelf: "stretch",
-              }}
-            >
-              <Divider spacing="none" />
-              <Box
+          <Stack
+            spacing={tokens.spacing.sm}
+            useFlexGap
+            sx={{
+              padding: "1rem",
+              alignItems: "center",
+              color: NAVBAR_TEXT,
+              ...navbarControlsSx(NAVBAR_HOVER_FILL),
+            }}
+          >
+            <LanguageSelector width={SETTINGS_CONTROL_WIDTH} />
+            <ThemeToggle />
+            {onLogout ? (
+              <IconButton
+                onClick={() => {
+                  popover.close();
+                  onLogout();
+                }}
+                aria-label={t("canop.navbar.logout")}
                 sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  gap: LINK_GAP,
+                  width: SETTINGS_CONTROL_WIDTH,
+                  height: SETTINGS_CONTROL_HEIGHT,
+                  ...navbarLogoutSx(SETTINGS_BUTTON_RADIUS),
                 }}
               >
-                {showInfo && (
-                  <IconButton
-                    component="a"
-                    href={infoHref}
-                    onClick={closeMenu}
-                    aria-label={t("canop.navbar.legalInfo")}
-                    sx={linkButtonSx}
-                  >
-                    <Icon name="info" size="sm" />
-                  </IconButton>
-                )}
-                {supportHref && (
-                  <IconButton
-                    component="a"
-                    href={supportHref}
-                    onClick={closeMenu}
-                    aria-label={t("canop.navbar.reportBug")}
-                    sx={linkButtonSx}
-                  >
-                    <Icon name="help" size="sm" />
-                  </IconButton>
-                )}
-              </Box>
-            </Box>
-          )}
-        </Box>
-      </Popover>
+                <Icon name="logout" size="sm" />
+              </IconButton>
+            ) : null}
+            {showFooter ? (
+              <SettingsMenuFooter
+                footer={footer}
+                infoHref={infoLink}
+                supportHref={supportHref}
+                onNavigate={popover.close}
+              />
+            ) : null}
+          </Stack>
+        </Popover>
+      </SkeletonScope>
     </>
   );
 }

@@ -103,6 +103,27 @@ export function derniereValeurEmise(
   return valeursEmises(element, propriete, suffixe, conditions).at(-1) ?? "";
 }
 
+export function derniereValeurDansLeGroupe(
+  element: Element,
+  propriete: string,
+  suffixe = "",
+): string {
+  const classes = classesEmotion(element);
+  return (
+    reglesEmises(element)
+      .filter((regle) => regle.conditions.length === 0)
+      .filter((regle) =>
+        regle.selecteur
+          .split(",")
+          .map((partie) => partie.trim())
+          .some((partie) => classes.some((classe) => partie === `.${classe}${suffixe}`)),
+      )
+      .map((regle) => regle.style.getPropertyValue(propriete))
+      .filter((valeur) => valeur !== "")
+      .at(-1) ?? ""
+  );
+}
+
 export function blocsBrutsDe(element: Element): string[] {
   const texte = Array.from(document.querySelectorAll("style"))
     .map((balise) => balise.textContent ?? "")

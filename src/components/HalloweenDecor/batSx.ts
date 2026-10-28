@@ -1,4 +1,5 @@
 import type { CSSObject } from "@mui/material/styles";
+import { glyphFrameSx } from "./glyphLayerSx";
 import { keyframes, loop, when } from "./halloweenMotion";
 import type {
   HalloweenBatAltitude,
@@ -11,6 +12,8 @@ import { halloweenTone } from "./halloweenTones";
 
 const HEADING_VAR = "--canop-halloween-heading";
 const RADIUS_VAR = "--canop-halloween-radius";
+
+type HalloweenWing = "left" | "right";
 
 const WING_LEFT = "canop-halloween-wing-left";
 const WING_RIGHT = "canop-halloween-wing-right";
@@ -154,34 +157,34 @@ export function batLoopSx(spec: HalloweenBatSpec, animated: boolean): CSSObject 
   });
 }
 
-const WING_PIVOT = { transformBox: "view-box", transformOrigin: "50% 44%" } as const;
-
-export function batGlyphSx(mirrored: boolean, flap: number, animated: boolean): CSSObject {
+export function batGlyphSx(mirrored: boolean): CSSObject {
   return {
-    display: "block",
-    width: "100%",
-    height: "auto",
-    overflow: "visible",
+    ...glyphFrameSx("1"),
     color: halloweenTone("bat"),
     transform: mirrored ? "scaleX(-1)" : "none",
     "& [data-part='eye']": { fill: halloweenTone("batEye") },
-    "& [data-part='wing-left']": {
-      ...WING_PIVOT,
-      ...when(animated, { animation: loop(WING_LEFT, flap, 0) }),
-    },
-    "& [data-part='wing-right']": {
-      ...WING_PIVOT,
-      ...when(animated, { animation: loop(WING_RIGHT, flap, 0) }),
-    },
+  };
+}
+
+const wingFrames: Record<HalloweenWing, CSSObject> = {
+  left: {
+    "0%, 100%": { transform: "rotate(-16deg)" },
+    "50%": { transform: "rotate(24deg) scaleY(0.72)" },
+  },
+  right: {
+    "0%, 100%": { transform: "rotate(16deg)" },
+    "50%": { transform: "rotate(-24deg) scaleY(0.72)" },
+  },
+};
+
+const wingName: Record<HalloweenWing, string> = { left: WING_LEFT, right: WING_RIGHT };
+
+export function batWingSx(wing: HalloweenWing, flap: number, animated: boolean): CSSObject {
+  return {
+    transformOrigin: "50% 44%",
     ...when(animated, {
-      ...keyframes(WING_LEFT, {
-        "0%, 100%": { transform: "rotate(-16deg)" },
-        "50%": { transform: "rotate(24deg) scaleY(0.72)" },
-      }),
-      ...keyframes(WING_RIGHT, {
-        "0%, 100%": { transform: "rotate(16deg)" },
-        "50%": { transform: "rotate(-24deg) scaleY(0.72)" },
-      }),
+      animation: loop(wingName[wing], flap, 0),
+      ...keyframes(wingName[wing], wingFrames[wing]),
     }),
   };
 }

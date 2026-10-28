@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import { SquircleDashedBorder, squircleSurface } from "../../squircle";
 import Typography from "@mui/material/Typography";
 import { useCallback, useRef, useState, type DragEvent } from "react";
+import { withoutFocusRing } from "../../interaction";
 import { Icon } from "../../components/Icon";
 import { Stack } from "../../components/Stack";
 
@@ -82,7 +83,7 @@ export function UploadDropZone({
 
         cursor: disabled ? "not-allowed" : "pointer",
         opacity: disabled ? 0.6 : 1,
-        outline: "none",
+        ...withoutFocusRing,
       }}
     >
       <SquircleDashedBorder

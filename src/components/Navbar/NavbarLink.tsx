@@ -2,8 +2,16 @@ import Box from "@mui/material/Box";
 import type { MouseEvent, ReactNode } from "react";
 import { Icon, type CanopIconName } from "../Icon";
 import { NavbarActiveIndicator } from "./NavbarActiveIndicator";
-import { squircleFill, squircleSurface } from "../../squircle";
-import { NAVBAR_HOVER_OVERLAY } from "./navbarStyles";
+import { squircleSurface } from "../../squircle";
+import { navbarInteractionSx } from "./navbarInteraction";
+
+export const NAVBAR_LINK_RADIUS = "var(--canop-radius-sm)";
+
+export const NAVBAR_LINK_INSET = "1.125rem";
+
+const LINK_PADDING = `0.5625rem 0.75rem 0.5625rem ${NAVBAR_LINK_INSET}`;
+const NESTED_LINK_PADDING = `0.4375rem 0.75rem 0.4375rem ${NAVBAR_LINK_INSET}`;
+const LINK_FONT_SIZE = "0.9375rem";
 
 export interface NavbarLinkProps {
   href: string;
@@ -44,25 +52,19 @@ export function NavbarLink({
         display: "flex",
         alignItems: "center",
         gap: "0.75rem",
-        padding: nested ? "0.5rem 0.75rem" : "0.75rem 0.875rem",
-        ...squircleSurface({ radius: "var(--canop-radius-md)", background: "transparent" }),
-        color: active ? "primary.main" : "primary.contrastText",
+        padding: nested ? NESTED_LINK_PADDING : LINK_PADDING,
+        ...squircleSurface({ radius: NAVBAR_LINK_RADIUS, background: "transparent" }),
         fontWeight: active ? 600 : 400,
-        fontSize: nested ? "0.9375rem" : "1rem",
+        fontSize: LINK_FONT_SIZE,
         textDecoration: "none",
         cursor: "pointer",
-        transition: "color var(--canop-motion-duration-fast) var(--canop-motion-ease-standard)",
-        "&:hover": active ? {} : squircleFill(NAVBAR_HOVER_OVERLAY),
-        "&:focus-visible": {
-          outline: "0.125rem solid var(--canop-palette-accent-main)",
-          outlineOffset: "0.125rem",
-        },
+        ...navbarInteractionSx(active, showIndicator),
       }}
     >
-      {showIndicator && <NavbarActiveIndicator />}
+      {showIndicator && <NavbarActiveIndicator radius={NAVBAR_LINK_RADIUS} />}
       {icon && (
         <Box component="span" sx={{ position: "relative", zIndex: 1, display: "inline-flex" }}>
-          <Icon name={icon} size={nested ? "sm" : "md"} />
+          <Icon name={icon} size="sm" variant={active ? "solid" : "outline"} />
         </Box>
       )}
       <Box

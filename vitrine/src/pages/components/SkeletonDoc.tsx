@@ -20,7 +20,6 @@ const busyCode = `<section aria-busy={loading}>
 </section>`;
 
 const staticCode = `<Skeleton variant="lines" animated={false} />`;
-
 const fr = {
   intro:
     "Gabarit de contenu à venir, en bloc ou en lignes. Il pulse doucement le temps du chargement, se fige quand l'utilisateur demande un mouvement réduit, et reste invisible aux technologies d'assistance : il est aria-hidden.",

@@ -1,9 +1,8 @@
-import type { Transition } from "framer-motion";
-import { motionDurationSeconds, motionEasing } from "../../motion";
+import type { AnimationOptions } from "framer-motion";
 
-export const ACTIVE_INDICATOR_LAYOUT_ID = "active";
-
-export const activeIndicatorTransition: Transition = {
-  duration: motionDurationSeconds.base,
-  ease: motionEasing.organic,
+export const activeIndicatorTransition: AnimationOptions = {
+  type: "spring",
+  stiffness: 520,
+  damping: 42,
+  mass: 0.9,
 };

@@ -1,16 +1,15 @@
-import { useState } from "react";
-import { Button, CommandPalette, Toast, useCommandPalette, type CanopCommandItem } from "@canop/ui";
 import { DemoCard } from "../../kit/DemoCard";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
 import { PropsTable, type PropRow } from "../../kit/PropsTable";
 import { useDocLocale } from "../../i18n/useDocLocale";
+import { CommandPaletteDemo } from "./commandPalette/CommandPaletteDemo";
 
 const importCode = `import { CommandPalette, useCommandPalette } from "@canop/ui";`;
 
 const usageCode = `function CommandPaletteDemo() {
-  const { open, toggle, close } = useCommandPalette();
-  const [message, setMessage] = useState<string | null>(null);
+  const { open, toggle, close } = useCommandPalette({ shortcut: false });
+  const [selectedLabel, setSelectedLabel] = useState<string | null>(null);
 
   const items: CanopCommandItem[] = [
     { id: "home", label: "Accueil", group: "Navigation", icon: "home", href: "/" },
@@ -24,7 +23,7 @@ const usageCode = `function CommandPaletteDemo() {
   return (
     <>
       <Button startIcon={<Icon name="search" size="xs" />} onClick={toggle}>
-        Ouvrir (⌘K)
+        Ouvrir la palette
       </Button>
       <CommandPalette
         open={open}
@@ -32,66 +31,17 @@ const usageCode = `function CommandPaletteDemo() {
         items={items}
         onSelect={(item) => {
           close();
-          if (item.href) {
-            navigate(item.href);
-            return;
-          }
-          setMessage(item.label);
+          setSelectedLabel(item.label);
         }}
       />
       <Toast
-        open={message !== null}
-        message={message ? \`Commande : \${message}\` : ""}
-        onClose={() => setMessage(null)}
+        open={selectedLabel !== null}
+        message={selectedLabel ? \`Commande : \${selectedLabel}\` : ""}
+        onClose={() => setSelectedLabel(null)}
       />
     </>
   );
 }`;
-
-const demoItems: CanopCommandItem[] = [
-  { id: "home", label: "Accueil", group: "Navigation", icon: "home", href: "/" },
-  { id: "files", label: "Mes fichiers", group: "Navigation", icon: "folder", href: "/files" },
-  { id: "settings", label: "Réglages", group: "Navigation", icon: "settings", href: "/settings" },
-  {
-    id: "new",
-    label: "Nouveau document",
-    group: "Actions",
-    icon: "plus",
-    keywords: ["créer", "ajouter"],
-  },
-  { id: "upload", label: "Importer un fichier", group: "Actions", icon: "upload" },
-  { id: "delete", label: "Vider la corbeille", group: "Actions", icon: "trash" },
-];
-
-interface DemoLabels {
-  openLabel: string;
-  feedbackLabel: string;
-}
-
-function CommandPaletteDemo({ openLabel, feedbackLabel }: DemoLabels) {
-  const { open, toggle, close } = useCommandPalette();
-  const [message, setMessage] = useState<string | null>(null);
-
-  return (
-    <>
-      <Button onClick={toggle}>{openLabel}</Button>
-      <CommandPalette
-        open={open}
-        onClose={close}
-        items={demoItems}
-        onSelect={(item) => {
-          close();
-          setMessage(item.label);
-        }}
-      />
-      <Toast
-        open={message !== null}
-        message={message ? `${feedbackLabel} ${message}` : ""}
-        onClose={() => setMessage(null)}
-      />
-    </>
-  );
-}
 
 const fr = {
   intro:
@@ -102,18 +52,20 @@ const fr = {
     filtering: "Filtrage",
     routing: "Agnostique du routeur",
     hook: "Hook useCommandPalette",
+    hookOptions: "Options de useCommandPalette",
     apiPalette: "API — CommandPalette",
     apiItem: "API — CanopCommandItem",
+    apiList: "Composants de liste",
   },
   demos: {
     usageTitle: "Palette interactive",
     usageDescription:
-      "Cliquez sur le bouton ou pressez ⌘K / Ctrl+K pour ouvrir la palette. Les commandes sont regroupées ; la sélection déclenche un toast avec l'item choisi.",
-    openLabel: "Ouvrir (⌘K)",
+      "Cliquez sur le bouton pour ouvrir la palette. Les commandes sont regroupées ; la sélection déclenche un toast avec l'item choisi. Dans cette documentation, ⌘K / Ctrl+K ouvre déjà la recherche : la démo passe shortcut: false pour ne pas lui disputer le raccourci.",
+    openLabel: "Ouvrir la palette",
     feedbackLabel: "Commande :",
   },
   shortcutDescription:
-    "Le hook useCommandPalette enregistre un écouteur global ⌘K / Ctrl+K qui bascule l'ouverture. Une fois ouverte, la palette se pilote au clavier : ↑ / ↓ pour parcourir les commandes, Entrée pour valider la commande active, Échap pour fermer.",
+    "Le hook useCommandPalette enregistre un écouteur global ⌘K / Ctrl+K qui bascule l'ouverture. Une seule palette par écran doit le porter : pour une palette secondaire, passez shortcut: false et ouvrez-la par son bouton. Une fois ouverte, la palette se pilote au clavier : ↑ / ↓ pour parcourir les commandes, Entrée pour valider la commande active, Échap pour fermer.",
   filteringDescription:
     "La saisie filtre les commandes de façon insensible à la casse et aux accents, sur le libellé (label), les mots-clés (keywords) et le groupe (group). Les résultats restent regroupés ; emptyLabel s'affiche lorsqu'aucune commande ne correspond.",
   routingDescription:
@@ -140,8 +92,25 @@ const fr = {
   hookResult: {
     open: "Vrai lorsque la palette est ouverte.",
     setOpen: "Force l'état d'ouverture à la valeur passée.",
-    toggle: "Bascule l'ouverture ; branché aussi sur le raccourci ⌘K / Ctrl+K.",
+    toggle:
+      "Bascule l'ouverture ; branché aussi sur le raccourci ⌘K / Ctrl+K, sauf avec shortcut: false.",
     close: "Ferme la palette.",
+  },
+  hookOption: {
+    shortcut:
+      "Écoute le raccourci global ⌘K / Ctrl+K. false le coupe, pour une palette secondaire qui ne doit pas le disputer à la palette principale.",
+  },
+  listDescription:
+    "CommandList, CommandGroup, CommandOption et CommandEmpty sont les briques de rendu de la palette, exportées pour bâtir une recherche ancrée sous un champ avec le même rendu, comme la barre de recherche de cette vitrine.",
+  list: {
+    children: "CommandList et CommandGroup : les groupes, puis les options qu'ils contiennent.",
+    ariaLabel: "CommandList : nom accessible de la listbox.",
+    maxHeight: "CommandList : hauteur maximale avant défilement interne.",
+    meta: "CommandOption : contenu secondaire affiché à droite du libellé.",
+    active: "CommandOption : option mise en avant, que la liste fait défiler jusqu'à elle.",
+    onHighlight: "CommandOption : appelé au survol, pour suivre l'option active.",
+    announce:
+      "CommandEmpty : annonce le message en role status. false quand une région live externe annonce déjà.",
   },
 };
 
@@ -154,18 +123,20 @@ const en: typeof fr = {
     filtering: "Filtering",
     routing: "Router-agnostic",
     hook: "useCommandPalette hook",
+    hookOptions: "useCommandPalette options",
     apiPalette: "API — CommandPalette",
     apiItem: "API — CanopCommandItem",
+    apiList: "List components",
   },
   demos: {
     usageTitle: "Interactive palette",
     usageDescription:
-      "Click the button or press ⌘K / Ctrl+K to open the palette. Commands are grouped; selecting one triggers a toast with the chosen item.",
-    openLabel: "Open (⌘K)",
+      "Click the button to open the palette. Commands are grouped; selecting one triggers a toast with the chosen item. In this documentation, ⌘K / Ctrl+K already opens the search: the demo passes shortcut: false so as not to compete for the shortcut.",
+    openLabel: "Open the palette",
     feedbackLabel: "Command:",
   },
   shortcutDescription:
-    "The useCommandPalette hook registers a global ⌘K / Ctrl+K listener that toggles the palette. Once open, it is driven by the keyboard: ↑ / ↓ to move through commands, Enter to run the active one, Escape to close.",
+    "The useCommandPalette hook registers a global ⌘K / Ctrl+K listener that toggles the palette. Only one palette per screen should own it: for a secondary palette, pass shortcut: false and open it from its button. Once open, it is driven by the keyboard: ↑ / ↓ to move through commands, Enter to run the active one, Escape to close.",
   filteringDescription:
     "Typing filters commands in a case- and accent-insensitive way across the label, the keywords and the group. Results stay grouped; emptyLabel shows when no command matches.",
   routingDescription:
@@ -192,8 +163,24 @@ const en: typeof fr = {
   hookResult: {
     open: "True when the palette is open.",
     setOpen: "Forces the open state to the given value.",
-    toggle: "Toggles the palette; also wired to the ⌘K / Ctrl+K shortcut.",
+    toggle: "Toggles the palette; also wired to the ⌘K / Ctrl+K shortcut, unless shortcut: false.",
     close: "Closes the palette.",
+  },
+  hookOption: {
+    shortcut:
+      "Listens to the global ⌘K / Ctrl+K shortcut. false turns it off, for a secondary palette that must not compete with the main one.",
+  },
+  listDescription:
+    "CommandList, CommandGroup, CommandOption and CommandEmpty are the palette's rendering blocks, exported to build a search anchored under a field with the same rendering, like this showcase's search bar.",
+  list: {
+    children: "CommandList and CommandGroup: the groups, then the options they hold.",
+    ariaLabel: "CommandList: accessible name of the listbox.",
+    maxHeight: "CommandList: maximum height before inner scrolling.",
+    meta: "CommandOption: secondary content shown right of the label.",
+    active: "CommandOption: highlighted option, scrolled into view by the list.",
+    onHighlight: "CommandOption: called on hover, to track the active option.",
+    announce:
+      "CommandEmpty: announces the message in a status role. false when an outer live region already announces.",
   },
 };
 
@@ -228,6 +215,25 @@ export default function CommandPaletteDoc() {
     { name: "close", type: "() => void", description: t.hookResult.close },
   ];
 
+  const hookOptionRows: PropRow[] = [
+    {
+      name: "shortcut",
+      type: "boolean",
+      defaultValue: "true",
+      description: t.hookOption.shortcut,
+    },
+  ];
+
+  const listRows: PropRow[] = [
+    { name: "children", type: "ReactNode", required: true, description: t.list.children },
+    { name: "ariaLabel", type: "string", description: t.list.ariaLabel },
+    { name: "maxHeight", type: "string", defaultValue: '"24rem"', description: t.list.maxHeight },
+    { name: "meta", type: "ReactNode", description: t.list.meta },
+    { name: "active", type: "boolean", required: true, description: t.list.active },
+    { name: "onHighlight", type: "() => void", required: true, description: t.list.onHighlight },
+    { name: "announce", type: "boolean", defaultValue: "true", description: t.list.announce },
+  ];
+
   return (
     <DocPage title="CommandPalette" intro={t.intro} importCode={importCode}>
       <DocSection title={t.sections.usage}>
@@ -245,11 +251,17 @@ export default function CommandPaletteDoc() {
       <DocSection title={t.sections.hook} description={t.hookDescription}>
         <PropsTable rows={hookRows} />
       </DocSection>
+      <DocSection title={t.sections.hookOptions}>
+        <PropsTable rows={hookOptionRows} />
+      </DocSection>
       <DocSection title={t.sections.apiPalette}>
         <PropsTable rows={paletteRows} />
       </DocSection>
       <DocSection title={t.sections.apiItem}>
         <PropsTable rows={itemRows} />
+      </DocSection>
+      <DocSection title={t.sections.apiList} description={t.listDescription}>
+        <PropsTable rows={listRows} />
       </DocSection>
     </DocPage>
   );

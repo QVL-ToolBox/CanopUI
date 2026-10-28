@@ -4,6 +4,7 @@ import MenuItem from "@mui/material/MenuItem";
 import MuiSelect from "@mui/material/Select";
 import Typography from "@mui/material/Typography";
 import { isValidElement, type ReactNode } from "react";
+import { keyboardFocus } from "../../interaction";
 import { Icon } from "../Icon";
 import { FieldLabel } from "../_shared/FieldLabel";
 import { useFieldLabelling } from "../_shared/useFieldLabelling";
@@ -29,8 +30,11 @@ export interface CanopMultiSelectProps {
 const CHIP_INSET_ALIGNED_WITH_TEXT = "0.75rem";
 const CHIP_GAP_COMPENSATION = "-0.25rem";
 
+const CHIP_BACKGROUND = "primary.main";
+
 const CHIP_SX = {
-  backgroundColor: "primary.main",
+  backgroundColor: CHIP_BACKGROUND,
+  [keyboardFocus()]: { backgroundColor: CHIP_BACKGROUND },
   color: "primary.contrastText",
   "& .MuiChip-icon": {
     color: "primary.contrastText",

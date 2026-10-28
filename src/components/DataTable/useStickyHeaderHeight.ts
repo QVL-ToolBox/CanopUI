@@ -13,8 +13,12 @@ export function useStickyHeaderHeight(enabled: boolean): UseStickyHeaderHeightRe
     if (!enabled) return;
     const header = headerRef.current;
     if (!header) return;
-    const measure = () => setHeaderHeight(header.offsetHeight);
+    const measure = (entries?: ResizeObserverEntry[]) => {
+      const borderBox = entries?.[0]?.borderBoxSize?.[0];
+      setHeaderHeight(borderBox ? borderBox.blockSize : header.offsetHeight);
+    };
     measure();
+    if (typeof ResizeObserver === "undefined") return;
     const observer = new ResizeObserver(measure);
     observer.observe(header);
     return () => observer.disconnect();

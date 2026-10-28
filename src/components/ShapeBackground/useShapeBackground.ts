@@ -1,31 +1,24 @@
 import { useTheme } from "@mui/material/styles";
-import useMediaQuery from "@mui/material/useMediaQuery";
 import { useMemo } from "react";
-import { clamp } from "../_shared/clamp";
-import {
-  AMBIENT_DARK_OPACITY_FACTOR,
-  edgeShapes,
-  shapePools,
-  variantConfig,
-  type CanopShapeDefinition,
-  type CanopShapeTier,
-  type CanopShapeVariant,
-} from "./shapes";
+import { lavaBaseColor } from "./lavaPaint";
+import { LAVA_RECIPE, type LavaSettings } from "./lavaRecipe";
+import { resolveShapeHue } from "./shapeHue";
+import { shapeLayouts, type CanopShapeVariant, type ShapeLayout } from "./shapeLayout";
+import { useLavaMotion, type LavaMotion } from "./useLavaMotion";
 
 export interface UseShapeBackgroundParams {
   variant: CanopShapeVariant;
   density?: number;
   intensity: number;
   color: string;
+  animated: boolean;
 }
 
 export interface UseShapeBackgroundResult {
-  shapes: CanopShapeDefinition[];
-  shapeBlur?: string;
-  showVeil: boolean;
-  veilOpacity: number;
+  layout: ShapeLayout;
+  lava: LavaSettings;
+  motion: LavaMotion;
   backgroundColor: string;
-  contentJustify: "center" | "flex-start";
 }
 
 export function useShapeBackground({
@@ -33,36 +26,22 @@ export function useShapeBackground({
   density,
   intensity,
   color,
+  animated,
 }: UseShapeBackgroundParams): UseShapeBackgroundResult {
-  const theme = useTheme();
-  const isDark = theme.palette.mode === "dark";
-  const isDesktop = useMediaQuery(theme.breakpoints.up("md"));
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const mode = useTheme().palette.mode;
+  const motion = useLavaMotion(animated);
+  const hue = resolveShapeHue(color);
+  const masses = density ?? LAVA_RECIPE.masses;
 
-  const tier: CanopShapeTier = isDesktop ? "desktop" : isMobile ? "mobile" : "tablet";
-  const config = variantConfig[variant];
-
-  const shapes = useMemo(() => {
-    const pool =
-      variant === "edge"
-        ? edgeShapes
-        : tier === "mobile"
-          ? shapePools[variant].mobile
-          : shapePools[variant].desktop;
-    const count = Math.min(density ?? config.defaultDensity[tier], pool.length);
-    const opacityFactor =
-      intensity * (variant === "ambient" && isDark ? AMBIENT_DARK_OPACITY_FACTOR : 1);
-    return pool
-      .slice(0, count)
-      .map((shape) => ({ ...shape, opacity: clamp(shape.opacity * opacityFactor, 0, 1) }));
-  }, [variant, tier, density, intensity, isDark, config]);
+  const lava = useMemo<LavaSettings>(
+    () => ({ hue, mode, masses, intensity: Math.max(0, intensity) }),
+    [hue, mode, masses, intensity],
+  );
 
   return {
-    shapes,
-    shapeBlur: config.shapeBlur,
-    showVeil: config.hasVeil,
-    veilOpacity: isDark ? config.veilOpacity.dark : config.veilOpacity.light,
-    backgroundColor: variant === "hero" ? color : config.backgroundRole,
-    contentJustify: config.contentJustify,
+    layout: shapeLayouts[variant],
+    lava,
+    motion,
+    backgroundColor: lavaBaseColor(hue),
   };
 }

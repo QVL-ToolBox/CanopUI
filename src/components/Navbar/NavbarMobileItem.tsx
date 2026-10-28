@@ -1,4 +1,5 @@
 import { NavbarTileItem } from "./NavbarTileItem";
+import { MOBILE_TILE_PLACEMENT } from "./navbarTilePlacement";
 import { type CanopNavbarItem } from "./navigation";
 
 export interface NavbarMobileItemProps {
@@ -13,9 +14,7 @@ export function NavbarMobileItem({ item, activeHref, onNavigate }: NavbarMobileI
       item={item}
       activeHref={activeHref}
       onNavigate={onNavigate}
-      popoverAnchorOrigin={{ vertical: "top", horizontal: "center" }}
-      popoverTransformOrigin={{ vertical: "bottom", horizontal: "center" }}
-      popoverOffset={{ marginBottom: "0.75rem" }}
+      placement={MOBILE_TILE_PLACEMENT}
     />
   );
 }

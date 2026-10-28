@@ -23,6 +23,7 @@ export function MapFallback({ center, zoom, height }: MapFallbackProps) {
       sx={{
         height: height,
         width: "100%",
+        backgroundColor: "var(--canop-palette-surface-sunken)",
       }}
     >
       <EmptyState

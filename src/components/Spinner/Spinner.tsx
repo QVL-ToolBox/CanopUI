@@ -3,7 +3,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import { useId } from "react";
 import { useTranslation } from "../../i18n";
 import type { CanopPaletteColorName } from "../_shared/paletteColorVar";
+import { ContentSkeleton } from "../Skeleton/ContentSkeleton";
 import { PaletteStrokeGradient } from "./PaletteStrokeGradient";
+import { useSpinnerSkeleton } from "./useSpinnerSkeleton";
 
 export type CanopSpinnerSize = "small" | "medium" | "large";
 export type CanopSpinnerColor = CanopPaletteColorName | "inherit";
@@ -13,6 +15,7 @@ export interface CanopSpinnerProps {
   size?: CanopSpinnerSize;
   color?: CanopSpinnerColor;
   ariaLabel?: string;
+  skeleton?: boolean;
 }
 
 const sizeMapping: Record<CanopSpinnerSize, string> = {
@@ -47,9 +50,16 @@ export function Spinner({
   size = "medium",
   color = "accent",
   ariaLabel,
+  skeleton = true,
 }: CanopSpinnerProps) {
   const { t } = useTranslation();
   const gradientId = urlSafeGradientIdFrom(useId());
+  const skeletonShape = useSpinnerSkeleton({ skeleton, fullPage, size, color });
+
+  if (skeletonShape) {
+    return <ContentSkeleton shape={skeletonShape} ariaLabel={ariaLabel} />;
+  }
+
   const progress = (
     <>
       {color !== "inherit" && <PaletteStrokeGradient id={gradientId} color={color} />}

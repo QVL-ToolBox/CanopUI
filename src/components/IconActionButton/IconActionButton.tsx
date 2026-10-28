@@ -4,7 +4,7 @@ import { squircleFill, squircleSurface } from "../../squircle";
 import type { MouseEventHandler, Ref } from "react";
 import { Icon, type CanopIconName, type CanopIconSize } from "../Icon";
 import { Spinner } from "../Spinner";
-import { focusRingSx } from "../_shared/focusRing";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import { OptionalTooltip } from "../_shared/OptionalTooltip";
 import { useIconActionButton } from "./useIconActionButton";
 
@@ -104,9 +104,7 @@ export function IconActionButton({
           }),
           color: disabled ? "action.disabled" : fgMap[variant],
           transition: "all 0.15s",
-          "&.Mui-focusVisible": squircleFill(restBg),
-          "&:hover": squircleFill(hoverBgMap[variant]),
-          "&:focus-visible": focusRingSx,
+          [hoverOrKeyboardFocus()]: squircleFill(hoverBgMap[variant]),
           ...(loading && { cursor: "progress" }),
         }}
       >

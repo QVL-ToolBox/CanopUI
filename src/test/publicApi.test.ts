@@ -1,6 +1,16 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 import type { ComponentProps } from "react";
-import type { CanopHalloweenDecorProps, CanopSeason } from "../index";
+import type {
+  CanopBackgroundTone,
+  CanopHalloweenDecorProps,
+  CanopMainElement,
+  CanopNavbarGroup,
+  CanopNavbarItem,
+  CanopNavbarTitleLevel,
+  CanopResponsiveValue,
+  CanopSeason,
+  CanopTitleLevel,
+} from "../index";
 import * as canopUi from "../index";
 import * as canopUiMap from "../map";
 import * as canopUiVite from "../vite";
@@ -54,6 +64,8 @@ const colorExports = [
   "LIGHT_COLOR_THRESHOLD",
 ];
 
+const interactionExports = ["hoverOrKeyboardFocus", "keyboardFocus", "withoutFocusRing"];
+
 const breakpointExports = ["useBreakpoint", "useBreakpointDown", "useBreakpointUp"];
 
 const themeExports = [
@@ -63,6 +75,8 @@ const themeExports = [
   "createCanopTheme",
   "canopSeasonAt",
 ];
+
+const neonGlowExports = ["glow", "glowFilter", "innerGlow", "NEON_GLOW_VAR", "useNeonGlow"];
 
 const motionExports = [
   "useReducedMotion",
@@ -86,6 +100,10 @@ const componentExports = [
   "Carousel",
   "Checkbox",
   "CommandPalette",
+  "CommandList",
+  "CommandGroup",
+  "CommandOption",
+  "CommandEmpty",
   "ConfirmDialog",
   "Countdown",
   "DataTable",
@@ -138,7 +156,6 @@ const componentExports = [
   "CanopyBackground",
   "SidePanel",
   "Slider",
-  "SlidingIndicator",
   "Spinner",
   "Stack",
   "StatCard",
@@ -179,6 +196,8 @@ const componentExports = [
   "canopyScenesFrom",
   "resolveCanopyScene",
 ];
+
+const pageInsetExports = ["avoidPageTopRight", "reservePageTopRight", "resetPageInsets"];
 
 const i18nExports = [
   "CanopI18nProvider",
@@ -288,17 +307,38 @@ const svgMapExports = [
 ];
 
 const bentoExports = ["BentoGrid", "BentoTile"];
-const primitiveExports = ["Avatar", "Skeleton", "VisuallyHidden", "LiveRegion", "useLiveAnnouncer"];
+const liquidGlassExports = [
+  "liquidGlassBackground",
+  "liquidGlassFallbackBackground",
+  "liquidGlassBackdropFilter",
+  "LiquidGlassLayers",
+  "useRefractionFilter",
+  "useRefractionSupport",
+  "FROSTED_CARD_LIQUID_GLASS",
+];
+const primitiveExports = [
+  "Avatar",
+  "Skeleton",
+  "ContentSkeleton",
+  "SkeletonScope",
+  "VisuallyHidden",
+  "LiveRegion",
+  "useLiveAnnouncer",
+];
 
 const expectedPublicApi = [
   ...rootExports,
   ...tokenExports,
   ...themeExports,
+  ...neonGlowExports,
   ...motionExports,
+  ...interactionExports,
   ...breakpointExports,
   ...colorExports,
   ...squircleExports,
+  ...liquidGlassExports,
   ...componentExports,
+  ...pageInsetExports,
   ...i18nExports,
   ...httpExports,
   ...uploadExports,
@@ -368,6 +408,15 @@ describe("surface publique de src/index.ts", () => {
     }).toEqual({ symbolesLiesAUndefined: [] });
   });
 
+  it("ne publie plus la recette neon par defaut ni ses variables, mais garde NEON_GLOW_VAR", () => {
+    expect({
+      recetteNeonPubliee: ["NEON_GLOW_DEFAULT_RECIPE", "neonGlowRecipeVariables"].filter((name) =>
+        actualPublicApi.includes(name),
+      ),
+      neonGlowVarPublie: actualPublicApi.includes("NEON_GLOW_VAR"),
+    }).toEqual({ recetteNeonPubliee: [], neonGlowVarPublie: true });
+  });
+
   it("expose la grille bento et sa tuile comme composants", () => {
     expect({
       symbolesBentoAbsents: absentFrom(bentoExports, actualPublicApi),
@@ -423,6 +472,15 @@ describe("surface publique de src/vite.ts", () => {
   });
 });
 
+describe("surface publique des etats d'interaction", () => {
+  it("expose les helpers de focus clavier comme valeurs definies", () => {
+    expect({
+      symbolesAbsents: absentFrom(interactionExports, actualPublicApi),
+      symbolesLiesAUndefined: undefinedAmong(interactionExports, publicApiValues),
+    }).toEqual({ symbolesAbsents: [], symbolesLiesAUndefined: [] });
+  });
+});
+
 describe("types publics du theme saisonnier", () => {
   it("expose CanopSeason comme l'union des saisons connues", () => {
     expectTypeOf<CanopSeason>().toEqualTypeOf<"halloween">();
@@ -438,5 +496,48 @@ describe("types publics du theme saisonnier", () => {
     expectTypeOf<NonNullable<CanopHalloweenDecorProps["density"]>>().toEqualTypeOf<
       "low" | "medium"
     >();
+  });
+});
+
+describe("types publics des corrections de la lib", () => {
+  it("expose CanopTitleLevel comme les niveaux 1 a 4 ou text", () => {
+    expectTypeOf<CanopTitleLevel>().toEqualTypeOf<1 | 2 | 3 | 4 | "text">();
+  });
+
+  it("garde CanopNavbarTitleLevel comme alias de CanopTitleLevel", () => {
+    expectTypeOf<CanopNavbarTitleLevel>().toEqualTypeOf<CanopTitleLevel>();
+  });
+
+  it("expose CanopMainElement comme main ou div", () => {
+    expectTypeOf<CanopMainElement>().toEqualTypeOf<"main" | "div">();
+  });
+
+  it("expose CanopBackgroundTone comme primary ou accent", () => {
+    expectTypeOf<CanopBackgroundTone>().toEqualTypeOf<"primary" | "accent">();
+  });
+
+  it("accepte une valeur simple ou par point de rupture dans CanopResponsiveValue", () => {
+    expectTypeOf<"row">().toMatchTypeOf<CanopResponsiveValue<"row" | "column">>();
+    expectTypeOf<{ xs: "column"; md: "row" }>().toMatchTypeOf<
+      CanopResponsiveValue<"row" | "column">
+    >();
+  });
+
+  it("expose CanopNavbarGroup comme un intertitre et ses items", () => {
+    expectTypeOf<CanopNavbarGroup>().toEqualTypeOf<{ label: string; items: CanopNavbarItem[] }>();
+  });
+
+  it("exporte les composants de liste de palette comme des composants", () => {
+    expect(
+      ["CommandList", "CommandGroup", "CommandOption", "CommandEmpty"].filter(
+        (name) => typeof publicApiValues.get(name) !== "function",
+      ),
+    ).toEqual([]);
+  });
+
+  it("exporte les helpers de reserve de page comme des fonctions", () => {
+    expect(
+      pageInsetExports.filter((name) => typeof publicApiValues.get(name) !== "function"),
+    ).toEqual([]);
   });
 });

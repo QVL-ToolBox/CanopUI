@@ -1,4 +1,4 @@
-import { useCallback, useId, useMemo, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import type { KeyboardEvent } from "react";
 import type { CanopIconName } from "../Icon";
 
@@ -11,6 +11,12 @@ export interface CanopSegmentedControlOption<T extends string = string> {
   disabled?: boolean;
 }
 
+export interface CanopSegmentedControlIconOption<
+  T extends string = string,
+> extends CanopSegmentedControlOption<T> {
+  icon: CanopIconName;
+}
+
 interface UseSegmentedControlParams<T extends string> {
   options: CanopSegmentedControlOption<T>[];
   value: T;
@@ -18,7 +24,6 @@ interface UseSegmentedControlParams<T extends string> {
 }
 
 interface UseSegmentedControlResult<T extends string> {
-  groupId: string;
   registerOption: (value: T) => (node: HTMLButtonElement | null) => void;
   handleKeyDown: (event: KeyboardEvent<HTMLDivElement>) => void;
   isSelected: (value: T) => boolean;
@@ -30,7 +35,6 @@ export function useSegmentedControl<T extends string>({
   value,
   onChange,
 }: UseSegmentedControlParams<T>): UseSegmentedControlResult<T> {
-  const groupId = useId();
   const nodesRef = useRef(new Map<T, HTMLButtonElement>());
 
   const enabledValues = useMemo(
@@ -94,5 +98,5 @@ export function useSegmentedControl<T extends string>({
     [onChange, value],
   );
 
-  return { groupId, registerOption, handleKeyDown, isSelected, selectOption };
+  return { registerOption, handleKeyDown, isSelected, selectOption };
 }

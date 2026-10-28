@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { useInView } from "../useInView";
+import { useInView } from "../../_shared/useInView";
 
 class FakeIntersectionObserver {
   static instances: FakeIntersectionObserver[] = [];

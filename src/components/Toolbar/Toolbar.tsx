@@ -36,6 +36,8 @@ export function Toolbar({ ariaLabel, search, sort, view, actions = [] }: CanopTo
     openOverflow,
     closeOverflow,
   } = useToolbar({ actions });
+  const hasActions = actions.length > 0;
+  const hasControls = Boolean(sort) || Boolean(view) || hasActions;
 
   return (
     <MotionStack
@@ -46,38 +48,46 @@ export function Toolbar({ ariaLabel, search, sort, view, actions = [] }: CanopTo
       transition={enter.transition}
       direction="row"
       spacing={1.5}
+      useFlexGap
       sx={{
         paddingY: 1,
         alignItems: "center",
         justifyContent: "space-between",
-        flexWrap: "nowrap",
+        flexWrap: { xs: "wrap", sm: "nowrap" },
         minWidth: 0,
       }}
     >
-      {search ? <ToolbarSearch config={search} /> : <span />}
+      {search && <ToolbarSearch config={search} />}
 
-      <Stack
-        direction="row"
-        spacing={1}
-        sx={{
-          alignItems: "center",
-          flexShrink: 0,
-        }}
-      >
-        {sort && <ToolbarSort config={sort} compact={isCompact} />}
-        {view && <ToolbarViewToggle config={view} />}
-        {actions.length > 0 && (
-          <ToolbarActions
-            visibleActions={visibleActions}
-            overflowActions={overflowActions}
-            compact={isCompact}
-            overflowOpen={overflowOpen}
-            overflowAnchor={overflowAnchor}
-            openOverflow={openOverflow}
-            closeOverflow={closeOverflow}
-          />
-        )}
-      </Stack>
+      {hasControls && (
+        <Stack
+          direction="row"
+          spacing={1}
+          useFlexGap
+          sx={{
+            alignItems: "center",
+            justifyContent: "flex-end",
+            flexWrap: { xs: "wrap", sm: "nowrap" },
+            flexShrink: { xs: 1, sm: 0 },
+            minWidth: 0,
+            marginLeft: "auto",
+          }}
+        >
+          {sort && <ToolbarSort config={sort} compact={isCompact} />}
+          {view && <ToolbarViewToggle config={view} />}
+          {hasActions && (
+            <ToolbarActions
+              visibleActions={visibleActions}
+              overflowActions={overflowActions}
+              compact={isCompact}
+              overflowOpen={overflowOpen}
+              overflowAnchor={overflowAnchor}
+              openOverflow={openOverflow}
+              closeOverflow={closeOverflow}
+            />
+          )}
+        </Stack>
+      )}
     </MotionStack>
   );
 }

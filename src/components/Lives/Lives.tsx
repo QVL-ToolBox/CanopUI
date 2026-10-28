@@ -49,7 +49,13 @@ export function Lives({
     <Box
       role="img"
       aria-label={ariaLabel ?? t("canop.lives.label", { count: remaining, max })}
-      sx={{ display: "inline-flex", alignItems: "center", gap: "0.25rem" }}
+      sx={{
+        display: "inline-flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        gap: "0.25rem",
+        maxWidth: "100%",
+      }}
     >
       {cells.map((filled, index) => (
         <LivesHeart

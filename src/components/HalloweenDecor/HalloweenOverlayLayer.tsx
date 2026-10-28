@@ -8,13 +8,15 @@ import type {
 } from "./halloweenSceneTypes";
 import { HalloweenSpider } from "./HalloweenSpider";
 import { HalloweenWitch } from "./HalloweenWitch";
+import { useHalloweenLayerPause } from "./useHalloweenLayerPause";
 
 interface HalloweenOverlayLayerProps {
   witch: HalloweenWitchSpec;
   spiders: HalloweenSpiderSpec[];
   scope: CanopHalloweenDecorScope;
   animated: boolean;
-  paused: boolean;
+  tabHidden: boolean;
+  revealed: boolean;
   zIndex: number;
   toneVariables: Record<string, string>;
 }
@@ -24,20 +26,28 @@ export function HalloweenOverlayLayer({
   spiders,
   scope,
   animated,
-  paused,
+  tabHidden,
+  revealed,
   zIndex,
   toneVariables,
 }: HalloweenOverlayLayerProps) {
+  const { ref, paused } = useHalloweenLayerPause(tabHidden);
+
   const layer = (
     <Box
+      ref={ref}
       aria-hidden="true"
       data-paused={paused ? "true" : "false"}
-      sx={[overlayLayerSx(scope, paused, zIndex), toneVariables]}
+      sx={[overlayLayerSx({ scope, paused, revealed }, zIndex), toneVariables]}
     >
-      {spiders.map((spec) => (
-        <HalloweenSpider key={spec.id} spec={spec} animated={animated} />
-      ))}
-      {animated ? <HalloweenWitch spec={witch} /> : null}
+      {revealed ? (
+        <>
+          {spiders.map((spec) => (
+            <HalloweenSpider key={spec.id} spec={spec} animated={animated} />
+          ))}
+          {animated ? <HalloweenWitch spec={witch} /> : null}
+        </>
+      ) : null}
     </Box>
   );
   return scope === "viewport" ? <Portal>{layer}</Portal> : layer;

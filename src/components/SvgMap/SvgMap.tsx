@@ -7,6 +7,7 @@ import {
   type UseSvgMapViewportResult,
 } from "../../svgmap";
 import { useTranslation } from "../../i18n";
+import { hoverOrKeyboardFocus, withoutFocusRing } from "../../interaction";
 import { SvgMapControls } from "./SvgMapControls";
 import { useSvgMapGestures } from "./useSvgMapGestures";
 
@@ -215,12 +216,8 @@ export function SvgMap({
               ...(selectable
                 ? {
                     cursor: "pointer",
-                    outline: "none",
-                    "&:hover": { filter: "brightness(0.92)" },
-                    "&:focus-visible": {
-                      stroke: "var(--canop-palette-primary-main)",
-                      strokeWidth: 2.5,
-                    },
+                    ...withoutFocusRing,
+                    [hoverOrKeyboardFocus()]: { filter: "brightness(0.92)" },
                   }
                 : {}),
             }}

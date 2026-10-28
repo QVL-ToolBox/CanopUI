@@ -1,12 +1,19 @@
-import type { KeyboardEventHandler, MouseEventHandler } from "react";
+import type { CSSProperties, KeyboardEventHandler, MouseEventHandler } from "react";
 import type { SxProps, Theme } from "@mui/material/styles";
 import { useReducedMotion } from "../../motion";
-import { focusRingSx } from "../_shared/focusRing";
+import { hoverOrKeyboardFocus, withoutFocusRing } from "../../interaction";
 import { cardArrowSx } from "./cardArrowSx";
-import { FROSTED_PADDING, frostedGlass, type CardGlass } from "./cardGlass";
+import {
+  FROSTED_GLASS,
+  FROSTED_PADDING,
+  frostedRefractionStyle,
+  type CardGlass,
+} from "./cardGlass";
 import { CARD_TRANSFORM_TRANSITION } from "./cardTransitions";
 import { useCardClick, type CardActionsIsolationProps } from "./useCardClick";
+import { useCardLiquidGlass, type CardLiquidGlass } from "./useCardLiquidGlass";
 import { squircleRingPath, squircleShadow, squircleSurface } from "../../squircle";
+import { SQUIRCLE_CLIP_VAR } from "../../squircle/squircleSx";
 
 export type CanopCardVariant = "surface" | "interactive" | "floating" | "stat" | "frosted";
 /**
@@ -37,9 +44,12 @@ interface UseCardParams {
   arrow: boolean;
   hasHeader: boolean;
   onClick?: () => void;
+  href?: string;
 }
 
 interface CardInteractionProps {
+  component?: "a";
+  href?: string;
   tabIndex?: number;
   role?: "button";
   onKeyDown?: KeyboardEventHandler<HTMLDivElement>;
@@ -48,11 +58,13 @@ interface CardInteractionProps {
 
 interface UseCardResult {
   rootSx: SxProps<Theme>;
+  rootStyle: CSSProperties | undefined;
   headerSx: SxProps<Theme>;
   contentSx: SxProps<Theme>;
   actionsSx: SxProps<Theme>;
   interactionProps: CardInteractionProps;
   actionsProps: CardActionsIsolationProps;
+  liquidGlass: CardLiquidGlass | null;
 }
 
 const shadowByElevation: Record<CanopCardElevation, string> = {
@@ -111,6 +123,14 @@ const NO_SURFACE_BLUR = "none";
 const WITHOUT_STANDARD_OR_PREFIXED_BACKDROP_FILTER =
   "@supports not ((backdrop-filter: blur(0.0625rem)) or (-webkit-backdrop-filter: blur(0.0625rem)))";
 
+const BLUR_CLIPPED_TO_SQUIRCLE = { clipPath: `var(${SQUIRCLE_CLIP_VAR})` };
+
+const BLOCK_LINK = { display: "block", textDecoration: "none" };
+
+function clipsGlassToSquircle(variant: CanopCardVariant, restShadow: string): boolean {
+  return variant === "frosted" && restShadow === "none";
+}
+
 function translucent(color: string): string {
   return `color-mix(in srgb, ${color} ${OPAQUE_SURFACE_OPACITY}, transparent)`;
 }
@@ -164,12 +184,30 @@ function solidGlass(variant: CanopCardVariant, tone: CanopCardTone): CardGlass {
 }
 
 function glassFor(variant: CanopCardVariant, tone: CanopCardTone): CardGlass {
-  return variant === "frosted" ? frostedGlass : solidGlass(variant, tone);
+  return variant === "frosted" ? FROSTED_GLASS : solidGlass(variant, tone);
 }
 
 function paddingFor(variant: CanopCardVariant, density: CanopCardDensity) {
   if (density !== "auto") return densityPadding[density];
   return variant === "frosted" ? FROSTED_PADDING : autoPadding;
+}
+
+interface CardInteractionParams {
+  isInteractive: boolean;
+  href?: string;
+  onClick?: MouseEventHandler<HTMLDivElement>;
+  onKeyDown: KeyboardEventHandler<HTMLDivElement>;
+}
+
+function cardInteractionProps({
+  isInteractive,
+  href,
+  onClick,
+  onKeyDown,
+}: CardInteractionParams): CardInteractionProps {
+  if (href !== undefined) return { component: "a", href, onClick };
+  if (isInteractive && onClick) return { tabIndex: 0, role: "button", onKeyDown, onClick };
+  return onClick ? { onClick } : {};
 }
 
 export function useCard({
@@ -183,15 +221,24 @@ export function useCard({
   arrow,
   hasHeader,
   onClick,
+  href,
 }: UseCardParams): UseCardResult {
   const reduced = useReducedMotion();
   const isInteractive = variant === "interactive" || (variant === "stat" && onClick !== undefined);
+  const isLink = variant === "interactive" && href !== undefined;
   const { handleClick, handleKeyDown, actionsProps } = useCardClick(onClick);
 
   const restShadow = elevation ? shadowByElevation[elevation] : restShadowByVariant[variant];
   const resolvedRadius = radius ?? defaultRadiusByVariant[variant];
   const padding = paddingFor(variant, density);
+  const clippedToSquircle = clipsGlassToSquircle(variant, restShadow);
+  const liquidGlass = useCardLiquidGlass({
+    frosted: variant === "frosted",
+    refraction: clippedToSquircle,
+    radius: radiusVar[resolvedRadius],
+  });
   const glass = glassFor(variant, tone);
+  const rootStyle = frostedRefractionStyle(liquidGlass?.filter?.id);
 
   const rootSx: SxProps<Theme> = {
     ...squircleSurface({
@@ -200,24 +247,25 @@ export function useCard({
       shadow: restShadow === "none" ? undefined : restShadow,
       shadowTransition: reduced ? undefined : shadowTransition,
     }),
-    borderRadius: radiusVar[resolvedRadius],
+    ...(clippedToSquircle ? BLUR_CLIPPED_TO_SQUIRCLE : { borderRadius: radiusVar[resolvedRadius] }),
     minWidth: 0,
     backdropFilter: glass.backdropFilter,
     WebkitBackdropFilter: glass.backdropFilter,
     [WITHOUT_STANDARD_OR_PREFIXED_BACKDROP_FILTER]: { "&::before": glass.opaqueFallback },
     overflow: "visible",
+    ...(isLink ? BLOCK_LINK : {}),
     ...(fill ? { display: "flex", flexDirection: "column", flex: 1, minHeight: 0 } : {}),
     ...(isInteractive
       ? {
           cursor: "pointer",
           transition: reduced ? "none" : interactiveTransition,
           willChange: "transform",
-          "&:hover": {
+          ...withoutFocusRing,
+          [hoverOrKeyboardFocus()]: {
             ...squircleShadow("var(--canop-drop-shadow-e2)"),
             ...(reduced ? {} : { transform: "translateY(-0.125rem)" }),
           },
           "&:active": reduced ? {} : { transform: "scale(0.99)" },
-          "&:focus-visible": focusRingSx,
         }
       : {}),
     ...(arrow && isInteractive ? cardArrowSx(!reduced) : {}),
@@ -254,12 +302,21 @@ export function useCard({
     ...(fill ? { flexShrink: 0 } : {}),
   };
 
-  const interactionProps: CardInteractionProps =
-    isInteractive && onClick
-      ? { tabIndex: 0, role: "button" as const, onKeyDown: handleKeyDown, onClick: handleClick }
-      : onClick
-        ? { onClick: handleClick }
-        : {};
+  const interactionProps = cardInteractionProps({
+    isInteractive,
+    href: isLink ? href : undefined,
+    onClick: onClick ? handleClick : undefined,
+    onKeyDown: handleKeyDown,
+  });
 
-  return { rootSx, headerSx, contentSx, actionsSx, interactionProps, actionsProps };
+  return {
+    rootSx,
+    rootStyle,
+    headerSx,
+    contentSx,
+    actionsSx,
+    interactionProps,
+    actionsProps,
+    liquidGlass,
+  };
 }

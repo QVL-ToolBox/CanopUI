@@ -1,67 +1,70 @@
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Popover from "@mui/material/Popover";
-import { useId, useState } from "react";
+import { useId, type ReactNode } from "react";
 import { Icon } from "../Icon";
-import { logoutButtonSx } from "../_shared/logoutButtonSx";
-import { squircleFill, squircleSurface } from "../../squircle";
+import { squircleSurface } from "../../squircle";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import { useTranslation } from "../../i18n";
-import { NAVBAR_HOVER_OVERLAY } from "./navbarStyles";
+import { NavbarDivider } from "./NavbarDivider";
+import { NavbarRailAccount } from "./NavbarRailAccount";
+import { NavbarTileTooltip } from "./NavbarTileTooltip";
+import { navbarHoverSx } from "./navbarInteraction";
+import { navbarPopoverSurfaceSx } from "./navbarSurface";
+import { NAVBAR_TILE_RADIUS } from "./navbarTile";
+import { NAVBAR_TEXT } from "./navbarTone";
+import { useNavbarPopover } from "./useNavbarPopover";
+
+const RAIL_WIDGET_WIDTH = "13.5rem";
 
 export interface NavbarRailSettingsProps {
   userName?: string;
   onLogout?: () => void;
+  widget?: ReactNode;
 }
 
-export function NavbarRailSettings({ userName, onLogout }: NavbarRailSettingsProps) {
+export function NavbarRailSettings({ userName, onLogout, widget }: NavbarRailSettingsProps) {
   const { t } = useTranslation();
-  const [anchor, setAnchor] = useState<HTMLElement | null>(null);
+  const popover = useNavbarPopover();
   const triggerId = useId();
-  const panelId = useId();
-  const open = Boolean(anchor);
-
-  function close() {
-    setAnchor(null);
-  }
+  const hasAccount = Boolean(userName || onLogout);
 
   return (
     <>
-      <IconButton
-        id={triggerId}
-        onClick={(event) => setAnchor(event.currentTarget)}
-        aria-label={t("canop.navbar.openMenu")}
-        aria-haspopup="dialog"
-        aria-expanded={open}
-        aria-controls={open ? panelId : undefined}
-        sx={{
-          width: "3rem",
-          height: "3rem",
-          ...squircleSurface({ radius: "var(--canop-radius-lg)", background: "transparent" }),
-          color: "primary.contrastText",
-          "&:hover": squircleFill(NAVBAR_HOVER_OVERLAY),
-        }}
-      >
-        <Icon name="settings" size="md" />
-      </IconButton>
+      <NavbarTileTooltip label={t("canop.navbar.openMenu")} placement="right">
+        <IconButton
+          id={triggerId}
+          onClick={popover.openFrom}
+          aria-label={t("canop.navbar.openMenu")}
+          aria-haspopup="dialog"
+          aria-expanded={popover.open}
+          aria-controls={popover.open ? popover.panelId : undefined}
+          sx={{
+            width: "3rem",
+            height: "3rem",
+            ...squircleSurface({ radius: NAVBAR_TILE_RADIUS, background: "transparent" }),
+            color: NAVBAR_TEXT,
+            [hoverOrKeyboardFocus()]: navbarHoverSx,
+          }}
+        >
+          <Icon name="settings" size="md" />
+        </IconButton>
+      </NavbarTileTooltip>
 
       <Popover
-        open={open}
-        anchorEl={anchor}
-        onClose={close}
+        open={popover.open}
+        anchorEl={popover.anchor}
+        onClose={popover.close}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         transformOrigin={{ vertical: "bottom", horizontal: "left" }}
         slotProps={{
           paper: {
-            id: panelId,
+            id: popover.panelId,
             role: "dialog",
             "aria-labelledby": triggerId,
             sx: {
               marginLeft: "0.5rem",
-              ...squircleSurface({
-                radius: "var(--canop-radius-lg)",
-                background: "var(--canop-palette-surface-overlay)",
-                shadow: "var(--canop-drop-shadow-e4)",
-              }),
+              ...navbarPopoverSurfaceSx(NAVBAR_TILE_RADIUS),
             },
           },
         }}
@@ -72,36 +75,22 @@ export function NavbarRailSettings({ userName, onLogout }: NavbarRailSettingsPro
             display: "flex",
             flexDirection: "column",
             gap: "0.75rem",
-            alignItems: "center",
+            color: NAVBAR_TEXT,
           }}
         >
-          {userName && (
+          {widget && (
             <Box
               sx={{
-                fontSize: "0.9rem",
-                fontWeight: 600,
-                maxWidth: "12rem",
-                wordBreak: "break-word",
+                width: RAIL_WIDGET_WIDTH,
+                maxWidth: "100%",
               }}
             >
-              {userName}
+              {widget}
             </Box>
           )}
-          {onLogout && (
-            <IconButton
-              onClick={() => {
-                close();
-                onLogout();
-              }}
-              aria-label={t("canop.navbar.logout")}
-              sx={(theme) => ({
-                width: "3rem",
-                height: "2.5rem",
-                ...logoutButtonSx(theme, "var(--canop-radius-md)"),
-              })}
-            >
-              <Icon name="logout" size="sm" />
-            </IconButton>
+          {widget && hasAccount && <NavbarDivider />}
+          {hasAccount && (
+            <NavbarRailAccount userName={userName} onLogout={onLogout} onClose={popover.close} />
           )}
         </Box>
       </Popover>

@@ -68,12 +68,33 @@ describe("parseChangelog", () => {
     expect(dates).toEqual(newestFirst);
   });
 
-  it("places 1.0.0 above every 3.x release even though its number is lower", () => {
+  it("lists the renumbered 0.x releases right below 1.0.0, from newest to oldest", () => {
     const versions = releases.map((release) => release.version);
     const renamed = versions.indexOf("1.0.0");
-    const firstLegacy = versions.findIndex((version) => version.startsWith("3."));
     expect(renamed).toBeGreaterThanOrEqual(0);
-    expect(firstLegacy).toBeGreaterThan(renamed);
+    expect(versions.slice(renamed)).toEqual(["1.0.0", "0.1.1", "0.1.0", "0.0.2", "0.0.1", "0.0.0"]);
+  });
+
+  it("no longer lists any 3.x release of CanopUI", () => {
+    const versions = releases.map((release) => release.version);
+    expect(versions.filter((version) => version.startsWith("3."))).toEqual([]);
+    expect(source).not.toMatch(/^## \[3\.\d+\.\d+\]/m);
+  });
+
+  it("only mentions a 3.x number for the Prettier third-party dependency", () => {
+    const mentions = [...source.matchAll(/(?<![\d.v])3\.\d+\.\d+(?![\d.])/g)].map(
+      ([version]) => version,
+    );
+    expect(mentions).toEqual(["3.9.6"]);
+    expect(source).toMatch(/Prettier en 3\.9\.6/);
+  });
+
+  it("keeps the former v3.x tags only in the header, above every release", () => {
+    const header = source.slice(0, source.search(/^## \[/m));
+    const body = source.slice(header.length);
+    expect(header).toMatch(/v3\.0\.0/);
+    expect(body).not.toMatch(/v3\.\d+\.\d+/);
+    expect(releases.some((release) => JSON.stringify(release).includes("v3."))).toBe(false);
   });
 
   it("reads the date of both dash styles", () => {
@@ -84,7 +105,7 @@ describe("parseChangelog", () => {
   // Ces deux tests portent sur le parseur, pas sur ce qui se trouve en tete du
   // fichier : ils visaient `releases[0]` et supposaient donc qu'une version
   // ajoute toujours quelque chose. Un correctif n'a legitimement qu'une section
-  // `Corrige`, et la 3.0.1 les a fait tomber tous les deux.
+  // `Corrige`, et la 0.0.1 les a fait tomber tous les deux.
   it("counts one entry per bullet of a section", () => {
     const release = releases.find((candidate) =>
       candidate.sections.some((section) => section.title === "Ajouté"),

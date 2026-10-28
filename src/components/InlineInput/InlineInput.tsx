@@ -74,9 +74,6 @@ export function InlineInput({
           clipPath: squircleRingPath("var(--canop-radius-xs)", "0.0625rem"),
           backgroundColor: "var(--canop-palette-primary-main)",
         },
-        "&.Mui-focused::after": {
-          clipPath: squircleRingPath("var(--canop-radius-xs)", "0.125rem"),
-        },
       }}
     />
   );

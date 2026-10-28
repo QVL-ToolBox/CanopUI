@@ -1,6 +1,5 @@
-import Typography from "@mui/material/Typography";
-import type { ReactNode } from "react";
-import { Heading, Stack } from "@canop/ui";
+import { useId, type ReactNode } from "react";
+import { Heading, Stack, Text } from "@canop/ui";
 
 export interface DocSectionProps {
   title: string;
@@ -9,23 +8,15 @@ export interface DocSectionProps {
 }
 
 export function DocSection({ title, description, children }: DocSectionProps) {
+  const sectionId = useId();
+
   return (
-    <Stack gap="md">
-      <Stack gap="xs">
-        <Heading level={2} size={4} gutterBottom={false}>
-          {title}
-        </Heading>
-        {description ? (
-          <Typography
-            sx={{
-              color: "text.secondary",
-            }}
-          >
-            {description}
-          </Typography>
-        ) : null}
-      </Stack>
-      {children}
+    <Stack as="section" gap="sm" data-doc-section={sectionId}>
+      <Heading level={2} size={{ xs: 5, md: 4 }} gutterBottom={false}>
+        {title}
+      </Heading>
+      {description ? <Text tone="muted">{description}</Text> : null}
+      {children ? <Stack gap="lg">{children}</Stack> : null}
     </Stack>
   );
 }

@@ -13,5 +13,11 @@
     "composite": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo"
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts",
+    "vitrine/releaseSummaryPlugin.ts",
+    "vitrine/src/changelog/parseChangelog.ts",
+    "vitrine/src/changelog/releaseHighlights.ts",
+    "vitrine/src/changelog/releaseSummary.ts"
+  ]
 }

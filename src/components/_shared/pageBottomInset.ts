@@ -1,6 +1,6 @@
 import type { CSSObject } from "@mui/material/styles";
 
-const PAGE_BOTTOM_INSET_VAR = "--canop-page-bottom-inset";
+export const PAGE_BOTTOM_INSET_VAR = "--canop-page-bottom-inset";
 
 const inset = `var(${PAGE_BOTTOM_INSET_VAR}, 0rem)`;
 

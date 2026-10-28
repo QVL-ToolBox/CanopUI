@@ -1,6 +1,7 @@
 export {
   Navbar,
   type CanopMobileFooterPlacement,
+  type CanopNavbarGroup,
   type CanopNavbarItem,
   type CanopNavbarProps,
   type CanopNavbarTitleLevel,

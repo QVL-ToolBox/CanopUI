@@ -1,4 +1,4 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CanopThemeProvider } from "../../../theme";
@@ -45,6 +45,25 @@ function normalize(html: string): string {
   return html.replace(/ data-projection-id="\d+"/g, "");
 }
 
+function emulateKeyboardFocusVisible() {
+  const matches = Element.prototype.matches;
+  vi.spyOn(Element.prototype, "matches").mockImplementation(function (
+    this: Element,
+    selector: string,
+  ) {
+    if (selector === ":focus-visible") return this === document.activeElement;
+    return matches.call(this, selector);
+  });
+}
+
+function tooltipPlacement(tooltip: HTMLElement): string {
+  return (
+    tooltip.closest("[data-popper-placement]")?.getAttribute("data-popper-placement") ??
+    tooltip.getAttribute("data-popper-placement") ??
+    ""
+  );
+}
+
 function expectSameTile(rail: HTMLElement, mobile: HTMLElement) {
   expect(rail.tagName).toBe(mobile.tagName);
   expect(rail.className).toBe(mobile.className);
@@ -57,6 +76,10 @@ function expectSameTile(rail: HTMLElement, mobile: HTMLElement) {
 describe("parite de rendu rail / mobile", () => {
   beforeEach(() => {
     mockMatchMedia();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
   it("rend la meme tuile pour un item sans enfant", () => {
@@ -77,17 +100,32 @@ describe("parite de rendu rail / mobile", () => {
     expectSameTile(rail, mobile);
   });
 
-  it("seule la variante rail habille la tuile d'une infobulle", async () => {
+  it("la variante rail ouvre une infobulle a droite au survol", async () => {
     const user = userEvent.setup();
     const rail = renderTile(<NavbarRailItem item={leaf} />);
     await user.hover(rail);
-    expect(await screen.findByRole("tooltip")).toHaveTextContent("Utilisateurs");
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toHaveTextContent("Utilisateurs");
+    expect(tooltipPlacement(tooltip)).toMatch(/^right/);
   });
 
-  it("la variante mobile n'ouvre aucune infobulle au survol", async () => {
+  it("la variante mobile ouvre une infobulle au-dessus au survol", async () => {
     const user = userEvent.setup();
     const mobile = renderTile(<NavbarMobileItem item={leaf} />);
     await user.hover(mobile);
-    expect(screen.queryByRole("tooltip")).not.toBeInTheDocument();
+    const tooltip = await screen.findByRole("tooltip");
+    expect(tooltip).toHaveTextContent("Utilisateurs");
+    expect(tooltipPlacement(tooltip)).toMatch(/^top/);
+  });
+
+  it.each([
+    ["rail", <NavbarRailItem key="rail" item={leaf} />],
+    ["mobile", <NavbarMobileItem key="mobile" item={leaf} />],
+  ])("la variante %s ouvre son infobulle au focus clavier", async (_, tile) => {
+    const user = userEvent.setup();
+    renderTile(tile);
+    emulateKeyboardFocusVisible();
+    await user.tab();
+    expect(await screen.findByRole("tooltip")).toHaveTextContent("Utilisateurs");
   });
 });

@@ -1,0 +1,3 @@
+export const SKELETON_REVEAL_DELAY_MS = 180;
+export const SKELETON_MIN_VISIBLE_MS = 400;
+export const SKELETON_STAGGER_MS = 70;

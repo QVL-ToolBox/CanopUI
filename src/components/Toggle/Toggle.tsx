@@ -1,8 +1,10 @@
 import Box from "@mui/material/Box";
-import { squircleClip, squircleSurface } from "../../squircle";
+import { squircleSurface } from "../../squircle";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import type { CanopPaletteColorName } from "../_shared/paletteColorVar";
+import { withoutFocusRing } from "../../interaction";
+import { GLOW_FILTER_TRANSITION, glowFilter, useNeonGlow } from "../../theme/neonGlow";
+import { paletteColorVar, type CanopPaletteColorName } from "../_shared/paletteColorVar";
 import { useFieldLabelling } from "../_shared/useFieldLabelling";
 
 export type CanopToggleColor = Extract<
@@ -27,6 +29,9 @@ const sizes = {
   medium: { track: { w: 52, h: 28 }, thumb: 22, offset: 3 },
 } as const;
 
+const TRACK_OFF = "var(--canop-palette-grey-400)";
+const TRACK_FILL_TRANSITION = "background-color 200ms ease";
+
 export function Toggle({
   checked,
   onChange,
@@ -37,6 +42,7 @@ export function Toggle({
   color = "accent",
 }: CanopToggleProps) {
   const { labelId, labelledBy, accessibleName } = useFieldLabelling({ label, ariaLabel });
+  const glowing = useNeonGlow() && checked && !disabled;
   const s = sizes[size];
   const thumbLeft = checked ? s.track.w - s.thumb - s.offset : s.offset;
   const toggle = () => !disabled && onChange(!checked);
@@ -51,19 +57,26 @@ export function Toggle({
       aria-labelledby={labelledBy}
       disabled={disabled}
       onClick={toggle}
-      sx={{
-        position: "relative",
-        width: `${s.track.w / 16}rem`,
-        height: `${s.track.h / 16}rem`,
-        padding: 0,
-        border: "none",
-        bgcolor: checked ? `${color}.main` : "grey.400",
-        flexShrink: 0,
-        ...squircleClip(`${s.track.h / 32}rem`, { shape: "pill" }),
-        opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? "default" : "pointer",
-        transition: "background-color 200ms ease",
-      }}
+      sx={[
+        {
+          width: `${s.track.w / 16}rem`,
+          height: `${s.track.h / 16}rem`,
+          padding: 0,
+          border: "none",
+          flexShrink: 0,
+          ...squircleSurface({
+            radius: `${s.track.h / 32}rem`,
+            shape: "pill",
+            background: checked ? paletteColorVar[color] : TRACK_OFF,
+            shadowTransition: GLOW_FILTER_TRANSITION,
+          }),
+          opacity: disabled ? 0.5 : 1,
+          cursor: disabled ? "default" : "pointer",
+          ...withoutFocusRing,
+        },
+        { "&::before": { transition: TRACK_FILL_TRANSITION } },
+        glowing && { filter: glowFilter(color, "rest") },
+      ]}
     >
       <Box
         sx={{

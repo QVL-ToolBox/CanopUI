@@ -1,9 +1,25 @@
-import { createTheme, type Theme } from "@mui/material/styles";
+import { createTheme, type CSSObject, type Theme } from "@mui/material/styles";
 import { tokens } from "../tokens";
 import { scrollbarSx } from "../scrollbar";
 import { mapChromeSx } from "./mapChrome";
 import { squircleClip, squircleClipPath, squircleSurface } from "../squircle";
 import { SQUIRCLE_CLIP_VAR } from "../squircle/squircleSx";
+import { hoverOrKeyboardFocus, keyboardFocus } from "../interaction";
+import { validFieldHoverOrSelectKeyboardFocus } from "../interaction/interactionStates";
+import { navbarToneVariables } from "../components/Navbar/navbarTone";
+import { actionFocusMirroringHover } from "./actionFocusMirroringHover";
+import { neonGlowVariables, withNeonGlow } from "./neonGlow";
+import {
+  buttonKeyboardFocus,
+  fabKeyboardFocus,
+  selectionControlKeyboardFocus,
+  switchBaseKeyboardFocus,
+  toggleButtonKeyboardFocus,
+} from "./keyboardFocusMirroringHover";
+import {
+  centeredRippleFillingSquircle,
+  rippleClippedToOwnSquircle,
+} from "./pressEffectFollowingShape";
 
 export type CanopThemeMode = "light" | "dark";
 
@@ -64,20 +80,30 @@ declare module "@mui/material/Slider" {
 const remToPx = (value: string): number => parseFloat(value) * 16;
 const msToNumber = (value: string): number => parseFloat(value);
 
+const INPUT_RADIUS = "var(--canop-radius-md)";
 const INPUT_BORDER_WIDTH = "0.125rem";
-const LABEL_SHRINK_OFFSET = "0.5625rem";
-const LABEL_SHRINK_SCALE = "0.75";
-const NOTCH_COLOR = "var(--canop-input-notch, var(--canop-palette-background-default))";
-const NOTCH_EDGE = `calc((${LABEL_SHRINK_OFFSET} + ${INPUT_BORDER_WIDTH}) / ${LABEL_SHRINK_SCALE})`;
+const INPUT_OUTLINE_VAR = "--canop-input-outline";
+const INPUT_OUTLINE = `var(${INPUT_OUTLINE_VAR})`;
+const LABEL_SHRINK_INLINE_START = "0.875rem";
+const LABEL_SHRINK_BLOCK_START = "-0.5625rem";
+const LABEL_SHRINK_SCALE = 0.75;
+const LABEL_SHRINK_GUTTER = "0.4rem";
+const LABEL_SHRINK_SCALED_GUTTER = `calc(${LABEL_SHRINK_GUTTER} * ${LABEL_SHRINK_SCALE})`;
+const NOTCH_CORNER_CLEARANCE = INPUT_BORDER_WIDTH;
+const NOTCH_INLINE_START = `calc(${LABEL_SHRINK_INLINE_START} + ${NOTCH_CORNER_CLEARANCE})`;
+const NOTCH_INLINE_END = INPUT_RADIUS;
+const NOTCH_LEGEND_GUTTER_START = `calc(${LABEL_SHRINK_SCALED_GUTTER} - ${NOTCH_CORNER_CLEARANCE})`;
+const LABEL_SHRINK_OFFSET = `translate(${LABEL_SHRINK_INLINE_START}, ${LABEL_SHRINK_BLOCK_START})`;
+const LABEL_SHRINK_ROOM = `calc(100% - ${LABEL_SHRINK_INLINE_START} - ${NOTCH_INLINE_END})`;
+
+const OUTLINED_LABEL_SHRUNK_INTO_NOTCH: CSSObject = {
+  paddingInline: LABEL_SHRINK_GUTTER,
+  transform: `${LABEL_SHRINK_OFFSET} scale(${LABEL_SHRINK_SCALE})`,
+  maxWidth: `calc(${LABEL_SHRINK_ROOM} / ${LABEL_SHRINK_SCALE})`,
+};
 
 const INPUT_BACKGROUND =
   "color-mix(in srgb, var(--canop-palette-secondary-light) 32%, var(--canop-palette-background-paper))";
-
-const NOTCH_GRADIENT = [
-  "linear-gradient(to bottom",
-  `${NOTCH_COLOR} ${NOTCH_EDGE}`,
-  `${INPUT_BACKGROUND} ${NOTCH_EDGE})`,
-].join(", ");
 
 const AUTOFILL_INSET_SHADOW_COVERING_AGENT_BACKGROUND = {
   boxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_BACKGROUND})`,
@@ -101,6 +127,40 @@ const CIRCLE_CLIP = squircleClipPath("50%", { shape: "circle" });
 const ICON_BUTTON_CLIP_FOLLOWING_SURFACE_ELSE_CIRCLE = `var(${SQUIRCLE_CLIP_VAR}, ${CIRCLE_CLIP})`;
 const LAYER_TRANSITION =
   "background-color var(--canop-motion-duration-base) var(--canop-motion-ease-standard)";
+
+const WITHOUT_FOCUS_RIPPLE = { defaultProps: { disableFocusRipple: true } } as const;
+const ENABLED_FIELD = ":not(.Mui-disabled):not(.Mui-error)";
+
+const NOTCHED_OUTLINE = ".MuiOutlinedInput-notchedOutline";
+const FIELD_WITH_FLOATING_LABEL = `&:has(${NOTCHED_OUTLINE} legend > span:not(.notranslate))`;
+const MASK_OPAQUE = "black";
+const OUTLINE_LAYER_WITHOUT_TOP_EDGE = [
+  "linear-gradient(transparent",
+  `transparent ${INPUT_BORDER_WIDTH}`,
+  `${MASK_OPAQUE} ${INPUT_BORDER_WIDTH})`,
+].join(", ");
+
+const TOP_EDGE_NOTCHED_UNDER_LABEL: CSSObject = {
+  [`& ${NOTCHED_OUTLINE}`]: {
+    inset: 0,
+    paddingBlock: 0,
+    paddingInline: `${NOTCH_INLINE_START} ${NOTCH_INLINE_END}`,
+    borderStyle: "solid",
+    borderWidth: `${INPUT_BORDER_WIDTH} 0 0`,
+    borderColor: INPUT_OUTLINE,
+    borderRadius: 0,
+    clipPath: `var(${SQUIRCLE_CLIP_VAR})`,
+    "& legend": {
+      display: "block",
+      height: INPUT_BORDER_WIDTH,
+      lineHeight: INPUT_BORDER_WIDTH,
+      "& > span": { paddingInline: `${NOTCH_LEGEND_GUTTER_START} ${LABEL_SHRINK_SCALED_GUTTER}` },
+    },
+  },
+  "&::before": {
+    maskImage: OUTLINE_LAYER_WITHOUT_TOP_EDGE,
+  },
+};
 
 const headingBase = {
   fontFamily: tokens.typography.fontFamilyHeading,
@@ -199,6 +259,7 @@ export function createCanopTheme(
       surface: { ...palette.surface },
       text: { ...palette.text },
       divider: palette.divider,
+      action: actionFocusMirroringHover(mode),
     },
     typography: {
       fontFamily: tokens.typography.fontFamily,
@@ -232,10 +293,14 @@ export function createCanopTheme(
     shape: {
       borderRadius: remToPx(tokens.radius.md),
     },
-    components: {
+    components: withNeonGlow(mode, {
       MuiCssBaseline: {
         styleOverrides: {
-          ":root": buildCanopCssVariables(mode),
+          ":root": {
+            ...buildCanopCssVariables(mode),
+            ...navbarToneVariables(mode),
+            ...neonGlowVariables(mode),
+          },
           "*": scrollbarSx(),
           "input::-ms-reveal, input::-ms-clear": { display: "none" },
           ...mapChromeSx(),
@@ -252,22 +317,57 @@ export function createCanopTheme(
           },
         },
       },
-      MuiPaper: {
-        styleOverrides: {
-          root: { "--canop-input-notch": "var(--canop-palette-background-paper)" },
-        },
-      },
       MuiInputLabel: {
         styleOverrides: {
           outlined: {
-            "&.MuiInputLabel-shrink": {
-              paddingInline: "0.4rem",
-              backgroundImage: NOTCH_GRADIENT,
-            },
+            "&.MuiInputLabel-shrink": OUTLINED_LABEL_SHRUNK_INTO_NOTCH,
+          },
+        },
+      },
+      MuiButtonBase: {
+        styleOverrides: { root: rippleClippedToOwnSquircle },
+      },
+      MuiButton: {
+        ...WITHOUT_FOCUS_RIPPLE,
+        styleOverrides: { root: ({ theme: t }) => buttonKeyboardFocus(t) },
+      },
+      MuiFab: {
+        ...WITHOUT_FOCUS_RIPPLE,
+        styleOverrides: { root: ({ theme: t }) => fabKeyboardFocus(t) },
+      },
+      MuiToggleButton: {
+        ...WITHOUT_FOCUS_RIPPLE,
+        styleOverrides: { root: ({ theme: t }) => toggleButtonKeyboardFocus(t) },
+      },
+      MuiTab: WITHOUT_FOCUS_RIPPLE,
+      MuiRadio: {
+        ...WITHOUT_FOCUS_RIPPLE,
+        styleOverrides: { root: ({ theme: t }) => selectionControlKeyboardFocus(t) },
+      },
+      MuiSwitch: {
+        ...WITHOUT_FOCUS_RIPPLE,
+        styleOverrides: { switchBase: ({ theme: t }) => switchBaseKeyboardFocus(t) },
+      },
+      MuiCheckbox: {
+        ...WITHOUT_FOCUS_RIPPLE,
+        styleOverrides: { root: ({ theme: t }) => selectionControlKeyboardFocus(t) },
+      },
+      MuiFormLabel: {
+        styleOverrides: {
+          root: ({ theme: t }) => ({
+            [`&.Mui-focused${ENABLED_FIELD}`]: { color: t.palette.text.secondary },
+          }),
+        },
+      },
+      MuiTableSortLabel: {
+        styleOverrides: {
+          root: {
+            [keyboardFocus(":not(.Mui-active) .MuiTableSortLabel-icon")]: { opacity: 0.5 },
           },
         },
       },
       MuiIconButton: {
+        ...WITHOUT_FOCUS_RIPPLE,
         styleOverrides: {
           root: {
             borderRadius: 0,
@@ -284,17 +384,11 @@ export function createCanopTheme(
               backgroundColor: "transparent",
               transition: LAYER_TRANSITION,
             },
-            "&:hover": {
+            [hoverOrKeyboardFocus()]: {
               backgroundColor: "transparent",
               "&::before": { backgroundColor: "var(--canop-palette-action-hover)" },
             },
-            "&.Mui-focusVisible": {
-              backgroundColor: "transparent",
-              "&::before": { backgroundColor: "var(--canop-palette-action-focus)" },
-            },
-            "& .MuiTouchRipple-root": {
-              clipPath: ICON_BUTTON_CLIP_FOLLOWING_SURFACE_ELSE_CIRCLE,
-            },
+            ...centeredRippleFillingSquircle,
           },
         },
       },
@@ -307,8 +401,8 @@ export function createCanopTheme(
               shadow: "var(--canop-drop-shadow-e2)",
             }),
             position: "absolute",
-            "--canop-input-notch": "var(--canop-palette-background-paper)",
             boxShadow: "none",
+            backgroundImage: "none",
           },
         },
       },
@@ -373,7 +467,8 @@ export function createCanopTheme(
               background: "var(--canop-palette-surface-overlay)",
               shadow: "var(--canop-drop-shadow-e5)",
             }),
-            "--canop-input-notch": "var(--canop-palette-surface-overlay)",
+            boxShadow: "none",
+            backgroundImage: "none",
           },
         },
       },
@@ -388,23 +483,31 @@ export function createCanopTheme(
         styleOverrides: {
           root: ({ theme: t }) => ({
             ...squircleSurface({
-              radius: "var(--canop-radius-md)",
+              radius: INPUT_RADIUS,
               background: INPUT_BACKGROUND,
-              borderColor: t.palette.primary.main,
+              borderColor: INPUT_OUTLINE,
               borderWidth: INPUT_BORDER_WIDTH,
             }),
-            "& .MuiOutlinedInput-notchedOutline": { border: "none" },
-            "& .MuiOutlinedInput-notchedOutline legend": { display: "none" },
-            "&:hover:not(.Mui-disabled):not(.Mui-error)::before": {
-              backgroundColor: t.palette.primary.dark,
+            [INPUT_OUTLINE_VAR]: t.palette.primary.main,
+            [`& ${NOTCHED_OUTLINE}`]: { border: "none" },
+            [`& ${NOTCHED_OUTLINE} legend`]: { display: "none" },
+            [validFieldHoverOrSelectKeyboardFocus()]: {
+              [INPUT_OUTLINE_VAR]: t.palette.primary.dark,
+              "&::before": { backgroundColor: INPUT_OUTLINE },
             },
-            "&.Mui-focused::before": { backgroundColor: t.palette.primary.main },
-            "&.Mui-error::before": { backgroundColor: t.palette.error.main },
-            "&.Mui-disabled::before": { backgroundColor: t.palette.action.disabled },
+            "&.Mui-error": {
+              [INPUT_OUTLINE_VAR]: t.palette.error.main,
+              "&::before": { backgroundColor: INPUT_OUTLINE },
+            },
+            "&.Mui-disabled": {
+              [INPUT_OUTLINE_VAR]: t.palette.action.disabled,
+              "&::before": { backgroundColor: INPUT_OUTLINE },
+            },
+            [FIELD_WITH_FLOATING_LABEL]: TOP_EDGE_NOTCHED_UNDER_LABEL,
           }),
         },
       },
-    },
+    }),
   });
   theme.shadows[1] = elevation.e1;
   theme.shadows[2] = elevation.e2;

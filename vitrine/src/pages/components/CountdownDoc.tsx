@@ -34,7 +34,7 @@ function Chrono({ labels }: { labels: { start: string; pause: string; restart: s
 
   return (
     <Stack gap="md" alignItems="stretch">
-      <Stack direction="row" gap="md" alignItems="center">
+      <Stack direction="row" gap="md" alignItems="center" wrap>
         <Text variant="metric" tabularNums slashedZero>
           {seconds}s
         </Text>
@@ -44,7 +44,7 @@ function Chrono({ labels }: { labels: { start: string; pause: string; restart: s
         {ended && <StatusChip tone="warning" label="ended" />}
       </Stack>
       <ProgressBar value={Math.round(progress * 100)} color={ended ? "error" : "primary"} />
-      <Stack direction="row" gap="sm">
+      <Stack direction="row" gap="sm" wrap>
         <Button size="small" disabled={ended} onClick={() => setRunning((value) => !value)}>
           {running ? labels.pause : labels.start}
         </Button>

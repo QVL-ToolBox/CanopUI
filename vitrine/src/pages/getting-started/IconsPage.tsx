@@ -1,6 +1,13 @@
 import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import { Icon, Input, Stack, Toggle, type CanopIconName, type CanopIconVariant } from "@canop/ui";
+import {
+  Icon,
+  Input,
+  Stack,
+  Text,
+  Toggle,
+  type CanopIconName,
+  type CanopIconVariant,
+} from "@canop/ui";
 import { useDocLocale } from "../../i18n/useDocLocale";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
@@ -55,6 +62,7 @@ function IconTile({ name, variant, copied, copiedLabel, onCopy }: IconTileProps)
         flexDirection: "column",
         alignItems: "center",
         gap: "0.5rem",
+        minWidth: 0,
         padding: "1rem 0.5rem",
         border: "0.0625rem solid",
         borderColor: copied ? "success.main" : "divider",
@@ -73,15 +81,9 @@ function IconTile({ name, variant, copied, copiedLabel, onCopy }: IconTileProps)
       ) : (
         <Icon name={name} variant={variant} size="lg" />
       )}
-      <Typography
-        color={copied ? "success.main" : "text.secondary"}
-        noWrap
-        sx={{
-          fontSize: "0.75rem",
-        }}
-      >
+      <Text variant="caption" tone={copied ? "success" : "muted"} noWrap>
         {copied ? copiedLabel : name}
-      </Typography>
+      </Text>
     </Box>
   );
 }
@@ -97,8 +99,8 @@ export function IconsPage() {
         <Stack direction="row" alignItems="center" gap="lg" wrap>
           <Box
             sx={{
-              flex: 1,
-              minWidth: "14rem",
+              flex: "1 1 14rem",
+              minWidth: 0,
             }}
           >
             <Input
@@ -110,20 +112,15 @@ export function IconsPage() {
             />
           </Box>
           <Toggle checked={solid} onChange={setSolid} ariaLabel={t.solidLabel} />
-          <Typography
-            sx={{
-              fontSize: "0.85rem",
-              color: "text.secondary",
-            }}
-          >
+          <Text variant="body-sm" tone="muted">
             {solid ? "solid" : "outline"} · {names.length} {t.count}
-          </Typography>
+          </Text>
         </Stack>
         <Box
           sx={{
             display: "grid",
             gap: "0.75rem",
-            gridTemplateColumns: "repeat(auto-fill, minmax(7rem, 1fr))",
+            gridTemplateColumns: "repeat(auto-fill, minmax(min(7rem, 100%), 1fr))",
           }}
         >
           {names.map((name) => (

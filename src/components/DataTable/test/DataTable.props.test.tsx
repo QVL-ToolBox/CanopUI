@@ -3,6 +3,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { CanopThemeProvider } from "../../../theme";
 import { DataTable, type CanopColumn, type CanopDataTableProps } from "../DataTable";
+import { valeursEmises } from "../../../test/cssRules";
 
 interface Person {
   id: string;
@@ -84,11 +85,52 @@ const dragPayload = (key: string) =>
   ({ dropEffect: "", getData: () => key, setData: vi.fn() }) as unknown as DataTransfer;
 
 describe("DataTable — conteneur défilant", () => {
-  it("laisse le contenu déborder sans hauteur imposée", () => {
+  afterEach(restoreElementMetrics);
+
+  it("défile horizontalement dans son propre cadre sans hauteur imposée", () => {
     renderTable();
 
-    expect(scrollContainer()).toHaveStyle({ overflow: "visible" });
+    expect(scrollContainer()).toHaveStyle({ overflowX: "auto", minWidth: "0px" });
     expect(wrapper()).not.toHaveStyle({ display: "flex" });
+  });
+
+  it("n'expose pas de région focusable tant que le contenu tient dans le cadre", () => {
+    stubElementMetric("scrollWidth", 400);
+    stubElementMetric("clientWidth", 400);
+    renderTable();
+
+    expect(scrollContainer()).not.toHaveAttribute("role");
+    expect(scrollContainer()).not.toHaveAttribute("tabindex");
+    expect(scrollContainer()).not.toHaveAttribute("aria-label");
+  });
+
+  it("devient une région nommée et focusable quand le contenu déborde", () => {
+    stubElementMetric("scrollWidth", 900);
+    stubElementMetric("clientWidth", 300);
+    renderTable();
+
+    expect(screen.getByRole("region", { name: "Tableau défilant" })).toBe(scrollContainer());
+    expect(scrollContainer()).toHaveAttribute("tabindex", "0");
+  });
+
+  it("garde un débordement visible avec stickyHeader sans hauteur bornée", () => {
+    renderTable({ stickyHeader: true });
+
+    expect(scrollContainer()).toHaveStyle({ overflow: "visible" });
+  });
+
+  it("défile toujours dans le cadre avec stickyHeader et une hauteur bornée", () => {
+    renderTable({ stickyHeader: true, maxHeight: 200 });
+
+    expect(scrollContainer()).toHaveStyle({ maxHeight: "200px", overflow: "auto" });
+    expect(headerOf("Ville")).toHaveStyle({ position: "sticky" });
+  });
+
+  it("fige toujours la largeur des colonnes avec fixedLayout dans le cadre défilant", () => {
+    renderTable({ fixedLayout: true });
+
+    expect(table()).toHaveStyle({ tableLayout: "fixed" });
+    expect(scrollContainer()).toHaveStyle({ overflowX: "auto" });
   });
 
   it("occupe la hauteur disponible avec fillHeight", () => {
@@ -238,7 +280,7 @@ describe("DataTable — en-tête figée", () => {
     restoreElementMetrics();
   });
 
-  it("donne une surface opaque a l'en-tete figee", () => {
+  it("donne une barre squircle a l'en-tete figee", () => {
     stubElementMetric("offsetHeight", 40);
     stubElementMetric("scrollHeight", 1000);
     stubElementMetric("clientHeight", 200);
@@ -249,8 +291,11 @@ describe("DataTable — en-tête figée", () => {
     expect(calque).not.toBeNull();
     const style = getComputedStyle(calque);
     expect(style.position).toBe("sticky");
-    expect(style.backgroundColor).toBe("var(--canop-palette-background-paper)");
+    expect(style.backgroundColor).toBe("rgba(0, 0, 0, 0)");
     expect(style.height).toBe("40px");
+    expect(valeursEmises(calque, "clip-path", "::before")[0]).toMatch(/^polygon\(/);
+    expect(valeursEmises(calque, "--canop-squircle-clip")[0]).toContain("1.5rem");
+    expect(style.filter).toBe("var(--canop-drop-shadow-e1)");
   });
 
   it("ne pose aucun calque sans stickyHeader", () => {
@@ -322,8 +367,15 @@ describe("DataTable — état vide et chargement", () => {
     expect(screen.getByText("Aucune donnée").closest("td")).toHaveAttribute("colspan", "4");
   });
 
-  it("étend l'indicateur de chargement sur toutes les colonnes", () => {
+  it("affiche des lignes fantômes sous l'indicateur de chargement", () => {
     renderTable({ loading: true, actions: () => <button>Ouvrir</button> });
+
+    expect(screen.getByRole("progressbar", { name: "Chargement" })).toBeInTheDocument();
+    expect(table().querySelectorAll("tbody tr[data-skeleton-row]")).toHaveLength(3);
+  });
+
+  it("étend l'ancien indicateur de chargement sur toutes les colonnes sans squelette", () => {
+    renderTable({ loading: true, skeleton: false, actions: () => <button>Ouvrir</button> });
 
     expect(screen.getByRole("progressbar").closest("td")).toHaveAttribute("colspan", "4");
   });

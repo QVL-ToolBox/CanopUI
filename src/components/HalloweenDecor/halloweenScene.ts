@@ -9,6 +9,7 @@ import {
 } from "./halloweenSceneData";
 import type {
   CanopHalloweenDecorDensity,
+  HalloweenDecorBudget,
   HalloweenDepth,
   HalloweenFireflySpec,
   HalloweenGhostSpec,
@@ -37,32 +38,65 @@ interface HalloweenCounts {
   witchCycle: number;
 }
 
-const densityCounts: Record<CanopHalloweenDecorDensity, HalloweenCounts> = {
+const densityCounts: Record<
+  CanopHalloweenDecorDensity,
+  Record<HalloweenDecorBudget, HalloweenCounts>
+> = {
   low: {
-    stars: 16,
-    bats: 4,
-    swarm: false,
-    ghosts: 4,
-    spiders: 1,
-    sparkles: 5,
-    pumpkins: 3,
-    leaves: 4,
-    fireflies: 6,
-    cauldron: false,
-    witchCycle: 37,
+    full: {
+      stars: 16,
+      bats: 4,
+      swarm: false,
+      ghosts: 4,
+      spiders: 1,
+      sparkles: 5,
+      pumpkins: 3,
+      leaves: 4,
+      fireflies: 6,
+      cauldron: false,
+      witchCycle: 37,
+    },
+    lite: {
+      stars: 10,
+      bats: 2,
+      swarm: false,
+      ghosts: 3,
+      spiders: 1,
+      sparkles: 3,
+      pumpkins: 2,
+      leaves: 2,
+      fireflies: 3,
+      cauldron: false,
+      witchCycle: 37,
+    },
   },
   medium: {
-    stars: 26,
-    bats: 7,
-    swarm: true,
-    ghosts: 7,
-    spiders: 2,
-    sparkles: 8,
-    pumpkins: 5,
-    leaves: 8,
-    fireflies: 12,
-    cauldron: true,
-    witchCycle: 29,
+    full: {
+      stars: 26,
+      bats: 7,
+      swarm: true,
+      ghosts: 7,
+      spiders: 2,
+      sparkles: 8,
+      pumpkins: 5,
+      leaves: 8,
+      fireflies: 12,
+      cauldron: true,
+      witchCycle: 29,
+    },
+    lite: {
+      stars: 14,
+      bats: 4,
+      swarm: false,
+      ghosts: 4,
+      spiders: 2,
+      sparkles: 4,
+      pumpkins: 3,
+      leaves: 4,
+      fireflies: 6,
+      cauldron: false,
+      witchCycle: 29,
+    },
   },
 };
 
@@ -147,8 +181,11 @@ function generate<T>(count: number, build: (index: number) => T): T[] {
   return Array.from({ length: count }, (_, index) => build(index));
 }
 
-export function halloweenScene(density: CanopHalloweenDecorDensity): HalloweenScene {
-  const counts = densityCounts[density];
+export function halloweenScene(
+  density: CanopHalloweenDecorDensity,
+  budget: HalloweenDecorBudget,
+): HalloweenScene {
+  const counts = densityCounts[density][budget];
   return {
     stars: generate(counts.stars, star),
     bats: batFlock.slice(0, counts.bats),

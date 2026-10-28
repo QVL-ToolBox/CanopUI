@@ -1,11 +1,21 @@
 import Box from "@mui/material/Box";
-import { LayoutGroup } from "framer-motion";
-import { useId } from "react";
 import { useTranslation } from "../../i18n";
+import { SlidingIndicatorGroup } from "../../motion/SlidingIndicatorGroup";
 import { type CanopNavbarItem } from "./navigation";
 import { NavbarMobileItem } from "./NavbarMobileItem";
-import { squircleSurface } from "../../squircle";
-import { NAVBAR_MOBILE_BAR_OFFSET, NAVBAR_SURFACE_GRADIENT } from "./navbarStyles";
+import { NavbarMobileMore } from "./NavbarMobileMore";
+import { NAVBAR_MOBILE_BAR_GAP } from "./navbarOverflow";
+import {
+  NAVBAR_MOBILE_BAR_LEFT,
+  NAVBAR_MOBILE_BAR_MAX_WIDTH,
+  NAVBAR_MOBILE_BAR_OFFSET,
+  NAVBAR_MOBILE_BAR_PADDING_X,
+  NAVBAR_MOBILE_BAR_PADDING_Y,
+  NAVBAR_MOBILE_BAR_RIGHT,
+} from "./navbarStyles";
+import { navbarFloatingSurfaceSx } from "./navbarSurface";
+import { NavbarTileTooltipProvider } from "./NavbarTileTooltipProvider";
+import { useNavbarMobileOverflow } from "./useNavbarMobileOverflow";
 
 export interface NavbarMobileBarProps {
   items: CanopNavbarItem[];
@@ -15,40 +25,52 @@ export interface NavbarMobileBarProps {
 
 export function NavbarMobileBar({ items, activeHref, onNavigate }: NavbarMobileBarProps) {
   const { t } = useTranslation();
-  const groupId = useId();
+  const { barRef, visible, overflow, overflowActive } = useNavbarMobileOverflow(items, activeHref);
 
   return (
     <Box
+      ref={barRef}
       component="nav"
       aria-label={t("canop.navbar.navigation")}
       sx={{
         bottom: NAVBAR_MOBILE_BAR_OFFSET,
-        left: "1rem",
-        right: "1rem",
+        left: NAVBAR_MOBILE_BAR_LEFT,
+        right: NAVBAR_MOBILE_BAR_RIGHT,
         zIndex: (theme) => theme.zIndex.appBar,
+        boxSizing: "border-box",
+        minWidth: 0,
+        maxWidth: NAVBAR_MOBILE_BAR_MAX_WIDTH,
         display: "flex",
         justifyContent: "space-around",
         alignItems: "center",
-        gap: "0.25rem",
-        padding: "0.5rem",
-        ...squircleSurface({
-          radius: "var(--canop-radius-xl)",
-          background: NAVBAR_SURFACE_GRADIENT,
-          shadow: "var(--canop-drop-shadow-e3)",
-          position: "fixed",
-        }),
+        gap: NAVBAR_MOBILE_BAR_GAP,
+        paddingX: NAVBAR_MOBILE_BAR_PADDING_X,
+        paddingY: NAVBAR_MOBILE_BAR_PADDING_Y,
+        overflowX: "clip",
+        "& > *": { flexShrink: 0 },
+        ...navbarFloatingSurfaceSx({ position: "fixed" }),
       }}
     >
-      <LayoutGroup id={groupId}>
-        {items.map((item) => (
-          <NavbarMobileItem
-            key={item.href}
-            item={item}
-            activeHref={activeHref}
-            onNavigate={onNavigate}
-          />
-        ))}
-      </LayoutGroup>
+      <NavbarTileTooltipProvider>
+        <SlidingIndicatorGroup>
+          {visible.map((item) => (
+            <NavbarMobileItem
+              key={item.href}
+              item={item}
+              activeHref={activeHref}
+              onNavigate={onNavigate}
+            />
+          ))}
+          {overflow.length > 0 && (
+            <NavbarMobileMore
+              items={overflow}
+              active={overflowActive}
+              activeHref={activeHref}
+              onNavigate={onNavigate}
+            />
+          )}
+        </SlidingIndicatorGroup>
+      </NavbarTileTooltipProvider>
     </Box>
   );
 }

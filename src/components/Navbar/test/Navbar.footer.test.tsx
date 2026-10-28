@@ -81,7 +81,7 @@ describe("Navbar footer legal", () => {
       expect(info).toHaveAttribute("href", "/cgu");
     });
 
-    it("n'affiche pas le contenu du footer directement dans le menu", async () => {
+    it("affiche le contenu du footer dans le menu de settings", async () => {
       const user = userEvent.setup();
       renderNavbar(
         <Navbar
@@ -94,8 +94,8 @@ describe("Navbar footer legal", () => {
         </Navbar>,
       );
       await user.click(screen.getByLabelText("Ouvrir le menu"));
-      await screen.findByRole("link", { name: "Informations légales" });
-      expect(screen.queryByText("Footer legal")).not.toBeInTheDocument();
+      const dialog = await screen.findByRole("presentation");
+      expect(within(dialog).getByText("Footer legal")).toBeInTheDocument();
     });
 
     it("n'affiche pas de bouton info sans infoHref", async () => {

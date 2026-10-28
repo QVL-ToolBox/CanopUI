@@ -19,7 +19,8 @@ export function HalloweenDecorScene({
   behindPageContent,
   children,
 }: HalloweenDecorSceneProps) {
-  const { animated, paused, toneVariables, overlayZIndex, ...scene } = useHalloweenDecor(density);
+  const { animated, tabHidden, revealed, toneVariables, overlayZIndex, ...scene } =
+    useHalloweenDecor(density);
 
   return (
     <Box sx={decorRootSx(behindPageContent)}>
@@ -27,7 +28,8 @@ export function HalloweenDecorScene({
         scene={scene}
         scope={scope}
         animated={animated}
-        paused={paused}
+        tabHidden={tabHidden}
+        revealed={revealed}
         toneVariables={toneVariables}
       />
       <Box sx={decorContentSx}>{children}</Box>
@@ -36,7 +38,8 @@ export function HalloweenDecorScene({
         spiders={scene.spiders}
         scope={scope}
         animated={animated}
-        paused={paused}
+        tabHidden={tabHidden}
+        revealed={revealed}
         zIndex={overlayZIndex}
         toneVariables={toneVariables}
       />

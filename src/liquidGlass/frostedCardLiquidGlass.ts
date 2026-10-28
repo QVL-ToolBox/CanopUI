@@ -1,0 +1,25 @@
+import type { CanopLiquidGlassParams } from "./liquidGlassParams";
+
+const FROSTED_BLUR_REM = 0.25;
+const FROSTED_SATURATION = 1.8;
+const FROSTED_VEIL_PERCENT = 0;
+const FROSTED_TINT_PERCENT = 15;
+const FROSTED_BEVEL_REM = 2.25;
+const FROSTED_DISPLACEMENT = 25;
+const FROSTED_CHROMATIC_DISPERSION = 0.17;
+const FROSTED_SPECULAR_RIM = 0.35;
+const FROSTED_REFLECTION = 0;
+const FROSTED_INNER_SHADOW = 0.35;
+
+export const FROSTED_CARD_LIQUID_GLASS: Readonly<CanopLiquidGlassParams> = Object.freeze({
+  blur: FROSTED_BLUR_REM,
+  saturation: FROSTED_SATURATION,
+  veil: FROSTED_VEIL_PERCENT,
+  tint: FROSTED_TINT_PERCENT,
+  bevel: FROSTED_BEVEL_REM,
+  displacement: FROSTED_DISPLACEMENT,
+  dispersion: FROSTED_CHROMATIC_DISPERSION,
+  specular: FROSTED_SPECULAR_RIM,
+  reflection: FROSTED_REFLECTION,
+  innerShadow: FROSTED_INNER_SHADOW,
+});

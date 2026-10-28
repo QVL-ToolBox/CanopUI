@@ -1,8 +1,6 @@
-import Box from "@mui/material/Box";
 import { Card, PageContent } from "@canop/ui";
-import { squircleClip, tokens } from "@canop/ui";
 import { DemoCard } from "../../kit/DemoCard";
-import { LiveDemoGate } from "../../kit/LiveDemoGate";
+import { DemoScreen } from "../../kit/DemoScreen";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
 import { PropsTable, type PropRow } from "../../kit/PropsTable";
@@ -10,40 +8,25 @@ import { useDocLocale } from "../../i18n/useDocLocale";
 
 const importCode = `import { PageContent } from "@canop/ui";`;
 
-const wrapperOpen = `<Box
-  height="26rem"
-  width="100%"
-  display="flex"
-  flexDirection="column"
-  borderRadius="0.75rem"
-  overflow="hidden"
-  border="0.0625rem solid"
-  borderColor="divider"
->`;
+const SCREEN_HEIGHT = "26rem";
 
-const basicCode = `${wrapperOpen}
-  <PageContent title="Documents">
-    <Card>Premier document.</Card>
-    <Card>Deuxième document.</Card>
-    <Card>Troisième document.</Card>
-  </PageContent>
-</Box>`;
+const basicCode = `<PageContent title="Documents">
+  <Card>Premier document.</Card>
+  <Card>Deuxième document.</Card>
+  <Card>Troisième document.</Card>
+</PageContent>`;
 
-const centerCode = `${wrapperOpen}
-  <PageContent title="Bienvenue" align="center">
-    <Card>Contenu aligné au centre.</Card>
-  </PageContent>
-</Box>`;
+const centerCode = `<PageContent title="Bienvenue" align="center">
+  <Card>Contenu aligné au centre.</Card>
+</PageContent>`;
 
-const fillHeightCode = `${wrapperOpen}
-  <PageContent fillHeight>
-    <Card fill>Contenu occupant toute la hauteur disponible.</Card>
-  </PageContent>
-</Box>`;
+const fillHeightCode = `<PageContent fillHeight>
+  <Card fill>Contenu occupant toute la hauteur disponible.</Card>
+</PageContent>`;
 
 const fr = {
   intro:
-    "Zone de contenu principale d'une page applicative. Elle gère le titre de section, le défilement vertical stylé, l'alignement et les modes plein écran, et expose sur mobile les utilitaires (langue, thème) dans un menu de paramètres. Utilisée conjointement avec PageScaffold.",
+    "Zone de contenu principale d'une page applicative. Elle gère le titre de section, le défilement vertical stylé, l'alignement et les modes plein écran, et garde son dernier élément au-dessus de la barre de navigation mobile. Utilisée conjointement avec PageScaffold.",
   sections: {
     basic: "Usage de base",
     align: "Alignement",
@@ -76,12 +59,14 @@ const fr = {
       "Fait occuper au contenu toute la hauteur disponible sans défilement interne, utile pour un tableau ou une carte plein écran.",
     hugContent: "Ajuste la zone à la hauteur de son contenu plutôt que de remplir l'espace.",
     children: "Contenu de la page, disposé dans un Stack vertical.",
+    skeleton:
+      "Change les Spinner et les DataTable en chargement de la page en squelettes de contenu. false garde les Spinner et le chargement d'origine pour tout ce que la page contient. Le footer n'est pas concerné.",
   },
 };
 
 const en: typeof fr = {
   intro:
-    "Main content area of an application page. It handles the section title, styled vertical scrolling, alignment and full-screen modes, and on mobile exposes the utilities (language, theme) in a settings menu. Used together with PageScaffold.",
+    "Main content area of an application page. It handles the section title, styled vertical scrolling, alignment and full-screen modes, and keeps its last element above the mobile navigation bar. Used together with PageScaffold.",
   sections: {
     basic: "Basic usage",
     align: "Alignment",
@@ -112,6 +97,8 @@ const en: typeof fr = {
       "Makes the content fill the full available height without inner scrolling, useful for a full-screen table or card.",
     hugContent: "Fits the area to the height of its content rather than filling the space.",
     children: "Page content, laid out in a vertical Stack.",
+    skeleton:
+      "Turns the page's Spinners and loading DataTables into content skeletons. false keeps the Spinners and the original loading state for everything the page contains. The footer is not affected.",
   },
 };
 
@@ -160,6 +147,12 @@ export default function PageContentDoc() {
       defaultValue: '"lg"',
       description: t.props.maxWidth,
     },
+    {
+      name: "skeleton",
+      type: "boolean",
+      defaultValue: "true",
+      description: t.props.skeleton,
+    },
   ];
 
   return (
@@ -171,28 +164,13 @@ export default function PageContentDoc() {
           code={basicCode}
           align="stretch"
         >
-          <LiveDemoGate>
-            <Box
-              sx={[
-                {
-                  height: "26rem",
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  overflow: "hidden",
-                  border: "0.0625rem solid",
-                  borderColor: "divider",
-                },
-                squircleClip(tokens.radius.sm),
-              ]}
-            >
-              <PageContent title="Documents">
-                <Card>Premier document.</Card>
-                <Card>Deuxième document.</Card>
-                <Card>Troisième document.</Card>
-              </PageContent>
-            </Box>
-          </LiveDemoGate>
+          <DemoScreen height={SCREEN_HEIGHT}>
+            <PageContent title="Documents">
+              <Card>Premier document.</Card>
+              <Card>Deuxième document.</Card>
+              <Card>Troisième document.</Card>
+            </PageContent>
+          </DemoScreen>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.align}>
@@ -202,26 +180,11 @@ export default function PageContentDoc() {
           code={centerCode}
           align="stretch"
         >
-          <LiveDemoGate>
-            <Box
-              sx={[
-                {
-                  height: "26rem",
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  overflow: "hidden",
-                  border: "0.0625rem solid",
-                  borderColor: "divider",
-                },
-                squircleClip(tokens.radius.sm),
-              ]}
-            >
-              <PageContent title="Bienvenue" align="center">
-                <Card>Contenu aligné au centre.</Card>
-              </PageContent>
-            </Box>
-          </LiveDemoGate>
+          <DemoScreen height={SCREEN_HEIGHT}>
+            <PageContent title="Bienvenue" align="center">
+              <Card>Contenu aligné au centre.</Card>
+            </PageContent>
+          </DemoScreen>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.fillHeight}>
@@ -231,26 +194,11 @@ export default function PageContentDoc() {
           code={fillHeightCode}
           align="stretch"
         >
-          <LiveDemoGate>
-            <Box
-              sx={[
-                {
-                  height: "26rem",
-                  width: "100%",
-                  display: "flex",
-                  flexDirection: "column",
-                  overflow: "hidden",
-                  border: "0.0625rem solid",
-                  borderColor: "divider",
-                },
-                squircleClip(tokens.radius.sm),
-              ]}
-            >
-              <PageContent fillHeight>
-                <Card fill>Contenu occupant toute la hauteur disponible.</Card>
-              </PageContent>
-            </Box>
-          </LiveDemoGate>
+          <DemoScreen height={SCREEN_HEIGHT}>
+            <PageContent fillHeight>
+              <Card fill>Contenu occupant toute la hauteur disponible.</Card>
+            </PageContent>
+          </DemoScreen>
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.api}>

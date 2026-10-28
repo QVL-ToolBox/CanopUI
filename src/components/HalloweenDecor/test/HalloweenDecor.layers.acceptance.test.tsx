@@ -1,10 +1,12 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { act, cleanup } from "@testing-library/react";
 import { ThemeProvider, useTheme, type Theme } from "@mui/material/styles";
 import { HalloweenDecor, tokens, type CanopHalloweenDecorDensity } from "../../../index";
 import { reglesEmises, type CanopRegleEmise } from "../../../test/cssRules";
 import {
   mockMatchMedia,
+  preparerDecorDeterministe,
+  quitterDecor,
   renderDecor,
   runningAnimations,
 } from "../../../test/halloweenDecorTestKit";
@@ -134,8 +136,12 @@ function renderedTooltipZIndex(): number {
   return tooltip;
 }
 
+beforeEach(() => {
+  preparerDecorDeterministe();
+});
+
 afterEach(() => {
-  vi.unstubAllGlobals();
+  quitterDecor();
   Reflect.deleteProperty(document, "visibilityState");
   Reflect.deleteProperty(document, "hidden");
 });

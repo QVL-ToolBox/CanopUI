@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import { SquircleDashedBorder, squircleSurface } from "../../squircle";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
+import { withoutFocusRing } from "../../interaction";
 import { Icon } from "../Icon";
 import { Stack } from "../Stack";
 import { DropzoneOverlay } from "./DropzoneOverlay";
@@ -53,7 +54,7 @@ export function Dropzone({
         : {})}
       sx={{
         position: "relative",
-        outline: "none",
+        ...withoutFocusRing,
         cursor: isPrompt && !disabled ? "pointer" : "default",
         opacity: disabled ? 0.6 : 1,
 

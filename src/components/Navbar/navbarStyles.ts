@@ -1,13 +1,8 @@
-export const NAVBAR_HOVER_OVERLAY =
-  "color-mix(in srgb, var(--canop-palette-primary-contrastText) 14%, transparent)";
-
-export const NAVBAR_SURFACE_GRADIENT =
-  "linear-gradient(180deg, var(--canop-palette-primary-dark) 0%, var(--canop-palette-primary-main) 100%)";
-
 const BAR_HEIGHT = "4rem";
 const BAR_INSET = "1rem";
 const WIDGET_GAP = "0.5rem";
 const SAFE_AREA_BOTTOM = "env(safe-area-inset-bottom)";
+const SAFE_AREA_LEFT = "env(safe-area-inset-left, 0rem)";
 const SAFE_AREA_RIGHT = "env(safe-area-inset-right, 0rem)";
 
 function aboveSafeArea(...lengths: string[]): string {
@@ -15,6 +10,16 @@ function aboveSafeArea(...lengths: string[]): string {
 }
 
 export const NAVBAR_MOBILE_BAR_OFFSET = aboveSafeArea(BAR_INSET);
+
+export const NAVBAR_MOBILE_BAR_LEFT = `calc(${BAR_INSET} + ${SAFE_AREA_LEFT})`;
+
+export const NAVBAR_MOBILE_BAR_RIGHT = `calc(${BAR_INSET} + ${SAFE_AREA_RIGHT})`;
+
+export const NAVBAR_MOBILE_BAR_PADDING_Y = "0.5rem";
+
+export const NAVBAR_MOBILE_BAR_PADDING_X = "0.75rem";
+
+export const NAVBAR_MOBILE_BAR_MAX_WIDTH = `calc(100vw - ${NAVBAR_MOBILE_BAR_LEFT} - ${NAVBAR_MOBILE_BAR_RIGHT})`;
 
 export const NAVBAR_MOBILE_BAR_SPACE = aboveSafeArea(BAR_HEIGHT, BAR_INSET);
 
@@ -45,6 +50,3 @@ export const NAVBAR_UTILITIES_BOTTOM = `calc(env(safe-area-inset-bottom, 0rem) +
 export const NAVBAR_UTILITIES_RIGHT = `calc(${SAFE_AREA_RIGHT} + ${UTILITY_INSET})`;
 
 export const NAVBAR_UTILITIES_FOOTPRINT = `calc(${SAFE_AREA_RIGHT} + ${NAVBAR_UTILITIES_WIDTH} + 2 * ${UTILITY_INSET})`;
-
-export const NAVBAR_FOOT_GLOW =
-  "radial-gradient(circle at 50% 120%, color-mix(in srgb, var(--canop-palette-accent-main) 16%, transparent), transparent 70%)";

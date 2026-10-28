@@ -2,6 +2,7 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import { tokens } from "../../tokens";
 import { squircleClip } from "../../squircle";
+import { hoverOrKeyboardFocus, withoutFocusRing } from "../../interaction";
 import { TOUCH_TARGET_MIN, touchPaddingFor } from "../_shared/touchTarget";
 import type { CanopCarouselOrientation } from "./carouselHelpers";
 
@@ -79,6 +80,8 @@ export function CarouselIndicators({
               appearance: "none",
               cursor: "pointer",
               padding: isVertical ? `${HIT_PADDING} 0` : `0 ${HIT_PADDING}`,
+              ...withoutFocusRing,
+              [hoverOrKeyboardFocus(" > *")]: { opacity: 1 },
 
               "@media (pointer: coarse)": {
                 padding: isVertical
@@ -104,7 +107,6 @@ export function CarouselIndicators({
                     easing: tokens.motion.easing.organic,
                   }),
 
-                "button:hover > &": { opacity: 1 },
                 "@media (prefers-reduced-motion: reduce)": { transition: "none" },
               }}
             >

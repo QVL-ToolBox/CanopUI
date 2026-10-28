@@ -5,6 +5,7 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 import svgr from "vite-plugin-svgr";
 import dts from "vite-plugin-dts";
+import { releaseSummary } from "./vitrine/releaseSummaryPlugin";
 
 const FONTS_SOURCE = fileURLToPath(new URL("./src/assets/fonts", import.meta.url));
 const FONTS_OUTPUT = "assets/fonts";
@@ -55,6 +56,7 @@ export default defineConfig({
     }),
     copyFontLicense(),
     copyCanopyScenes(),
+    releaseSummary(),
   ],
   build: {
     lib: {

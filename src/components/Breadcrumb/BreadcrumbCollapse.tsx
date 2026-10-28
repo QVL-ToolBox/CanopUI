@@ -2,7 +2,7 @@ import ButtonBase from "@mui/material/ButtonBase";
 import { squircleSurface } from "../../squircle";
 import type { MouseEvent } from "react";
 import { useTranslation } from "../../i18n";
-import { focusRingSx } from "../_shared/focusRing";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import { Icon } from "../Icon";
 import { Menu, MenuItem } from "../Menu";
 import type { CanopBreadcrumbItem } from "./breadcrumbTypes";
@@ -43,8 +43,7 @@ export function BreadcrumbCollapse({
           borderRadius: "var(--canop-radius-sm)",
           color: "text.secondary",
           transition: "color var(--canop-motion-duration-fast) var(--canop-motion-ease-standard)",
-          "&:hover": { color: "primary.main" },
-          "&:focus-visible": focusRingSx,
+          [hoverOrKeyboardFocus()]: { color: "primary.main" },
           "@media (prefers-reduced-motion: reduce)": { transition: "none" },
         }}
       >

@@ -72,8 +72,8 @@ function Vies({ labels }: { labels: { lose: string; refill: string } }) {
 
   return (
     <Stack gap="md" alignItems="start">
-      <Lives value={restantes} max={10} size="md" />
-      <Stack direction="row" gap="sm">
+      <Lives value={restantes} max={10} />
+      <Stack direction="row" gap="sm" wrap>
         <Button size="small" onClick={() => setRestantes((value) => Math.max(0, value - 1))}>
           {labels.lose}
         </Button>
@@ -92,7 +92,7 @@ function Serie({ labels }: { labels: { good: string; miss: string } }) {
   return (
     <Stack gap="md" alignItems="start">
       <Streak value={serie} multiplier={multiplicateur} />
-      <Stack direction="row" gap="sm">
+      <Stack direction="row" gap="sm" wrap>
         <Button size="small" onClick={() => setSerie((value) => value + 1)}>
           {labels.good}
         </Button>
@@ -155,7 +155,7 @@ function Chrono({ labels }: { labels: { restart: string; over: string } }) {
   return (
     <Stack gap="md" alignItems="stretch">
       <Countdown key={manche} duration={20_000} urgentBelow={10} onEnd={() => setEcoule(true)} />
-      <Stack direction="row" gap="sm" alignItems="center">
+      <Stack direction="row" gap="sm" alignItems="center" wrap>
         <Button size="small" variant="secondary" onClick={relancer}>
           {labels.restart}
         </Button>
@@ -177,7 +177,7 @@ function Eclair({ labels }: { labels: { good: string; bad: string; prompt: strin
       <Card flash={flash}>
         <Text variant="body-md">{labels.prompt}</Text>
       </Card>
-      <Stack direction="row" gap="sm">
+      <Stack direction="row" gap="sm" wrap>
         <Button size="small" onClick={() => show("success", 350)}>
           {labels.good}
         </Button>
@@ -250,7 +250,8 @@ const fr = {
     choicePadding: "Rembourrage intérieur, pris dans l'échelle d'espacement.",
     choiceAriaLabel: "Nom accessible explicite, si le contenu ne suffit pas.",
     livesValue: "Vies restantes. Bornée entre 0 et max.",
-    livesMax: "Vies au départ, donc nombre de cases dessinées.",
+    livesMax:
+      "Vies au départ, donc nombre de cases dessinées. Au-delà de la largeur disponible, les cœurs passent à la ligne.",
     icon: "Icône du registre. heart par défaut pour les vies, fire pour la série.",
     streakValue: "Longueur de la série en cours.",
     multiplier: "Multiplicateur atteint. Au-delà de 1, la série est dite chaude et se colore.",
@@ -333,7 +334,8 @@ const en = {
     choicePadding: "Inner padding, taken from the spacing scale.",
     choiceAriaLabel: "Explicit accessible name, when the content is not enough.",
     livesValue: "Remaining lives. Clamped between 0 and max.",
-    livesMax: "Starting lives, therefore the number of cells drawn.",
+    livesMax:
+      "Starting lives, therefore the number of cells drawn. Beyond the available width, the hearts wrap.",
     icon: "Registry icon. heart by default for lives, fire for the streak.",
     streakValue: "Length of the current streak.",
     multiplier: "Multiplier reached. Above 1 the streak is hot and takes colour.",

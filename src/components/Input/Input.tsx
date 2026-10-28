@@ -4,9 +4,18 @@ import MuiTextField from "@mui/material/TextField";
 import { useState, type Ref } from "react";
 import { useTranslation } from "../../i18n";
 import { Icon, type CanopIconName } from "../Icon";
+import {
+  GhostCompletionInput,
+  InlineCompletionContext,
+  useInlineCompletion,
+  type CanopCompletionSource,
+} from "../InlineCompletion";
+import { LiveRegion } from "../LiveRegion";
 
 export type CanopInputType = "text" | "email" | "password" | "tel" | "url" | "number";
 export type CanopInputSize = "small" | "medium";
+
+const COMPLETABLE_TYPES: ReadonlySet<CanopInputType> = new Set(["text", "tel", "url"]);
 
 export interface CanopInputProps {
   label: string;
@@ -39,6 +48,22 @@ export interface CanopInputProps {
   pattern?: RegExp;
   patternMessage?: string;
   validate?: (value: string) => string | null;
+  /**
+   * Propose en gris la suite de la saisie : une liste de textes, ou un
+   * résolveur (synchrone ou asynchrone) relu à chaque frappe. Changer de
+   * résolveur prend effet à la frappe suivante.
+   */
+  completion?: CanopCompletionSource;
+  completionNormalize?: (text: string) => string;
+  /**
+   * Appelé avec la suggestion entière quand l'utilisateur l'accepte : `Tab`,
+   * `Entrée`, `→`, `Ctrl`/`⌥` + `→` sur son dernier mot, ou un toucher sur le
+   * texte gris. Une saisie qui finit par égaler une suggestion, lettre à
+   * lettre, n'est pas une acceptation.
+   */
+  onCompletionAccept?: (suggestion: string) => void;
+  ariaLabel?: string;
+  onBlur?: () => void;
 }
 
 export function Input({
@@ -61,6 +86,11 @@ export function Input({
   pattern,
   patternMessage,
   validate,
+  completion,
+  completionNormalize,
+  onCompletionAccept,
+  ariaLabel,
+  onBlur,
 }: CanopInputProps) {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
@@ -93,6 +123,7 @@ export function Input({
     if (effectiveValidate) {
       setLocalError(effectiveValidate(value));
     }
+    onBlur?.();
   };
 
   const startAdornment = icon ? (
@@ -114,25 +145,49 @@ export function Input({
     </InputAdornment>
   ) : undefined;
 
+  const completable = COMPLETABLE_TYPES.has(type);
+  const completesInline = completion !== undefined && completable;
+  const inlineCompletion = useInlineCompletion({
+    value,
+    onChange: handleChange,
+    onAccept: onCompletionAccept,
+    source: completesInline ? completion : undefined,
+    normalize: completionNormalize,
+    disabled,
+  });
+
   return (
-    <MuiTextField
-      label={label}
-      value={value}
-      onChange={(event) => handleChange(event.target.value)}
-      onBlur={handleBlur}
-      type={resolvedType}
-      name={name}
-      placeholder={placeholder}
-      helperText={shownError ?? helperText}
-      error={Boolean(shownError)}
-      required={required}
-      disabled={disabled}
-      fullWidth={fullWidth}
-      autoComplete={autoComplete}
-      autoFocus={autoFocus}
-      size={size}
-      inputRef={inputRef}
-      slotProps={{ input: { startAdornment, endAdornment } }}
-    />
+    <InlineCompletionContext value={inlineCompletion.ghost}>
+      <MuiTextField
+        label={label}
+        value={value}
+        onChange={(event) => handleChange(event.target.value)}
+        onBlur={handleBlur}
+        type={resolvedType}
+        name={name}
+        placeholder={placeholder}
+        helperText={shownError ?? helperText}
+        error={Boolean(shownError)}
+        required={required}
+        disabled={disabled}
+        fullWidth={fullWidth}
+        autoComplete={autoComplete ?? (completesInline ? "off" : undefined)}
+        autoFocus={autoFocus}
+        size={size}
+        inputRef={inputRef}
+        slotProps={{
+          input: {
+            startAdornment,
+            endAdornment,
+            ...(completable ? { inputComponent: GhostCompletionInput } : undefined),
+          },
+          htmlInput: {
+            ...(completesInline ? inlineCompletion.inputProps : undefined),
+            "aria-label": ariaLabel,
+          },
+        }}
+      />
+      {completesInline ? <LiveRegion message={inlineCompletion.announcement} /> : null}
+    </InlineCompletionContext>
   );
 }

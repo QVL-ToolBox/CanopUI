@@ -25,10 +25,10 @@ const PALIER_MD = 64;
 const PALIER_SM = 37.5;
 
 const DEGRADE_DU_HEROS =
-  /linear-gradient\(\s*150deg\s*,\s*color-mix\(in srgb,\s*var\(--canop-palette-primary-light\)\s+22%,\s*transparent\)\s*,\s*color-mix\(in srgb,\s*var\(--canop-palette-accent-light\)\s+18%,\s*transparent\)\s*\)/;
-const VOILE_DU_HEROS =
-  /color-mix\(in srgb,\s*var\(--canop-palette-surface-base\)\s+33%,\s*transparent\)/;
-const FLOU_DU_HEROS = "blur(0.35rem) saturate(1.3)";
+  /linear-gradient\(\s*150deg\s*,\s*color-mix\(in srgb,\s*var\(--canop-palette-primary-light\)\s+15%,\s*transparent\)\s*,\s*color-mix\(in srgb,\s*var\(--canop-palette-accent-light\)\s+12%,\s*transparent\)\s*\)/;
+const SURFACE_BASE = "var(--canop-palette-surface-base)";
+const FLOU_DU_HEROS = "blur(0.25rem) saturate(1.8)";
+const SANS_ARRONDI = ["", "0", "0px"];
 
 type Mode = "light" | "dark";
 
@@ -84,23 +84,34 @@ function paliersDePadding(element: HTMLElement) {
   return declarationsDe(element, "padding");
 }
 
-describe("AC1 - Card variant frosted : surface verre depoli du heros du Hub", () => {
+describe("AC1 - Card variant frosted : recette du verre liquide", () => {
   it("expose frosted parmi les variantes publiques de Card", () => {
     expectTypeOf<"frosted">().toMatchTypeOf<CanopCardVariant>();
   });
 
-  it("pose le degrade a 150 degres de primary-light 22 % vers accent-light 18 %", () => {
+  it("pose le degrade a 150 degres de primary-light 15 % vers accent-light 12 %", () => {
     const { racine } = poserCarte();
     expect(fondsDe(sansCondition(reglesEmises(racine)))).toMatch(DEGRADE_DU_HEROS);
   });
 
-  it("pose le voile surface-base a 33 % sous le degrade", () => {
+  it("ne pose plus aucun voile surface-base hors repli", () => {
     const { racine } = poserCarte();
     const fond = fondsDe(sansCondition(reglesEmises(racine)));
-    expect(fond).toMatch(VOILE_DU_HEROS);
+    expect(fond).not.toContain(SURFACE_BASE);
   });
 
-  it("floute le fond en blur 0.35rem saturate 1.3", () => {
+  it("ne garde que le degrade comme fond hors repli", () => {
+    const { racine } = poserCarte();
+    const couches = sansCondition(reglesEmises(racine))
+      .map((regle) => regle.style.getPropertyValue("background"))
+      .filter((valeur) => valeur !== "");
+    expect(couches.length).toBeGreaterThan(0);
+    couches.forEach((couche) =>
+      expect(couche.trim()).toMatch(new RegExp(`^${DEGRADE_DU_HEROS.source}$`)),
+    );
+  });
+
+  it("floute le fond en blur 0.25rem saturate 1.8", () => {
     const { racine } = poserCarte();
     expect(derniereValeurEmise(racine, "backdrop-filter")).toBe(FLOU_DU_HEROS);
   });
@@ -110,11 +121,9 @@ describe("AC1 - Card variant frosted : surface verre depoli du heros du Hub", ()
     expect(blocsBrutsDe(racine).join("")).toContain(`-webkit-backdrop-filter:${FLOU_DU_HEROS}`);
   });
 
-  it("arrondit la surface au rayon xl", () => {
+  it("ne pose pas d'arrondi circulaire sur la surface decoupee", () => {
     const { racine } = poserCarte();
-    expect([radius.xl, "var(--canop-radius-xl)"]).toContain(
-      derniereValeurEmise(racine, "border-radius"),
-    );
+    expect(SANS_ARRONDI).toContain(derniereValeurEmise(racine, "border-radius"));
   });
 
   it("decoupe la surface en squircle sur le rayon xl", () => {
@@ -133,12 +142,13 @@ describe("AC1 - Card variant frosted : surface verre depoli du heros du Hub", ()
     const { racine } = poserCarte({}, "dark");
     const fond = fondsDe(sansCondition(reglesEmises(racine)));
     expect(fond).toMatch(DEGRADE_DU_HEROS);
-    expect(fond).toMatch(VOILE_DU_HEROS);
+    expect(fond).not.toContain(SURFACE_BASE);
     expect(derniereValeurEmise(racine, "backdrop-filter")).toBe(FLOU_DU_HEROS);
+    expect(blocsBrutsDe(racine).join("")).toContain(`-webkit-backdrop-filter:${FLOU_DU_HEROS}`);
   });
 });
 
-describe("AC1 - repli opaque sans backdrop-filter", () => {
+describe("AC7 - repli opaque sans backdrop-filter", () => {
   it("declare un repli sous @supports not backdrop-filter", () => {
     const { racine } = poserCarte();
     expect(sousRepli(reglesEmises(racine)).length).toBeGreaterThan(0);
@@ -154,11 +164,11 @@ describe("AC1 - repli opaque sans backdrop-filter", () => {
   it("pose un fond opaque surface-base dans le repli", () => {
     const { racine } = poserCarte();
     const fond = fondsDe(sousRepli(reglesEmises(racine)));
-    expect(coucheDuBas(fond)).toBe("var(--canop-palette-surface-base)");
-    expect(fond).not.toMatch(VOILE_DU_HEROS);
+    expect(coucheDuBas(fond)).toBe(SURFACE_BASE);
+    expect(fond).not.toMatch(/color-mix\(in srgb,\s*var\(--canop-palette-surface-base\)/);
   });
 
-  it("garde le degrade du heros par-dessus le fond opaque du repli", () => {
+  it("garde la teinte du verre par-dessus le fond opaque du repli", () => {
     const { racine } = poserCarte();
     expect(fondsDe(sousRepli(reglesEmises(racine)))).toMatch(DEGRADE_DU_HEROS);
   });
@@ -209,12 +219,27 @@ describe("AC1 - les props explicites restent honorees en frosted", () => {
     return { racine, contenu: racine.querySelector(".MuiCardContent-root") as HTMLElement };
   }
 
-  it.each(["2xl", "lg", "md"] as const)("honore radius=%s", (rayon) => {
-    const { racine } = poserCarte({ radius: rayon });
-    expect([radius[rayon], `var(--canop-radius-${rayon})`]).toContain(
-      derniereValeurEmise(racine, "border-radius"),
-    );
-  });
+  it.each(["2xl", "lg", "md"] as const)(
+    "porte radius=%s par le squircle sans arrondi circulaire",
+    (rayon) => {
+      const { racine } = poserCarte({ radius: rayon });
+      const contour = reglesEmises(racine)
+        .map((regle) => regle.style.getPropertyValue("--canop-squircle-clip"))
+        .join(" ");
+      expect(contour).toContain(`var(--canop-radius-${rayon})`);
+      expect(SANS_ARRONDI).toContain(derniereValeurEmise(racine, "border-radius"));
+    },
+  );
+
+  it.each(["2xl", "lg", "md"] as const)(
+    "honore radius=%s en arrondi circulaire avec une elevation explicite",
+    (rayon) => {
+      const { racine } = poserCarte({ radius: rayon, elevation: "md" });
+      expect([radius[rayon], `var(--canop-radius-${rayon})`]).toContain(
+        derniereValeurEmise(racine, "border-radius"),
+      );
+    },
+  );
 
   it("decoupe le squircle sur le rayon explicite", () => {
     const { racine } = poserCarte({ radius: "2xl" });
@@ -251,7 +276,7 @@ describe("AC1 - les props explicites restent honorees en frosted", () => {
   });
 });
 
-describe("AC5 - les variantes existantes de Card ne prennent pas le verre", () => {
+describe("AC6 - les variantes existantes de Card ne prennent pas le verre", () => {
   it.each(["surface", "interactive", "floating", "stat"] as const)(
     "laisse la variante %s sans degrade du heros ni flou",
     (variant) => {
@@ -271,14 +296,14 @@ describe("AC5 - les variantes existantes de Card ne prennent pas le verre", () =
   });
 });
 
-describe("AC2 - lisibilite en clair et en sombre", () => {
+describe("AC7 - lisibilite en clair et en sombre", () => {
   const POSITIONS_DU_DEGRADE = Array.from({ length: 21 }, (_, index) => index / 20);
 
   type JeuDeCouleurs = typeof palette | typeof paletteDark;
 
   function verreSur(jeu: JeuDeCouleurs, dessous: string, position: number): string {
-    const partPrimaire = (1 - position) * 0.22;
-    const partAccent = position * 0.18;
+    const partPrimaire = (1 - position) * 0.15;
+    const partAccent = position * 0.12;
     const opacite = partPrimaire + partAccent;
     const teinte = mixSrgb(jeu.primary.light, partPrimaire / opacite, jeu.accent.light);
     return mixSrgb(teinte, opacite, dessous);
@@ -287,10 +312,8 @@ describe("AC2 - lisibilite en clair et en sombre", () => {
   const reposeSurReplis = (jeu: JeuDeCouleurs) =>
     POSITIONS_DU_DEGRADE.map((position) => verreSur(jeu, jeu.surface.base, position));
 
-  const reposeSurFondParDefaut = (jeu: JeuDeCouleurs) => {
-    const voile = mixSrgb(jeu.surface.base, 0.33, jeu.background.default);
-    return POSITIONS_DU_DEGRADE.map((position) => verreSur(jeu, voile, position));
-  };
+  const reposeSurFondParDefaut = (jeu: JeuDeCouleurs) =>
+    POSITIONS_DU_DEGRADE.map((position) => verreSur(jeu, jeu.background.default, position));
 
   const pireContraste = (texte: string, fonds: string[]) =>
     Math.min(...fonds.map((fond) => contrastRatio(texte, fond)));

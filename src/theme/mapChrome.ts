@@ -1,8 +1,15 @@
 import type { CSSObject } from "@mui/material/styles";
+import { hoverOrKeyboardFocus } from "../interaction";
 import { squircleClip } from "../squircle";
 import { tokens } from "../tokens";
 
 const PAPER = "var(--canop-palette-background-paper)";
+
+const MAPLIBRE_FOCUS_INDICATORS = [
+  ".maplibregl-map .maplibregl-ctrl.maplibregl-ctrl-group button:focus",
+  ".maplibregl-map .maplibregl-ctrl .maplibregl-ctrl-attrib-button:focus",
+  ".maplibregl-map .maplibregl-canvas:focus",
+].join(", ");
 
 export function mapChromeSx(): CSSObject {
   return {
@@ -46,9 +53,10 @@ export function mapChromeSx(): CSSObject {
       backgroundColor: "transparent",
       width: "2rem",
       height: "2rem",
-      "&:hover": { backgroundColor: "var(--canop-palette-surface-sunken)" },
+      [hoverOrKeyboardFocus()]: { backgroundColor: "var(--canop-palette-surface-sunken)" },
       "& + button": { borderTop: "0.0625rem solid var(--canop-palette-divider)" },
     },
+    [MAPLIBRE_FOCUS_INDICATORS]: { boxShadow: "none", outline: "none" },
     "@media (pointer: coarse)": {
       ".maplibregl-ctrl-group button": { width: "2.75rem", height: "2.75rem" },
       ".maplibregl-ctrl-attrib": { fontSize: tokens.typography.fontSize.xs },

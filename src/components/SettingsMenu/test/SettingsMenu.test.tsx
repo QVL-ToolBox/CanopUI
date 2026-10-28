@@ -23,12 +23,16 @@ describe("SettingsMenu", () => {
     expect(info).toHaveAttribute("href", "/cgu");
   });
 
-  it("n'affiche pas le contenu du footer directement dans le menu", async () => {
+  it("affiche le contenu du footer en pied du menu", async () => {
     const user = userEvent.setup();
-    renderMenu(<SettingsMenu footer={<span>Mentions legales</span>} infoHref="/cgu" />);
+    renderMenu(
+      <SettingsMenu onLogout={vi.fn()} footer={<span>Mentions legales</span>} infoHref="/cgu" />,
+    );
     await user.click(screen.getByLabelText("Ouvrir le menu"));
-    await screen.findByRole("link", { name: "Informations légales" });
-    expect(screen.queryByText("Mentions legales")).not.toBeInTheDocument();
+    const dialog = await screen.findByRole("presentation");
+    const footer = within(dialog).getByText("Mentions legales");
+    const logout = within(dialog).getByRole("button", { name: "Déconnexion" });
+    expect(logout.compareDocumentPosition(footer) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("separe le bouton info du reste du menu par un separateur", async () => {
@@ -39,7 +43,7 @@ describe("SettingsMenu", () => {
     expect(within(dialog).getByRole("separator")).toBeInTheDocument();
   });
 
-  it("n'affiche pas le bouton info quand infoHref manque", async () => {
+  it("n'affiche pas le bouton info quand infoHref manque mais garde le footer", async () => {
     const user = userEvent.setup();
     renderMenu(<SettingsMenu footer={<span>Mentions legales</span>} />);
     await user.click(screen.getByLabelText("Ouvrir le menu"));
@@ -47,7 +51,7 @@ describe("SettingsMenu", () => {
     expect(
       within(dialog).queryByRole("link", { name: "Informations légales" }),
     ).not.toBeInTheDocument();
-    expect(within(dialog).queryByRole("separator")).not.toBeInTheDocument();
+    expect(within(dialog).getByText("Mentions legales")).toBeInTheDocument();
   });
 
   it("n'affiche pas le bouton info quand footer manque", async () => {

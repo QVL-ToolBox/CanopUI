@@ -42,13 +42,12 @@ export function leafSwaySx(spec: HalloweenLeafSpec, animated: boolean): CSSObjec
   });
 }
 
-export function leafGlyphSx(spec: HalloweenLeafSpec, animated: boolean): CSSObject {
+export function leafTumbleSx(spec: HalloweenLeafSpec, animated: boolean): CSSObject {
   return {
     display: "block",
-    width: "100%",
-    height: "auto",
     color: halloweenTone(hueTone[spec.hue]),
     transform: "rotate(20deg)",
+    "& > svg": { display: "block", width: "100%", height: "auto" },
     ...when(animated, {
       animation: loop(LEAF_TUMBLE, spec.spin, spec.delay, "normal", "linear"),
       ...keyframes(LEAF_TUMBLE, {

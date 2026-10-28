@@ -56,6 +56,8 @@ const fr = {
     fullPage:
       "Centre l'indicateur sur toute la hauteur de la fenêtre, utile pendant le chargement initial d'une page.",
     ariaLabel: "Libellé accessible annoncé par les lecteurs d'écran.",
+    skeleton:
+      "Dans une PageContent ou une Card, un Spinner medium ou large se change en squelette du contenu attendu : liste, page en large, corps de carte dans une Card. Les tailles small, la couleur inherit et fullPage restent des Spinner. false garde le Spinner.",
   },
 };
 
@@ -89,6 +91,8 @@ const en: typeof fr = {
     fullPage:
       "Centers the indicator across the full height of the viewport, useful during the initial load of a page.",
     ariaLabel: "Accessible label announced by screen readers.",
+    skeleton:
+      "Inside a PageContent or a Card, a medium or large Spinner turns into a skeleton of the expected content: a list, a page when large, a card body inside a Card. Small sizes, the inherit color and fullPage stay Spinners. false keeps the Spinner.",
   },
 };
 
@@ -120,6 +124,12 @@ export default function SpinnerDoc() {
       type: "string",
       defaultValue: '"Chargement"',
       description: t.props.ariaLabel,
+    },
+    {
+      name: "skeleton",
+      type: "boolean",
+      defaultValue: "true",
+      description: t.props.skeleton,
     },
   ];
 

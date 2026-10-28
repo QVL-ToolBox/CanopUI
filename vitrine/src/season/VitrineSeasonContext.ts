@@ -1,8 +1,10 @@
 import { createContext, useContext } from "react";
 
+export type VitrineSeasonChoice = "auto" | "halloween" | "off";
+
 export interface VitrineSeasonValue {
-  forcedHalloween: boolean;
-  setForcedHalloween: (forced: boolean) => void;
+  choice: VitrineSeasonChoice;
+  setChoice: (choice: VitrineSeasonChoice) => void;
   setSeasonalDecorHidden: (hidden: boolean) => void;
 }
 

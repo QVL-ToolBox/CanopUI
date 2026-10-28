@@ -2,7 +2,7 @@ import ButtonBase from "@mui/material/ButtonBase";
 import { squircleSurface } from "../../squircle";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { focusRingSx } from "../_shared/focusRing";
+import { hoverOrKeyboardFocus } from "../../interaction";
 import { Icon } from "../Icon";
 import type { CanopBreadcrumbItem } from "./breadcrumbTypes";
 
@@ -60,8 +60,7 @@ export function BreadcrumbLink({ item, isCurrent }: BreadcrumbLinkProps) {
         paddingY: "0.125rem",
         color: "text.secondary",
         transition: "color var(--canop-motion-duration-fast) var(--canop-motion-ease-standard)",
-        "&:hover": { color: "primary.main", textDecoration: "underline" },
-        "&:focus-visible": focusRingSx,
+        [hoverOrKeyboardFocus()]: { color: "primary.main", textDecoration: "underline" },
         "@media (prefers-reduced-motion: reduce)": { transition: "none" },
       }}
     >

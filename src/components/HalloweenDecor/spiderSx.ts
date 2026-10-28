@@ -1,7 +1,9 @@
 import type { CSSObject } from "@mui/material/styles";
+import { glyphFrameSx } from "./glyphLayerSx";
 import { keyframes, loop, when } from "./halloweenMotion";
 import type { HalloweenSpiderSpec, HalloweenWebSpec } from "./halloweenSceneTypes";
 import { halloweenTone } from "./halloweenTones";
+import type { SpiderWebDew } from "./spiderWebGeometry";
 
 const THREAD_VAR = "--canop-halloween-thread";
 
@@ -25,37 +27,41 @@ export function webAnchorSx(spec: HalloweenWebSpec): CSSObject {
   };
 }
 
-const DEW: CSSObject = { fill: halloweenTone("star"), opacity: 0.7 };
-
-const LEGS: CSSObject = {
-  fill: "none",
-  stroke: "currentColor",
-  strokeLinecap: "round",
-  strokeLinejoin: "round",
-  transformBox: "fill-box",
-  transformOrigin: "50% 50%",
-};
+const DEW_DIAMETER = "1.8%";
 
 export function webSx(spec: HalloweenWebSpec, animated: boolean): CSSObject {
   return {
-    display: "block",
-    width: "100%",
-    height: "auto",
-    overflow: "visible",
+    ...glyphFrameSx("1"),
     transformOrigin: "0 0",
     "& [data-part='strand']": { stroke: halloweenTone("web") },
-    "& [data-part='dew']": DEW,
     ...when(animated, {
       animation: loop(WEB_SWAY, 6.3, spec.delay, "alternate"),
-      "& [data-part='dew']": {
-        ...DEW,
-        animation: loop(DEW_GLINT, 3.3, spec.delay, "alternate"),
-      },
-      "& [data-part='dew']:nth-of-type(2n)": { animationDuration: "4.1s" },
       ...keyframes(WEB_SWAY, {
         "0%": { transform: "scale(1, 1)" },
         "100%": { transform: "scale(1.025, 1.045)" },
       }),
+    }),
+  };
+}
+
+export function dewSx(
+  dew: SpiderWebDew,
+  index: number,
+  spec: HalloweenWebSpec,
+  animated: boolean,
+): CSSObject {
+  return {
+    position: "absolute",
+    left: `${dew.cx}%`,
+    top: `${dew.cy}%`,
+    width: DEW_DIAMETER,
+    height: DEW_DIAMETER,
+    borderRadius: "50%",
+    backgroundColor: halloweenTone("star"),
+    transform: "translate(-50%, -50%)",
+    opacity: 0.7,
+    ...when(animated, {
+      animation: loop(DEW_GLINT, index % 2 === 1 ? 4.1 : 3.3, spec.delay, "alternate"),
       ...keyframes(DEW_GLINT, {
         "0%": { opacity: 0.25 },
         "100%": { opacity: 0.95 },
@@ -115,20 +121,18 @@ export function threadSx(spec: HalloweenSpiderSpec, animated: boolean): CSSObjec
 
 export function spiderBodySx(spec: HalloweenSpiderSpec, animated: boolean): CSSObject {
   return {
-    position: "relative",
-    display: "block",
-    width: "100%",
-    height: "auto",
+    ...glyphFrameSx("1"),
     color: halloweenTone("spider"),
     "& [data-part='eye']": { fill: halloweenTone("spiderEye") },
-    "& [data-part='legs']": LEGS,
+    "& [data-part='legs']": {
+      fill: "none",
+      stroke: "currentColor",
+      strokeLinecap: "round",
+      strokeLinejoin: "round",
+    },
     ...drop(STATIC_DROP),
     ...when(animated, {
       animation: loop(SPIDER_DROP, spec.cycle, spec.delay),
-      "& [data-part='legs']": {
-        ...LEGS,
-        animation: loop(SPIDER_LEGS, 0.7, spec.delay, "alternate"),
-      },
       ...keyframes(SPIDER_DROP, {
         "0%, 30%, 100%": drop(0.2),
         "52%": drop(1),
@@ -136,10 +140,16 @@ export function spiderBodySx(spec: HalloweenSpiderSpec, animated: boolean): CSSO
         "64%, 78%": drop(1),
         "92%": drop(0.2),
       }),
-      ...keyframes(SPIDER_LEGS, {
-        "0%": { transform: "scaleX(1)" },
-        "100%": { transform: "scaleX(0.9)" },
-      }),
     }),
   };
+}
+
+export function spiderLegsSx(spec: HalloweenSpiderSpec, animated: boolean): CSSObject {
+  return when(animated, {
+    animation: loop(SPIDER_LEGS, 0.7, spec.delay, "alternate"),
+    ...keyframes(SPIDER_LEGS, {
+      "0%": { transform: "scaleX(1)" },
+      "100%": { transform: "scaleX(0.9)" },
+    }),
+  });
 }

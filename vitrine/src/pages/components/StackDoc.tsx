@@ -1,71 +1,84 @@
 import Box from "@mui/material/Box";
-import { Stack } from "@canop/ui";
-import { squircleClip, tokens } from "@canop/ui";
+import { Stack, squircleClip, tokens } from "@canop/ui";
 import { DemoCard } from "../../kit/DemoCard";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
 import { PropsTable, type PropRow } from "../../kit/PropsTable";
 import { useDocLocale } from "../../i18n/useDocLocale";
+import { StackSwatch } from "./stack/StackSwatch";
 
 const importCode = `import { Stack } from "@canop/ui";`;
 
-const directionCode = `<Stack direction="row" gap="sm">
-  <Box bgcolor="primary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-  <Box bgcolor="secondary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-  <Box bgcolor="accent.main" borderRadius="0.5rem" width="3rem" height="3rem" />
+const directionCode = `function Swatch({ color, width = "3rem", height = "3rem" }: SwatchProps) {
+  return <Box sx={{ bgcolor: \`\${color}.main\`, borderRadius: "0.5rem", width, height }} />;
+}
+
+<Stack direction="row" gap="sm">
+  <Swatch color="primary" />
+  <Swatch color="secondary" />
+  <Swatch color="accent" />
+</Stack>`;
+
+const responsiveCode = `<Stack direction={{ xs: "column", md: "row" }} gap="sm" wrap={{ xs: false, sm: true }}>
+  <Swatch color="primary" width="6rem" />
+  <Swatch color="secondary" width="6rem" />
+  <Swatch color="accent" width="6rem" />
 </Stack>`;
 
 const gapCode = `<Stack gap="xl">
   <Stack direction="row" gap="xs">
-    <Box bgcolor="primary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-    <Box bgcolor="primary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-    <Box bgcolor="primary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
+    <Swatch color="primary" />
+    <Swatch color="primary" />
+    <Swatch color="primary" />
   </Stack>
   <Stack direction="row" gap="md">
-    <Box bgcolor="secondary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-    <Box bgcolor="secondary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-    <Box bgcolor="secondary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
+    <Swatch color="secondary" />
+    <Swatch color="secondary" />
+    <Swatch color="secondary" />
   </Stack>
   <Stack direction="row" gap="xl">
-    <Box bgcolor="accent.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-    <Box bgcolor="accent.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-    <Box bgcolor="accent.main" borderRadius="0.5rem" width="3rem" height="3rem" />
+    <Swatch color="accent" />
+    <Swatch color="accent" />
+    <Swatch color="accent" />
   </Stack>
 </Stack>`;
 
 const alignCode = `<Stack direction="row" gap="sm" alignItems="end">
-  <Box bgcolor="primary.main" borderRadius="0.5rem" width="3rem" height="2rem" />
-  <Box bgcolor="secondary.main" borderRadius="0.5rem" width="3rem" height="4rem" />
-  <Box bgcolor="accent.main" borderRadius="0.5rem" width="3rem" height="5.5rem" />
+  <Swatch color="primary" height="2rem" />
+  <Swatch color="secondary" height="4rem" />
+  <Swatch color="accent" height="5.5rem" />
 </Stack>`;
 
 const justifyCode = `<Stack direction="row" gap="sm" justifyContent="space-between">
-  <Box bgcolor="primary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-  <Box bgcolor="secondary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-  <Box bgcolor="accent.main" borderRadius="0.5rem" width="3rem" height="3rem" />
+  <Swatch color="primary" />
+  <Swatch color="secondary" />
+  <Swatch color="accent" />
 </Stack>`;
 
 const wrapCode = `<Stack direction="row" gap="sm" wrap>
-  <Box bgcolor="primary.main" borderRadius="0.5rem" width="6rem" height="3rem" />
-  <Box bgcolor="secondary.main" borderRadius="0.5rem" width="6rem" height="3rem" />
-  <Box bgcolor="accent.main" borderRadius="0.5rem" width="6rem" height="3rem" />
-  <Box bgcolor="primary.main" borderRadius="0.5rem" width="6rem" height="3rem" />
-  <Box bgcolor="secondary.main" borderRadius="0.5rem" width="6rem" height="3rem" />
+  <Swatch color="primary" width="6rem" />
+  <Swatch color="secondary" width="6rem" />
+  <Swatch color="accent" width="6rem" />
+  <Swatch color="primary" width="6rem" />
+  <Swatch color="secondary" width="6rem" />
 </Stack>`;
 
-const paddingCode = `<Box bgcolor="secondary.light" borderRadius="0.75rem" display="inline-block">
+const paddingCode = `<Box sx={{ bgcolor: "secondary.light", borderRadius: "0.75rem", display: "inline-block" }}>
   <Stack direction="row" padding="lg" gap="sm">
-    <Box bgcolor="primary.main" borderRadius="0.5rem" width="3rem" height="3rem" />
-    <Box bgcolor="accent.main" borderRadius="0.5rem" width="3rem" height="3rem" />
+    <Swatch color="primary" />
+    <Swatch color="accent" />
   </Stack>
 </Box>`;
 
-const fillCode = `<Box height="14rem" width="100%">
+const fillCode = `<Box sx={{ height: "14rem", width: "100%" }}>
   <Stack fill gap="sm" justifyContent="space-between">
-    <Box bgcolor="primary.main" borderRadius="0.5rem" height="3rem" />
-    <Box bgcolor="accent.main" borderRadius="0.5rem" height="3rem" />
+    <Swatch color="primary" width="auto" />
+    <Swatch color="accent" width="auto" />
   </Stack>
 </Box>`;
+
+const SQUARE = "3rem";
+const WIDE = "6rem";
 
 const fr = {
   intro:
@@ -84,6 +97,11 @@ const fr = {
     direction: {
       title: "Ligne ou colonne",
       description: "direction contrôle l'axe principal. La valeur par défaut est column.",
+    },
+    responsive: {
+      title: "Par point de rupture",
+      description:
+        "direction et wrap acceptent une valeur par point de rupture, dans la forme de MUI : ici une colonne sur mobile, une ligne dès md. Réduisez la fenêtre pour voir l'axe basculer.",
     },
     gap: {
       title: "Échelle de gap",
@@ -116,11 +134,12 @@ const fr = {
     },
   },
   props: {
-    direction: "Axe principal de disposition des enfants.",
+    direction:
+      "Axe principal de disposition des enfants. Une valeur, ou une valeur par point de rupture.",
     gap: "Espacement entre les enfants, dérivé de l'échelle d'espacement du thème.",
     alignItems: "Alignement des enfants sur l'axe transversal.",
     justifyContent: "Répartition des enfants sur l'axe principal.",
-    wrap: "Autorise le passage des enfants à la ligne lorsqu'ils dépassent la largeur.",
+    wrap: "Autorise le passage des enfants à la ligne lorsqu'ils dépassent la largeur. Une valeur, ou une valeur par point de rupture.",
     padding: "Marge intérieure appliquée sur les quatre côtés.",
     fill: "Étire le Stack pour occuper l'espace disponible de son parent flex.",
     weight:
@@ -158,6 +177,11 @@ const en: typeof fr = {
       title: "Row or column",
       description: "direction sets the main axis. The default value is column.",
     },
+    responsive: {
+      title: "Per breakpoint",
+      description:
+        "direction and wrap accept one value per breakpoint, in MUI's shape: here a column on mobile, a row from md. Narrow the window to watch the axis switch.",
+    },
     gap: {
       title: "Gap scale",
       description: "gap accepts five steps aligned with the theme spacing scale, from xs to xl.",
@@ -187,11 +211,11 @@ const en: typeof fr = {
     },
   },
   props: {
-    direction: "Main axis along which children are laid out.",
+    direction: "Main axis along which children are laid out. One value, or one per breakpoint.",
     gap: "Spacing between children, derived from the theme spacing scale.",
     alignItems: "Alignment of children along the cross axis.",
     justifyContent: "Distribution of children along the main axis.",
-    wrap: "Allows children to wrap to the next line when they exceed the width.",
+    wrap: "Allows children to wrap to the next line when they exceed the width. One value, or one per breakpoint.",
     padding: "Inner spacing applied on all four sides.",
     fill: "Stretches the Stack to fill the available space of its flex parent.",
     weight:
@@ -218,7 +242,7 @@ export default function StackDoc() {
   const propRows: PropRow[] = [
     {
       name: "direction",
-      type: '"row" | "column"',
+      type: '"row" | "column" | Partial<Record<"xs" | "sm" | "md" | "lg", "row" | "column">>',
       defaultValue: '"column"',
       description: t.props.direction,
     },
@@ -240,7 +264,7 @@ export default function StackDoc() {
     },
     {
       name: "wrap",
-      type: "boolean",
+      type: 'boolean | Partial<Record<"xs" | "sm" | "md" | "lg", boolean>>',
       defaultValue: "false",
       description: t.props.wrap,
     },
@@ -322,36 +346,20 @@ export default function StackDoc() {
           code={directionCode}
         >
           <Stack direction="row" gap="sm">
-            <Box
-              sx={[
-                {
-                  bgcolor: "primary.main",
-                  width: "3rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "secondary.main",
-                  width: "3rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "accent.main",
-                  width: "3rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
+            <StackSwatch color="primary" width={SQUARE} />
+            <StackSwatch color="secondary" width={SQUARE} />
+            <StackSwatch color="accent" width={SQUARE} />
+          </Stack>
+        </DemoCard>
+        <DemoCard
+          title={t.demos.responsive.title}
+          description={t.demos.responsive.description}
+          code={responsiveCode}
+        >
+          <Stack direction={{ xs: "column", md: "row" }} gap="sm" wrap={{ xs: false, sm: true }}>
+            <StackSwatch color="primary" width={WIDE} />
+            <StackSwatch color="secondary" width={WIDE} />
+            <StackSwatch color="accent" width={WIDE} />
           </Stack>
         </DemoCard>
       </DocSection>
@@ -359,100 +367,19 @@ export default function StackDoc() {
         <DemoCard title={t.demos.gap.title} description={t.demos.gap.description} code={gapCode}>
           <Stack gap="xl">
             <Stack direction="row" gap="xs">
-              <Box
-                sx={[
-                  {
-                    bgcolor: "primary.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "primary.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "primary.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
+              <StackSwatch color="primary" width={SQUARE} />
+              <StackSwatch color="primary" width={SQUARE} />
+              <StackSwatch color="primary" width={SQUARE} />
             </Stack>
             <Stack direction="row" gap="md">
-              <Box
-                sx={[
-                  {
-                    bgcolor: "secondary.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "secondary.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "secondary.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
+              <StackSwatch color="secondary" width={SQUARE} />
+              <StackSwatch color="secondary" width={SQUARE} />
+              <StackSwatch color="secondary" width={SQUARE} />
             </Stack>
             <Stack direction="row" gap="xl">
-              <Box
-                sx={[
-                  {
-                    bgcolor: "accent.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "accent.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "accent.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
+              <StackSwatch color="accent" width={SQUARE} />
+              <StackSwatch color="accent" width={SQUARE} />
+              <StackSwatch color="accent" width={SQUARE} />
             </Stack>
           </Stack>
         </DemoCard>
@@ -464,36 +391,9 @@ export default function StackDoc() {
           code={alignCode}
         >
           <Stack direction="row" gap="sm" alignItems="end">
-            <Box
-              sx={[
-                {
-                  bgcolor: "primary.main",
-                  width: "3rem",
-                  height: "2rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "secondary.main",
-                  width: "3rem",
-                  height: "4rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "accent.main",
-                  width: "3rem",
-                  height: "5.5rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
+            <StackSwatch color="primary" width={SQUARE} height="2rem" />
+            <StackSwatch color="secondary" width={SQUARE} height="4rem" />
+            <StackSwatch color="accent" width={SQUARE} height="5.5rem" />
           </Stack>
         </DemoCard>
       </DocSection>
@@ -505,36 +405,9 @@ export default function StackDoc() {
           align="stretch"
         >
           <Stack direction="row" gap="sm" justifyContent="space-between">
-            <Box
-              sx={[
-                {
-                  bgcolor: "primary.main",
-                  width: "3rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "secondary.main",
-                  width: "3rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "accent.main",
-                  width: "3rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
+            <StackSwatch color="primary" width={SQUARE} />
+            <StackSwatch color="secondary" width={SQUARE} />
+            <StackSwatch color="accent" width={SQUARE} />
           </Stack>
         </DemoCard>
       </DocSection>
@@ -546,56 +419,11 @@ export default function StackDoc() {
           align="stretch"
         >
           <Stack direction="row" gap="sm" wrap>
-            <Box
-              sx={[
-                {
-                  bgcolor: "primary.main",
-                  width: "6rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "secondary.main",
-                  width: "6rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "accent.main",
-                  width: "6rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "primary.main",
-                  width: "6rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
-            <Box
-              sx={[
-                {
-                  bgcolor: "secondary.main",
-                  width: "6rem",
-                  height: "3rem",
-                },
-                squircleClip(tokens.radius.xs),
-              ]}
-            />
+            <StackSwatch color="primary" width={WIDE} />
+            <StackSwatch color="secondary" width={WIDE} />
+            <StackSwatch color="accent" width={WIDE} />
+            <StackSwatch color="primary" width={WIDE} />
+            <StackSwatch color="secondary" width={WIDE} />
           </Stack>
         </DemoCard>
       </DocSection>
@@ -615,26 +443,8 @@ export default function StackDoc() {
             ]}
           >
             <Stack direction="row" padding="lg" gap="sm">
-              <Box
-                sx={[
-                  {
-                    bgcolor: "primary.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "accent.main",
-                    width: "3rem",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
+              <StackSwatch color="primary" width={SQUARE} />
+              <StackSwatch color="accent" width={SQUARE} />
             </Stack>
           </Box>
         </DemoCard>
@@ -653,24 +463,8 @@ export default function StackDoc() {
             }}
           >
             <Stack fill gap="sm" justifyContent="space-between">
-              <Box
-                sx={[
-                  {
-                    bgcolor: "primary.main",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
-              <Box
-                sx={[
-                  {
-                    bgcolor: "accent.main",
-                    height: "3rem",
-                  },
-                  squircleClip(tokens.radius.xs),
-                ]}
-              />
+              <StackSwatch color="primary" />
+              <StackSwatch color="accent" />
             </Stack>
           </Box>
         </DemoCard>

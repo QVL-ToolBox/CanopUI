@@ -45,7 +45,7 @@ export function ToolbarSearch({ config }: ToolbarSearchProps) {
         },
       }}
       sx={{
-        flex: 1,
+        flex: { xs: "1 1 100%", sm: "1 1 0%" },
         minWidth: 0,
         maxWidth: { sm: "24rem" },
         "& .MuiOutlinedInput-root": {

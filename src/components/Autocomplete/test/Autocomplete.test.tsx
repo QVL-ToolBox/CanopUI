@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { CanopThemeProvider } from "../../../theme";
 import { CanopI18nProvider } from "../../../i18n";
 import {
@@ -9,144 +9,429 @@ import {
   type CanopAutocompleteOption,
   type CanopAutocompleteProps,
 } from "../Autocomplete";
-import { foldForSearch } from "../foldForSearch";
+import { foldForSearch } from "../../_shared/foldText";
 
 const OPTIONS: CanopAutocompleteOption[] = [
   { value: "21", label: "Côte-d'Or" },
   { value: "29", label: "Finistère" },
   { value: "75", label: "Paris" },
   { value: "13", label: "Bouches-du-Rhône" },
-  { value: "06", label: "Alpes-Maritimes" },
-  { value: "31", label: "Haute-Garonne" },
-  { value: "68", label: "Haut-Rhin" },
+  { value: "42", label: "Saint-Étienne" },
 ];
 
-function poser(ui: React.ReactNode, locale: "fr" | "en" = "fr") {
-  return render(
+const LOIRES: CanopAutocompleteOption[] = [
+  { value: "42", label: "Loire" },
+  { value: "44", label: "Loire-Atlantique" },
+];
+
+function habiller(ui: ReactNode) {
+  return (
     <CanopThemeProvider>
-      <CanopI18nProvider locale={locale}>{ui}</CanopI18nProvider>
-    </CanopThemeProvider>,
+      <CanopI18nProvider locale="fr">{ui}</CanopI18nProvider>
+    </CanopThemeProvider>
   );
 }
 
-type ProprietesControle = Partial<
-  Omit<CanopAutocompleteProps, "options" | "value" | "inputValue" | "onInputChange">
->;
+function poser(ui: ReactNode) {
+  const rendu = render(habiller(ui));
+  return { ...rendu, reposer: (suivant: ReactNode) => rendu.rerender(habiller(suivant)) };
+}
 
-function Controle({ onChange, ...rest }: ProprietesControle) {
-  const [value, setValue] = useState("");
-  const [texte, setTexte] = useState("");
+type ProprietesControle = Partial<Omit<CanopAutocompleteProps, "value">> & { initiale?: string };
+
+function Controle({ onChange, initiale = "", options = OPTIONS, ...rest }: ProprietesControle) {
+  const [value, setValue] = useState(initiale);
   return (
     <Autocomplete
-      options={OPTIONS}
+      options={options}
       value={value}
-      onChange={(next) => {
-        setValue(next);
-        onChange?.(next);
+      onChange={(suivante) => {
+        setValue(suivante);
+        onChange?.(suivante);
       }}
-      inputValue={texte}
-      onInputChange={setTexte}
       label="Département"
       {...rest}
     />
   );
 }
 
-describe("Autocomplete", () => {
-  it("propose les options qui correspondent à la saisie", async () => {
+function champ(nom = "Département"): HTMLInputElement {
+  return screen.getByRole("textbox", { name: nom }) as HTMLInputElement;
+}
+
+function texteFantome(): string {
+  const input = champ();
+  const calque = (input.parentElement as HTMLElement).querySelector<HTMLElement>(
+    ":scope > [aria-hidden='true']:not(fieldset)",
+  );
+  if (!calque) return "";
+  const texte = calque.textContent ?? "";
+  return texte.startsWith(input.value) ? texte.slice(input.value.length).replace(/Tab$/, "") : "";
+}
+
+async function saisir(texte: string, nom?: string) {
+  await userEvent.type(champ(nom), texte);
+}
+
+function quitterLeChamp() {
+  act(() => champ().blur());
+}
+
+describe("Autocomplete — AC9 remplacement de la liste", () => {
+  it("n'expose ni combobox, ni liste, ni option", async () => {
     poser(<Controle />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "pari");
+    await saisir("pa");
 
-    expect(screen.getByRole("option", { name: "Paris" })).toBeInTheDocument();
-    expect(screen.queryByRole("option", { name: "Finistère" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
+    expect(screen.queryByRole("listbox")).not.toBeInTheDocument();
+    expect(screen.queryAllByRole("option")).toHaveLength(0);
   });
 
-  it("ignore les accents, que le clavier ne facilite pas", async () => {
+  it("est un champ texte à texte fantôme bâti sur les libellés", async () => {
     poser(<Controle />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "cote");
+    await saisir("fin");
 
-    expect(screen.getByRole("option", { name: "Côte-d'Or" })).toBeInTheDocument();
+    expect(champ()).toHaveAttribute("aria-autocomplete", "inline");
+    expect(texteFantome()).toBe("istère");
   });
 
-  it("ignore la casse", async () => {
-    poser(<Controle />);
+  it("se rabat sur la value d'une option sans libellé", async () => {
+    poser(<Controle options={[{ value: "Lyon" }]} />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "FINIS");
+    await saisir("ly");
 
-    expect(screen.getByRole("option", { name: "Finistère" })).toBeInTheDocument();
+    expect(texteFantome()).toBe("on");
   });
+});
 
-  it("retient la première suggestion sur Entrée", async () => {
+describe("Autocomplete — AC10 valeur", () => {
+  it("transmet la value de l'option à l'acceptation", async () => {
     const onChange = vi.fn();
     poser(<Controle onChange={onChange} />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "cote");
-    await userEvent.keyboard("{Enter}");
+    await saisir("pa");
+    await userEvent.keyboard("{Tab}");
 
-    expect(onChange).toHaveBeenCalledWith("21");
+    expect(onChange).toHaveBeenLastCalledWith("75");
+    expect(champ()).toHaveValue("Paris");
   });
 
-  it("rend la valeur et non le libellé", async () => {
+  it("transmet la value quand la saisie normalisée est exactement un libellé", async () => {
     const onChange = vi.fn();
     poser(<Controle onChange={onChange} />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "pari");
-    await userEvent.click(screen.getByRole("option", { name: "Paris" }));
+    await saisir("PARIS");
 
-    expect(onChange).toHaveBeenCalledWith("75");
+    expect(onChange).toHaveBeenLastCalledWith("75");
   });
 
-  it("navigue au clavier dans les suggestions", async () => {
+  it("n'appelle onChange que si la value change", async () => {
     const onChange = vi.fn();
     poser(<Controle onChange={onChange} />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "a");
-    await userEvent.keyboard("{ArrowDown}{Enter}");
-
-    expect(onChange).toHaveBeenCalled();
-  });
-
-  it("dit qu'il n'a rien trouvé", async () => {
-    poser(<Controle />);
-
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "zzzz");
-
-    expect(screen.getByText("Aucune correspondance")).toBeInTheDocument();
-  });
-
-  it("refuse par défaut une saisie hors liste", async () => {
-    const onChange = vi.fn();
-    poser(<Controle onChange={onChange} />);
-
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "Atlantide");
-    await userEvent.keyboard("{Enter}");
-
+    await saisir("zz");
     expect(onChange).not.toHaveBeenCalled();
+
+    await userEvent.clear(champ());
+    await saisir("paris");
+    await userEvent.keyboard("{Tab}");
+
+    expect(onChange.mock.calls).toEqual([["75"]]);
   });
 
-  it("accepte une saisie libre quand on le lui demande", async () => {
+  it("affiche le libellé d'une value venue de l'extérieur", () => {
+    const { reposer } = poser(
+      <Autocomplete options={OPTIONS} value="75" onChange={vi.fn()} label="Département" />,
+    );
+    expect(champ()).toHaveValue("Paris");
+
+    reposer(<Autocomplete options={OPTIONS} value="21" onChange={vi.fn()} label="Département" />);
+
+    expect(champ()).toHaveValue("Côte-d'Or");
+  });
+
+  it("affiche le libellé quand les options arrivent après la value", () => {
+    const { reposer } = poser(
+      <Autocomplete options={[]} value="29" onChange={vi.fn()} label="Département" />,
+    );
+
+    reposer(<Autocomplete options={OPTIONS} value="29" onChange={vi.fn()} label="Département" />);
+
+    expect(champ()).toHaveValue("Finistère");
+  });
+
+  it("retrouve le libellé dans une liste reconstruite", () => {
+    const { reposer } = poser(
+      <Autocomplete options={[...OPTIONS]} value="75" onChange={vi.fn()} label="Département" />,
+    );
+
+    reposer(
+      <Autocomplete
+        options={OPTIONS.map((option) => ({ ...option }))}
+        value="75"
+        onChange={vi.fn()}
+        label="Département"
+      />,
+    );
+
+    expect(champ()).toHaveValue("Paris");
+  });
+});
+
+describe("Autocomplete — AC11 correspondance exacte", () => {
+  it("retient le libellé exact sans proposer d'option plus longue", async () => {
+    const onChange = vi.fn();
+    poser(
+      <>
+        <Controle options={LOIRES} onChange={onChange} />
+        <button type="button">Suivant</button>
+      </>,
+    );
+
+    await saisir("Loire");
+
+    expect(onChange).toHaveBeenLastCalledWith("42");
+    expect(texteFantome()).toBe("");
+  });
+
+  it("quitte le champ sur Tab sans rien changer", async () => {
+    const onChange = vi.fn();
+    poser(
+      <>
+        <Controle options={LOIRES} onChange={onChange} />
+        <button type="button">Suivant</button>
+      </>,
+    );
+
+    await saisir("Loire");
+    await userEvent.tab();
+
+    expect(screen.getByRole("button", { name: "Suivant" })).toHaveFocus();
+    expect(champ()).toHaveValue("Loire");
+    expect(onChange.mock.calls).toEqual([["42"]]);
+  });
+
+  it("accepte le fantôme avec Entrée", async () => {
+    const onChange = vi.fn();
+    poser(<Controle onChange={onChange} />);
+
+    await saisir("pa");
+    await userEvent.keyboard("{Enter}");
+
+    expect(onChange).toHaveBeenLastCalledWith("75");
+    expect(champ()).toHaveValue("Paris");
+  });
+});
+
+describe("Autocomplete — AC11 normalisation", () => {
+  it.each([
+    ["cote", "-d'Or"],
+    ["cote ", "d'Or"],
+    ["cote d", "'Or"],
+  ])("« %s » affiche « %s »", async (saisie, suite) => {
+    poser(<Controle />);
+
+    await saisir(saisie);
+
+    expect(texteFantome()).toBe(suite);
+  });
+
+  it("donne le libellé exact et sa value à l'acceptation", async () => {
+    const onChange = vi.fn();
+    poser(<Controle onChange={onChange} />);
+
+    await saisir("cote d");
+    await userEvent.keyboard("{Tab}");
+
+    expect(champ()).toHaveValue("Côte-d'Or");
+    expect(onChange).toHaveBeenLastCalledWith("21");
+  });
+
+  it("ignore les espaces multiples et la ponctuation en trop", async () => {
+    const onChange = vi.fn();
+    poser(<Controle onChange={onChange} />);
+
+    await saisir("bouches  du   rhone");
+
+    expect(onChange).toHaveBeenLastCalledWith("13");
+  });
+
+  it("respecte une normalisation personnalisée", async () => {
+    const onChange = vi.fn();
+    const normalize = (texte: string) => foldForSearch(texte).replace(/\bst\b/g, "saint");
+    poser(<Controle onChange={onChange} normalize={normalize} />);
+
+    await saisir("st");
+    expect(texteFantome()).not.toBe("");
+    await userEvent.keyboard("{Tab}");
+
+    expect(champ()).toHaveValue("Saint-Étienne");
+    expect(onChange).toHaveBeenLastCalledWith("42");
+  });
+
+  it("reconnaît une saisie exacte à travers la normalisation personnalisée", async () => {
+    const onChange = vi.fn();
+    const normalize = (texte: string) => foldForSearch(texte).replace(/\bst\b/g, "saint");
+    poser(<Controle onChange={onChange} normalize={normalize} />);
+
+    await saisir("st etienne");
+
+    expect(onChange).toHaveBeenLastCalledWith("42");
+  });
+
+  it("ne propose pas un libellé impossible à découper proprement", async () => {
+    const aLEnvers = (texte: string) => texte.toLowerCase().split("").reverse().join("");
+    poser(<Controle options={[{ value: "75", label: "Paris" }]} normalize={aLEnvers} />);
+
+    await saisir("s");
+
+    expect(texteFantome()).toBe("");
+  });
+});
+
+describe("Autocomplete — AC12 hors liste", () => {
+  it("transmet une value vide pour une saisie hors liste", async () => {
+    const onChange = vi.fn();
+    poser(<Controle onChange={onChange} initiale="75" />);
+
+    await userEvent.clear(champ());
+    await saisir("Atlantide");
+
+    expect(onChange).toHaveBeenLastCalledWith("");
+    expect(onChange).not.toHaveBeenCalledWith("Atlantide");
+  });
+
+  it("reprend au blur le libellé de la value retenue", async () => {
+    const onChange = vi.fn();
+    poser(<Autocomplete options={OPTIONS} value="75" onChange={onChange} label="Département" />);
+
+    await userEvent.clear(champ());
+    await saisir("Atlantide");
+    quitterLeChamp();
+
+    expect(onChange).toHaveBeenCalledWith("");
+    expect(champ()).toHaveValue("Paris");
+  });
+
+  it("vide le champ au blur quand plus rien n'est retenu", async () => {
+    poser(<Controle initiale="75" />);
+
+    await userEvent.clear(champ());
+    await saisir("Atlantide");
+    quitterLeChamp();
+
+    expect(champ()).toHaveValue("");
+  });
+
+  it("transmet le texte brut avec allowFreeText", async () => {
     const onChange = vi.fn();
     poser(<Controle onChange={onChange} allowFreeText />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "Atlantide");
+    await saisir("Atlantide");
+    quitterLeChamp();
+
+    expect(onChange).toHaveBeenLastCalledWith("Atlantide");
+    expect(champ()).toHaveValue("Atlantide");
+  });
+});
+
+describe("Autocomplete — AC13 clearOnSelect", () => {
+  it("transmet l'option acceptée puis vide le champ", async () => {
+    const onChange = vi.fn();
+    poser(<Controle onChange={onChange} clearOnSelect />);
+
+    await saisir("pa");
+    await userEvent.keyboard("{Tab}");
+
+    expect(onChange).toHaveBeenLastCalledWith("75");
+    expect(champ()).toHaveValue("");
+  });
+
+  it("enchaîne les saisies sans émettre de chaîne vide ni de texte libre", async () => {
+    const onChange = vi.fn();
+    poser(<Controle onChange={onChange} clearOnSelect />);
+
+    await saisir("zz");
+    await userEvent.clear(champ());
+    await saisir("paris");
+    await saisir("cote");
+    await userEvent.keyboard("{Tab}");
+
+    expect(onChange.mock.calls).toEqual([["75"], ["21"]]);
+    expect(champ()).toHaveValue("");
+  });
+
+  it("ne retient pas immédiatement une saisie exacte qu'une autre option prolonge", async () => {
+    const onChange = vi.fn();
+    poser(<Controle options={LOIRES} onChange={onChange} clearOnSelect />);
+
+    await saisir("loire");
+
+    expect(onChange).not.toHaveBeenCalled();
+    expect(champ()).toHaveValue("loire");
+  });
+
+  it("retient au blur une saisie exacte qu'une autre option prolonge", async () => {
+    const onChange = vi.fn();
+    poser(<Controle options={LOIRES} onChange={onChange} clearOnSelect />);
+
+    await saisir("loire");
+    quitterLeChamp();
+
+    expect(onChange.mock.calls).toEqual([["42"]]);
+    expect(champ()).toHaveValue("");
+  });
+
+  it("retient Loire-Atlantique avec Entrée et vide le champ", async () => {
+    const onChange = vi.fn();
+    poser(<Controle options={LOIRES} onChange={onChange} clearOnSelect />);
+
+    await saisir("loire-a");
     await userEvent.keyboard("{Enter}");
 
-    expect(onChange).toHaveBeenCalledWith("Atlantide");
+    expect(onChange.mock.calls).toEqual([["44"]]);
+    expect(champ()).toHaveValue("");
   });
 
-  it("plafonne les suggestions quand on le lui demande", async () => {
-    poser(<Controle maxSuggestions={2} />);
+  it("permet d'atteindre Loire-Atlantique au clavier", async () => {
+    const onChange = vi.fn();
+    poser(<Controle options={LOIRES} onChange={onChange} clearOnSelect />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "e");
+    await saisir("loire-a");
+    await userEvent.keyboard("{Tab}");
 
-    expect(screen.getAllByRole("option").length).toBeLessThanOrEqual(2);
+    expect(onChange.mock.calls).toEqual([["44"]]);
+    expect(champ()).toHaveValue("");
   });
 
-  it("affiche l'erreur qu'on lui passe", () => {
-    poser(<Controle error="Département inconnu" />);
-    expect(screen.getByText("Département inconnu")).toBeInTheDocument();
+  it("ne transmet pas de texte libre même avec allowFreeText", async () => {
+    const onChange = vi.fn();
+    poser(<Controle onChange={onChange} clearOnSelect allowFreeText />);
+
+    await saisir("Atlantide");
+
+    expect(onChange).not.toHaveBeenCalledWith("Atlantide");
+    expect(onChange).not.toHaveBeenCalledWith("");
+  });
+});
+
+describe("Autocomplete — AC14 props conservées", () => {
+  it("se laisse piloter par inputValue et onInputChange", async () => {
+    const onInputChange = vi.fn();
+    const { reposer } = poser(
+      <Controle inputValue="Fi" onInputChange={onInputChange} label="Département" />,
+    );
+    expect(champ()).toHaveValue("Fi");
+
+    await saisir("n");
+    expect(onInputChange).toHaveBeenLastCalledWith("Fin");
+    expect(champ()).toHaveValue("Fi");
+
+    reposer(<Controle inputValue="Fin" onInputChange={onInputChange} label="Département" />);
+    expect(champ()).toHaveValue("Fin");
+    expect(texteFantome()).toBe("istère");
   });
 
   it("se laisse nommer sans libellé visible", () => {
@@ -158,70 +443,83 @@ describe("Autocomplete", () => {
         ariaLabel="Choisir un département"
       />,
     );
-    expect(screen.getByRole("combobox", { name: "Choisir un département" })).toBeInTheDocument();
+
+    expect(champ("Choisir un département")).toBeInTheDocument();
   });
 
-  it("retrouve la sélection dans une liste reconstruite", () => {
-    const { rerender } = poser(
-      <Autocomplete options={[...OPTIONS]} value="75" onChange={vi.fn()} label="Département" />,
-    );
-    rerender(
-      <CanopThemeProvider>
-        <CanopI18nProvider locale="fr">
-          <Autocomplete
-            options={OPTIONS.map((option) => ({ ...option }))}
-            value="75"
-            onChange={vi.fn()}
-            label="Département"
-          />
-        </CanopI18nProvider>
-      </CanopThemeProvider>,
-    );
+  it("affiche le placeholder et le texte d'aide", () => {
+    poser(<Controle placeholder="Tapez un nom" helperText="Un seul département" />);
 
-    expect(screen.getByRole("combobox", { name: "Département" })).toHaveValue("Paris");
+    expect(champ()).toHaveAttribute("placeholder", "Tapez un nom");
+    expect(screen.getByText("Un seul département")).toBeInTheDocument();
   });
 
-  it("suit la langue courante", async () => {
-    poser(<Controle />, "en");
+  it("affiche l'erreur", () => {
+    poser(<Controle error="Département inconnu" />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "zzzz");
+    expect(screen.getByText("Département inconnu")).toBeInTheDocument();
+    expect(champ()).toHaveAttribute("aria-invalid", "true");
+  });
 
-    expect(screen.getByText("No match")).toBeInTheDocument();
+  it("se désactive", () => {
+    poser(<Controle disabled />);
+
+    expect(champ()).toBeDisabled();
+  });
+
+  it("prend toute la largeur avec fullWidth", () => {
+    const { container } = poser(<Controle fullWidth />);
+
+    expect(container.querySelector(".MuiFormControl-root")).toHaveClass("MuiFormControl-fullWidth");
+  });
+
+  it("prend le focus au montage avec autoFocus", () => {
+    poser(<Controle autoFocus />);
+
+    expect(champ()).toHaveFocus();
+  });
+
+  it("applique la petite taille", () => {
+    poser(<Controle size="small" />);
+
+    expect(champ().closest(".MuiInputBase-root")).toHaveClass("MuiInputBase-sizeSmall");
+  });
+
+  it("accepte maxSuggestions sans effet", async () => {
+    poser(<Controle maxSuggestions={0} />);
+
+    await saisir("pa");
+
+    expect(texteFantome()).toBe("ris");
   });
 });
 
-describe("Autocomplete — la normalisation", () => {
-  it("ignore les séparateurs, que personne ne tape", async () => {
-    poser(<Controle />);
+describe("Autocomplete — libellés en double", () => {
+  it("avertit en développement", () => {
+    const avertir = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    poser(
+      <Controle
+        options={[
+          { value: "1", label: "Paris" },
+          { value: "2", label: "Paris" },
+        ]}
+      />,
+    );
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "cote d or");
-
-    expect(screen.getByRole("option", { name: "Côte-d'Or" })).toBeInTheDocument();
+    expect(avertir).toHaveBeenCalled();
+    avertir.mockRestore();
   });
+});
 
-  it("ignore aussi les espaces multiples et la ponctuation en trop", async () => {
-    poser(<Controle />);
+describe("Autocomplete — saisie exacte quel que soit l'ordre", () => {
+  it("ne propose pas « -Atlantique » même quand l'option longue vient en premier", async () => {
+    const onChange = vi.fn();
+    poser(<Controle options={[...LOIRES].reverse()} onChange={onChange} />);
 
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "bouches  du   rh");
+    await saisir("Loire");
 
-    expect(screen.getByRole("option", { name: "Bouches-du-Rhône" })).toBeInTheDocument();
-  });
-
-  it("accepte une normalisation maison", async () => {
-    const normalize = (texte: string) => foldForSearch(texte).replace(/\bfini\b/g, "finistere");
-    poser(<Controle normalize={normalize} />);
-
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "fini");
-
-    expect(screen.getByRole("option", { name: "Finistère" })).toBeInTheDocument();
-  });
-
-  it("plafonne toujours les suggestions avec un filtre maison", async () => {
-    poser(<Controle normalize={(texte) => texte.toLowerCase()} maxSuggestions={1} />);
-
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "a");
-
-    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(onChange).toHaveBeenLastCalledWith("42");
+    expect(texteFantome()).toBe("");
   });
 });
 
@@ -234,17 +532,5 @@ describe("foldForSearch", () => {
 
   it("garde les chiffres, qui font partie de bien des libellés", () => {
     expect(foldForSearch("Paris 15e")).toBe("paris 15e");
-  });
-});
-
-describe("Autocomplete — la mise en avant", () => {
-  it("retient l'option atteinte à la flèche, et non la première", async () => {
-    const onChange = vi.fn();
-    poser(<Controle onChange={onChange} />);
-
-    await userEvent.type(screen.getByRole("combobox", { name: "Département" }), "haut");
-    await userEvent.keyboard("{ArrowDown}{Enter}");
-
-    expect(onChange).toHaveBeenCalledWith("68");
   });
 });

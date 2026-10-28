@@ -1,7 +1,8 @@
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import { Heading, Stack, Text, tokens } from "@canop/ui";
-import { CodeBlock, monoFontFamily } from "../../kit/CodeBlock";
+import { CodeBlock } from "../../kit/CodeBlock";
+import { monoFontFamily } from "../../kit/codeStyle";
 import { DocPage } from "../../kit/DocPage";
 import { DocSection } from "../../kit/DocSection";
 import { useDocLocale } from "../../i18n/useDocLocale";
@@ -69,7 +70,7 @@ const fr = {
   font: {
     title: "Les fontes",
     description:
-      "Les deux sont auto-hébergées dans le paquet, chacune en deux sous-ensembles latin et latin étendu. Chivo est variable : un seul fichier couvre tout l'axe de graisse, de 100 à 900, sans requête supplémentaire quand on change de graisse. Titan One ne publie qu'un seul poids, le 400 — les titres sont donc composés à ce poids, et non au 700 d'avant la 3.0 : demander un gras ferait fabriquer au navigateur un faux gras, plus lourd et plus sale que le dessin d'origine.",
+      "Les deux sont auto-hébergées dans le paquet, chacune en deux sous-ensembles latin et latin étendu. Chivo est variable : un seul fichier couvre tout l'axe de graisse, de 100 à 900, sans requête supplémentaire quand on change de graisse. Titan One ne publie qu'un seul poids, le 400 — les titres sont donc composés à ce poids, et non au 700 d'avant la 0.0 : demander un gras ferait fabriquer au navigateur un faux gras, plus lourd et plus sale que le dessin d'origine.",
     sample: "Titan One — titres",
     sampleBody: "Chivo — police variable",
   },
@@ -134,7 +135,7 @@ const en: typeof fr = {
   font: {
     title: "The typefaces",
     description:
-      "Both are self-hosted inside the package, each in two subsets, latin and latin extended. Chivo is variable: a single file covers the whole weight axis, from 100 to 900, with no extra request when the weight changes. Titan One publishes a single weight, 400 — headings are therefore set at that weight rather than the 700 used before 3.0: asking for bold would make the browser fake it, heavier and dirtier than the original drawing.",
+      "Both are self-hosted inside the package, each in two subsets, latin and latin extended. Chivo is variable: a single file covers the whole weight axis, from 100 to 900, with no extra request when the weight changes. Titan One publishes a single weight, 400 — headings are therefore set at that weight rather than the 700 used before 0.0: asking for bold would make the browser fake it, heavier and dirtier than the original drawing.",
     sample: "Titan One — headings",
     sampleBody: "Chivo — variable font",
   },
@@ -258,6 +259,7 @@ function Specimen({
             fontWeight: graisse,
             lineHeight: tokens.typography.lineHeight.snug,
             letterSpacing: tokens.typography.letterSpacing.compact,
+            overflowWrap: "anywhere",
           }}
         >
           ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789

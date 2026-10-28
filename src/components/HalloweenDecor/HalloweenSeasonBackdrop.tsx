@@ -16,7 +16,8 @@ export function HalloweenSeasonBackdrop({ behindPageContent }: HalloweenSeasonBa
       scene={decor}
       scope="viewport"
       animated={decor.animated}
-      paused={decor.paused}
+      tabHidden={decor.tabHidden}
+      revealed={decor.revealed}
       toneVariables={decor.toneVariables}
     />
   );

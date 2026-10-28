@@ -16,7 +16,9 @@ export function starSx(spec: HalloweenStarSpec, animated: boolean): CSSObject {
     height: spec.size,
     color: halloweenTone("star"),
     opacity: 0.55,
-    ...(spec.glint ? {} : { borderRadius: "50%", backgroundColor: halloweenTone("star") }),
+    ...(spec.glint
+      ? { "& > svg": { display: "block", width: "100%", height: "100%" } }
+      : { borderRadius: "50%", backgroundColor: halloweenTone("star") }),
     ...when(animated, {
       animation: loop(name, spec.twinkle, spec.delay, "alternate"),
       ...keyframes(STAR_TWINKLE, {

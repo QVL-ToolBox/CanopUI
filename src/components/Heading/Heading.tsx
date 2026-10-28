@@ -1,6 +1,8 @@
 import Typography from "@mui/material/Typography";
-import type { ReactNode } from "react";
+import { useForkRef } from "@mui/material/utils";
+import type { ReactNode, Ref } from "react";
 import { tokens, type CanopBreakpoint } from "../../tokens";
+import { BREAKPOINTS } from "../_shared/responsiveValue";
 import { textToneColor, type CanopTextTone } from "../_shared/textTone";
 
 export type CanopHeadingLevel = 1 | 2 | 3 | 4;
@@ -19,6 +21,9 @@ export type CanopHeadingTextElement = "p" | "span" | "div";
 export type CanopResponsiveHeadingSize = Partial<Record<CanopBreakpoint, CanopHeadingSize>>;
 
 export interface CanopHeadingProps {
+  ref?: Ref<HTMLElement>;
+  /** `-1` rend le titre focalisable par programme, sans l'ajouter à l'ordre de tabulation. */
+  tabIndex?: number;
   level?: CanopHeadingLevel;
   size?: CanopHeadingSize | CanopResponsiveHeadingSize;
   align?: CanopHeadingAlign;
@@ -38,8 +43,6 @@ const sizeMapping = {
   6: tokens.typography.heading.h6,
 } as const;
 
-const breakpointOrder = Object.keys(tokens.breakpoints.values) as CanopBreakpoint[];
-
 type HeadingStyle = (typeof sizeMapping)[CanopHeadingSize];
 
 function responsiveSizeAndLetterSpacingOnly(
@@ -50,7 +53,7 @@ function responsiveSizeAndLetterSpacingOnly(
   const fontSize: Partial<Record<CanopBreakpoint, string>> = { xs: base.fontSize };
   const letterSpacing: Partial<Record<CanopBreakpoint, string>> = { xs: base.letterSpacing };
 
-  for (const breakpoint of breakpointOrder) {
+  for (const breakpoint of BREAKPOINTS) {
     const step = size[breakpoint];
     if (breakpoint === "xs" || step === undefined) continue;
     fontSize[breakpoint] = sizeMapping[step].fontSize;
@@ -75,9 +78,34 @@ function headingStyle(
   return responsiveSizeAndLetterSpacingOnly(size, level);
 }
 
+function largerSize(current: CanopHeadingSize, candidate: CanopHeadingSize): CanopHeadingSize {
+  return candidate < current ? candidate : current;
+}
+
+function largestDisplayedSize(
+  size: CanopHeadingSize | CanopResponsiveHeadingSize | undefined,
+  level: CanopHeadingLevel,
+): CanopHeadingSize {
+  if (size === undefined) return level;
+  if (typeof size === "number") return size;
+  return BREAKPOINTS.reduce<CanopHeadingSize>(
+    (largest, breakpoint) => largerSize(largest, size[breakpoint] ?? largest),
+    size.xs ?? level,
+  );
+}
+
+function headingVariant(
+  size: CanopHeadingSize | CanopResponsiveHeadingSize | undefined,
+  level: CanopHeadingLevel,
+): `h${CanopHeadingSize}` {
+  return `h${largestDisplayedSize(size, level)}`;
+}
+
 const WRAP_LONG_WORDS = { overflowWrap: "break-word" } as const;
 
 export function Heading({
+  ref,
+  tabIndex,
   level = 2,
   size,
   align = "left",
@@ -87,8 +115,13 @@ export function Heading({
   component,
   children,
 }: CanopHeadingProps) {
+  const headingRef = useForkRef<HTMLElement>(ref);
+
   return (
     <Typography
+      ref={headingRef}
+      tabIndex={tabIndex}
+      variant={headingVariant(size, level)}
       component={component ?? `h${level}`}
       align={align}
       gutterBottom={gutterBottom}

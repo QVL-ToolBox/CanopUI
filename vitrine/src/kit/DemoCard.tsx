@@ -1,92 +1,52 @@
 import Box from "@mui/material/Box";
 import Collapse from "@mui/material/Collapse";
-import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
-import { Button, Heading, Icon, squircleClip, Stack, tokens } from "@canop/ui";
+import { Button, Heading, Icon, Stack, Text, squircleClip, tokens } from "@canop/ui";
 import { CodeBlock } from "./CodeBlock";
+import { CopyCodeButton } from "./CopyCodeButton";
+import { DemoStage, type DemoStageAlign } from "./DemoStage";
 import { useDemoCard } from "./useDemoCard";
-import { useDocLocale } from "../i18n/useDocLocale";
-
-const labels = {
-  fr: {
-    showCode: "Afficher le code",
-    hideCode: "Masquer le code",
-    copy: "Copier",
-    copied: "Copié !",
-  },
-  en: {
-    showCode: "Show code",
-    hideCode: "Hide code",
-    copy: "Copy",
-    copied: "Copied!",
-  },
-};
 
 export interface DemoCardProps {
   title: string;
   description?: string;
   code: string;
-  align?: "center" | "start" | "stretch";
+  align?: DemoStageAlign;
   children: ReactNode;
 }
 
-const alignMap = {
-  center: "center",
-  start: "flex-start",
-  stretch: "stretch",
-} as const;
+const FRAME_RADIUS = tokens.radius.sm;
+const HAIRLINE = "0.0625rem";
+const HAIRLINE_BORDER = `${HAIRLINE} solid var(--canop-palette-divider)`;
 
 export function DemoCard({ title, description, code, align = "center", children }: DemoCardProps) {
-  const { showCode, toggleCode, copied, copy } = useDemoCard(code);
-  const t = labels[useDocLocale()];
+  const { showCode, toggleCode, toggleLabel, codeRevealTimeout } = useDemoCard();
 
   return (
     <Stack gap="sm">
-      <Heading level={3} size={5} gutterBottom={false}>
+      <Heading level={3} size={{ xs: 6, md: 5 }} gutterBottom={false}>
         {title}
       </Heading>
-      {description ? (
-        <Typography
-          sx={{
-            color: "text.secondary",
-          }}
-        >
-          {description}
-        </Typography>
-      ) : null}
+      {description ? <Text tone="muted">{description}</Text> : null}
       <Box
         sx={{
-          padding: "0.0625rem",
-          ...squircleClip(tokens.radius.sm),
+          minWidth: 0,
+          padding: HAIRLINE,
           backgroundColor: "var(--canop-palette-divider)",
+          ...squircleClip(FRAME_RADIUS),
         }}
       >
-        <Box sx={squircleClip(`calc(${tokens.radius.sm} - 0.0625rem)`)}>
-          <Box
-            sx={[
-              {
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "1rem",
-                alignItems: alignMap[align],
-                justifyContent: align === "center" ? "center" : "flex-start",
-                padding: { xs: "1.5rem 1rem", md: "2.5rem 2rem" },
-                bgcolor: "background.default",
-              },
-              align === "stretch" ? { flexDirection: "column" } : false,
-            ]}
-          >
-            {children}
-          </Box>
+        <Box sx={{ minWidth: 0, ...squircleClip(`calc(${FRAME_RADIUS} - ${HAIRLINE})`) }}>
+          <DemoStage align={align}>{children}</DemoStage>
           <Box
             sx={{
               display: "flex",
+              flexWrap: "wrap",
               justifyContent: "flex-end",
               gap: "0.5rem",
               padding: "0.5rem 0.75rem",
-              borderTop: "0.0625rem solid",
-              borderColor: "divider",
-              bgcolor: "background.paper",
+              borderTop: HAIRLINE_BORDER,
+              backgroundColor: "background.paper",
             }}
           >
             <Button
@@ -95,24 +55,12 @@ export function DemoCard({ title, description, code, align = "center", children 
               onClick={toggleCode}
               startIcon={<Icon name={showCode ? "eyeOff" : "eye"} size="xs" />}
             >
-              {showCode ? t.hideCode : t.showCode}
+              {toggleLabel}
             </Button>
-            <Button
-              variant="tonal"
-              size="small"
-              onClick={copy}
-              startIcon={<Icon name={copied ? "check" : "file"} size="xs" />}
-            >
-              {copied ? t.copied : t.copy}
-            </Button>
+            <CopyCodeButton code={code} />
           </Box>
-          <Collapse in={showCode}>
-            <Box
-              sx={{
-                borderTop: "0.0625rem solid",
-                borderColor: "divider",
-              }}
-            >
+          <Collapse in={showCode} timeout={codeRevealTimeout}>
+            <Box sx={{ borderTop: HAIRLINE_BORDER }}>
               <CodeBlock code={code} bare />
             </Box>
           </Collapse>

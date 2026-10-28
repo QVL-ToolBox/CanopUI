@@ -1,11 +1,12 @@
-import Box from "@mui/material/Box";
-import { squircleClip } from "../../squircle";
-import Typography from "@mui/material/Typography";
 import { motion } from "framer-motion";
 import type { ReactNode } from "react";
-import { useEnterAnimation } from "../../motion";
 import { Heading, type CanopHeadingLevel } from "../Heading";
 import { Stack } from "../Stack";
+import { EmptyStateDescription } from "./EmptyStateDescription";
+import { EmptyStateIllustration } from "./EmptyStateIllustration";
+import type { EmptyStateIllustrationSx } from "./emptyStateIllustrationSx";
+import type { EmptyStateSizeRecipe } from "./emptyStateSizes";
+import type { EmptyStateMotion } from "./useEmptyStateMotion";
 
 export interface EmptyStateContentProps {
   title: string;
@@ -13,11 +14,13 @@ export interface EmptyStateContentProps {
   icon?: ReactNode;
   action?: ReactNode;
   headingLevel: CanopHeadingLevel;
-  animated: boolean;
+  recipe: EmptyStateSizeRecipe;
+  choreography: EmptyStateMotion;
+  illustrationSx: EmptyStateIllustrationSx;
 }
 
-const iconWrapperBackground =
-  "color-mix(in srgb, var(--canop-palette-primary-main) 12%, var(--canop-palette-background-paper))";
+const FULL_WIDTH = { width: "100%" } as const;
+const ACTION_BREATHING_ROOM = { paddingTop: "0.5rem" } as const;
 
 export function EmptyStateContent({
   title,
@@ -25,57 +28,44 @@ export function EmptyStateContent({
   icon,
   action,
   headingLevel,
-  animated,
+  recipe,
+  choreography,
+  illustrationSx,
 }: EmptyStateContentProps) {
-  const enter = useEnterAnimation({ direction: "up", distance: "0.75rem", disabled: !animated });
-
   return (
     <motion.div
-      initial={enter.initial}
-      animate={enter.animate}
-      transition={enter.transition}
-      style={{ width: "100%" }}
+      initial={choreography.initial}
+      animate="visible"
+      variants={choreography.reveal}
+      style={FULL_WIDTH}
     >
-      <Stack gap="sm" alignItems="center">
+      <Stack gap={recipe.gap} alignItems="center">
         {icon && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: "4rem",
-              height: "4rem",
-              color: "primary.main",
-              marginBottom: "0.5rem",
-              ...squircleClip("var(--canop-radius-xl)"),
-              backgroundColor: iconWrapperBackground,
-            }}
-          >
-            {icon}
-          </Box>
+          <EmptyStateIllustration
+            icon={icon}
+            choreography={choreography}
+            illustrationSx={illustrationSx}
+          />
         )}
-        <Heading level={headingLevel} size={4} align="center" gutterBottom={false}>
-          {title}
-        </Heading>
-        {description && (
-          <Typography
+        <motion.div variants={choreography.rise}>
+          <Heading
+            level={headingLevel}
+            size={recipe.headingSize}
             align="center"
-            sx={{
-              color: "text.secondary",
-              maxWidth: "28rem",
-            }}
+            gutterBottom={false}
           >
-            {description}
-          </Typography>
+            {title}
+          </Heading>
+        </motion.div>
+        {description && (
+          <motion.div variants={choreography.rise} style={FULL_WIDTH}>
+            <EmptyStateDescription description={description} variant={recipe.descriptionVariant} />
+          </motion.div>
         )}
         {action && (
-          <Box
-            sx={{
-              marginTop: "0.5rem",
-            }}
-          >
+          <motion.div variants={choreography.rise} style={ACTION_BREATHING_ROOM}>
             {action}
-          </Box>
+          </motion.div>
         )}
       </Stack>
     </motion.div>
