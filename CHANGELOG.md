@@ -4,6 +4,12 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/) et le versioni
 
 ## [Non publié]
 
+## [2.1.2] - 2026-10-29
+
+### Modifié
+
+- **Publication : jetons lus dans le groupe de variables `paquets-publication`.** `NPM_TOKEN`, `NPMJS_TOKEN` et `GITHUB_MIRROR_TOKEN` ne sont plus des variables de la pipeline : ils viennent d'un groupe de variables réservé à `main` (check « Branch control »), référencé par les seuls jobs `Verdaccio`, `Npmjs` et `Miroir`. Aucun changement de code ni d'API : le paquet est identique à la 2.1.1. Cette version sert aussi de premier test des rebuilds des fronts sans approbation (environnements `<unit>-canopui`).
+
 ## [2.1.1] - 2026-10-29
 
 ### Corrigé

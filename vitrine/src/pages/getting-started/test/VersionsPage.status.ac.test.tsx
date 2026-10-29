@@ -6,6 +6,7 @@ import { VersionsPage } from "../VersionsPage";
 
 const RENDU_LENT = 20_000;
 const VERSIONS_ANTERIEURES = [
+  "2.1.1",
   "2.1.0",
   "2.0.0",
   "1.3.4",
@@ -42,10 +43,10 @@ function precede(avant: Element, apres: Element) {
 
 describe("page Versions de la vitrine", () => {
   it(
-    "marque 2.1.1 comme la version en production",
+    "marque 2.1.2 comme la version en production",
     () => {
       monte(<VersionsPage />);
-      expect(within(carteDeVersion("2.1.1")).getByText("En production")).not.toBeNull();
+      expect(within(carteDeVersion("2.1.2")).getByText("En production")).not.toBeNull();
     },
     RENDU_LENT,
   );
@@ -72,11 +73,11 @@ describe("page Versions de la vitrine", () => {
   );
 
   it(
-    "annonce 2.1.1 comme la version publiée",
+    "annonce 2.1.2 comme la version publiée",
     () => {
       monte(<VersionsPage />);
-      expect(screen.getAllByText("2.1.1").length).toBeGreaterThan(0);
-      expect(screen.getByText(/2\.1\.1 publiée le/)).not.toBeNull();
+      expect(screen.getAllByText("2.1.2").length).toBeGreaterThan(0);
+      expect(screen.getByText(/2\.1\.2 publiée le/)).not.toBeNull();
     },
     RENDU_LENT,
   );
