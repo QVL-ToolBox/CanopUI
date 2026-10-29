@@ -77,7 +77,7 @@ function traitsDuHaut(racine: HTMLElement): CSSStyleRule[] {
     const style = regle.style;
     const bordureHaute =
       style.getPropertyValue("border-style").startsWith("solid") &&
-      parseFloat(style.getPropertyValue("border-width").split(/\s+/)[0]) > 0 &&
+      !/^(0[a-z]*)?$/.test(style.getPropertyValue("border-width").split(/\s+(?![^(]*\))/)[0]) &&
       style.getPropertyValue("border-color").includes("var(--canop-input-outline)");
     const degrade = ["background", "background-image"].some((propriete) =>
       style.getPropertyValue(propriete).includes("var(--canop-input-outline)"),
@@ -194,12 +194,12 @@ describe("AC2 - le contour suit l'encoche du label flottant", () => {
     );
 
     it.each(CHAMPS_A_LABEL_FLOTTANT)(
-      "%s : le fieldset notched redessine le trait du haut à la couleur du contour, découpé au squircle",
+      "%s : le fieldset notched trace seul tout le contour à la couleur du contour, découpé au squircle",
       (_nom, ui) => {
         const racine = racineDuChamp(rendre(ui, mode).container);
         const regle = regleFieldsetNotched(racine);
         expect(regle).toBeDefined();
-        expect(regle!.style.getPropertyValue("clip-path")).toBe("var(--canop-squircle-clip)");
+        expect(regle!.style.getPropertyValue("clip-path")).toMatch(/^polygon\(/);
         expect(traitsDuHaut(racine).length).toBeGreaterThan(0);
         expect(getComputedStyle(racine).getPropertyValue("--canop-squircle-clip")).toContain(
           "polygon(",
@@ -207,14 +207,11 @@ describe("AC2 - le contour suit l'encoche du label flottant", () => {
       },
     );
 
-    it.each(CHAMPS_A_LABEL_FLOTTANT)("%s : le ::before masque sa bande supérieure", (_nom, ui) => {
+    it.each(CHAMPS_A_LABEL_FLOTTANT)("%s : le ::before ne peint plus le contour", (_nom, ui) => {
       const racine = racineDuChamp(rendre(ui, mode).container);
       const regle = regleAvantMasque(racine);
       expect(regle).toBeDefined();
-      const masque = regle!.style.getPropertyValue("mask-image");
-      expect(masque).toMatch(/^linear-gradient\(transparent/);
-      expect(masque).toMatch(/\bblack\b/);
-      expect(masque).not.toContain("var(");
+      expect(regle!.style.getPropertyValue("display")).toBe("none");
     });
 
     it.each(CHAMPS_A_LABEL_FLOTTANT)(

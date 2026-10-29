@@ -226,8 +226,6 @@ Le sélecteur `html:root` est volontairement plus spécifique que le `:root` ém
 
 Tous les composants consommant le thème (boutons, champs, surfaces…) reflètent immédiatement les nouvelles valeurs, car MUI référence `var(--canop-…)` dans les styles émis.
 
-Les champs à contour lisent deux variables posées sur leur racine `.MuiOutlinedInput-root` : `--canop-input-outline` (couleur du contour, selon l'état) et `--canop-input-fill` (fond du champ). Pour un champ sur un fond particulier, surcharger ces deux variables sur la racine du champ, jamais ses `::before` / `::after` : le haut du champ, encoche du label comprise, est peint par le `<fieldset>` à partir des mêmes variables.
-
 Variables disponibles : ouvrir les DevTools sur `:root` — toutes les variables générées portent le préfixe `--canop-`.
 
 ## Réserves de la coque

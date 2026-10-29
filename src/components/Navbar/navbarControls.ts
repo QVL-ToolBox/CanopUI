@@ -10,7 +10,6 @@ import {
 } from "./navbarTone";
 
 const INPUT_OUTLINE_VAR = "--canop-input-outline";
-const INPUT_FILL_VAR = "--canop-input-fill";
 const FIELD = ".MuiOutlinedInput-root.MuiInputBase-root";
 const FIELD_ENGAGED = fieldHoverOrSelectKeyboardFocus(`& ${FIELD}`);
 const THEME_TOGGLE_TRACK = 'button[role="switch"]';
@@ -22,8 +21,8 @@ export function navbarControlsSx(controlBackground: string): CSSObject {
     [`& ${THEME_TOGGLE_THUMB}::before`]: { backgroundColor: NAVBAR_ACTIVE_FILL },
     [`& ${FIELD}`]: {
       [INPUT_OUTLINE_VAR]: NAVBAR_FIELD_OUTLINE,
-      [INPUT_FILL_VAR]: NAVBAR_FIELD_FILL,
       color: NAVBAR_TEXT_STRONG,
+      "&::after": { backgroundColor: NAVBAR_FIELD_FILL },
     },
     [FIELD_ENGAGED]: { [INPUT_OUTLINE_VAR]: NAVBAR_FIELD_OUTLINE_ENGAGED },
     "& .MuiSelect-icon": { color: NAVBAR_TEXT },

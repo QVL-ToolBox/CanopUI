@@ -2,7 +2,7 @@ import { createTheme, type CSSObject, type Theme } from "@mui/material/styles";
 import { tokens } from "../tokens";
 import { scrollbarSx } from "../scrollbar";
 import { mapChromeSx } from "./mapChrome";
-import { squircleClip, squircleClipPath, squircleRingPath, squircleSurface } from "../squircle";
+import { squircleClip, squircleClipPath, squircleSurface, superellipseCorner } from "../squircle";
 import { SQUIRCLE_CLIP_VAR } from "../squircle/squircleSx";
 import { hoverOrKeyboardFocus, keyboardFocus } from "../interaction";
 import { validFieldHoverOrSelectKeyboardFocus } from "../interaction/interactionStates";
@@ -104,12 +104,10 @@ const OUTLINED_LABEL_SHRUNK_INTO_NOTCH: CSSObject = {
 
 const INPUT_BACKGROUND =
   "color-mix(in srgb, var(--canop-palette-secondary-light) 32%, var(--canop-palette-background-paper))";
-const INPUT_FILL_VAR = "--canop-input-fill";
-const INPUT_FILL = `var(${INPUT_FILL_VAR})`;
 
 const AUTOFILL_INSET_SHADOW_COVERING_AGENT_BACKGROUND = {
-  boxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_FILL})`,
-  WebkitBoxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_FILL})`,
+  boxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_BACKGROUND})`,
+  WebkitBoxShadow: `inset 0 0 0 100px var(--canop-input-autofill, ${INPUT_BACKGROUND})`,
   WebkitTextFillColor: "var(--canop-palette-text-primary)",
   caretColor: "var(--canop-palette-text-primary)",
 };
@@ -135,39 +133,37 @@ const ENABLED_FIELD = ":not(.Mui-disabled):not(.Mui-error)";
 
 const NOTCHED_OUTLINE = ".MuiOutlinedInput-notchedOutline";
 const FIELD_WITH_FLOATING_LABEL = `&:has(${NOTCHED_OUTLINE} legend > span:not(.notranslate))`;
-const MASK_OPAQUE = "black";
-const OUTLINE_LAYER_WITHOUT_TOP_EDGE = [
-  "linear-gradient(transparent",
-  `transparent ${INPUT_BORDER_WIDTH}`,
-  `${MASK_OPAQUE} ${INPUT_BORDER_WIDTH})`,
-].join(", ");
+const NOTCH_DEPTH = `calc(2 * ${INPUT_BORDER_WIDTH})`;
+const OUTLINE_BLEED = "0.25rem";
 
-const NOTCH_DEPTH = "0.625rem";
-const NOTCH_OUTLINE_SHARE = `${(parseFloat(INPUT_BORDER_WIDTH) / parseFloat(NOTCH_DEPTH)) * 100}%`;
-const NOTCH_BAND_BELOW_FILL_TOP = `calc(${NOTCH_DEPTH} - ${INPUT_BORDER_WIDTH})`;
-const NOTCH_BAND_LAYER = -3;
-const TOP_BAND_OUTLINE_THEN_FILL = [
-  `linear-gradient(${INPUT_OUTLINE} ${NOTCH_OUTLINE_SHARE}`,
-  `${INPUT_FILL} ${NOTCH_OUTLINE_SHARE}) 100% 0 0 0 / ${NOTCH_DEPTH} 0 0 0 stretch`,
-].join(", ");
-const FILL_LAYER_WITHOUT_TOP_BAND = [
-  "linear-gradient(transparent",
-  `transparent ${NOTCH_BAND_BELOW_FILL_TOP}`,
-  `${MASK_OPAQUE} ${NOTCH_BAND_BELOW_FILL_TOP})`,
-].join(", ");
+function squircleClipPathBelow(radius: string, top: string): string {
+  const corner = superellipseCorner();
+  const reversed = [...corner].reverse();
+  const start = (ratio: number) => `calc(${radius} * ${ratio})`;
+  const end = (ratio: number) => `calc(100% - ${radius} * ${ratio})`;
+  const below = (ratio: number) => `calc(${top} + ${radius} * ${ratio})`;
+  const points = [
+    ...corner.map(([u, v]) => `${start(u)} ${below(v)}`),
+    ...reversed.map(([u, v]) => `${end(u)} ${below(v)}`),
+    ...corner.map(([u, v]) => `${end(u)} ${end(v)}`),
+    ...reversed.map(([u, v]) => `${start(u)} ${end(v)}`),
+  ];
+  return `polygon(${points.join(", ")})`;
+}
 
-const TOP_BAND_NOTCHED_UNDER_LABEL: CSSObject = {
+const OUTLINE_RING_NOTCHED_UNDER_LABEL: CSSObject = {
   [`& ${NOTCHED_OUTLINE}`]: {
-    inset: 0,
-    zIndex: NOTCH_BAND_LAYER,
+    inset: `calc(-1 * ${OUTLINE_BLEED}) 0 0`,
+    zIndex: -2,
+    margin: 0,
     paddingBlock: 0,
-    paddingInline: `${NOTCH_INLINE_START} ${NOTCH_INLINE_END}`,
+    paddingInline: `0 calc(${NOTCH_INLINE_END} - ${NOTCH_INLINE_START})`,
     borderStyle: "solid",
-    borderWidth: `${NOTCH_DEPTH} 0 0`,
+    borderWidth: `calc(${NOTCH_DEPTH} + ${OUTLINE_BLEED}) ${NOTCH_INLINE_START} ${NOTCH_DEPTH}`,
     borderColor: INPUT_OUTLINE,
-    borderImage: TOP_BAND_OUTLINE_THEN_FILL,
     borderRadius: 0,
-    clipPath: `var(${SQUIRCLE_CLIP_VAR})`,
+    clipPath: squircleClipPathBelow(INPUT_RADIUS, OUTLINE_BLEED),
+    clip: `rect(${OUTLINE_BLEED}, auto, auto, auto)`,
     "& legend": {
       display: "block",
       height: NOTCH_DEPTH,
@@ -175,13 +171,7 @@ const TOP_BAND_NOTCHED_UNDER_LABEL: CSSObject = {
       "& > span": { paddingInline: `${NOTCH_LEGEND_GUTTER_START} ${LABEL_SHRINK_SCALED_GUTTER}` },
     },
   },
-  "&::before": {
-    clipPath: squircleRingPath(INPUT_RADIUS, INPUT_BORDER_WIDTH),
-    maskImage: OUTLINE_LAYER_WITHOUT_TOP_EDGE,
-  },
-  "&::after": {
-    maskImage: FILL_LAYER_WITHOUT_TOP_BAND,
-  },
+  "&::before": { display: "none" },
 };
 
 const headingBase = {
@@ -506,12 +496,11 @@ export function createCanopTheme(
           root: ({ theme: t }) => ({
             ...squircleSurface({
               radius: INPUT_RADIUS,
-              background: INPUT_FILL,
+              background: INPUT_BACKGROUND,
               borderColor: INPUT_OUTLINE,
               borderWidth: INPUT_BORDER_WIDTH,
             }),
             [INPUT_OUTLINE_VAR]: t.palette.primary.main,
-            [INPUT_FILL_VAR]: INPUT_BACKGROUND,
             [`& ${NOTCHED_OUTLINE}`]: { border: "none" },
             [`& ${NOTCHED_OUTLINE} legend`]: { display: "none" },
             [validFieldHoverOrSelectKeyboardFocus()]: {
@@ -526,7 +515,7 @@ export function createCanopTheme(
               [INPUT_OUTLINE_VAR]: t.palette.action.disabled,
               "&::before": { backgroundColor: INPUT_OUTLINE },
             },
-            [FIELD_WITH_FLOATING_LABEL]: TOP_BAND_NOTCHED_UNDER_LABEL,
+            [FIELD_WITH_FLOATING_LABEL]: OUTLINE_RING_NOTCHED_UNDER_LABEL,
           }),
         },
       },

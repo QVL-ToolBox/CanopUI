@@ -4,6 +4,16 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/) et le versioni
 
 ## [Non publié]
 
+## [2.1.1] - 2026-10-29
+
+### Corrigé
+
+- **Label flottant : contour tracé d'un seul tenant.** Sur les champs outlined à label flottant, le contour est désormais tracé entièrement par le `<fieldset>` (bordure et `clip-path` squircle complet, `::before` masqué sur ces champs) ; l'encoche du `<legend>` part `0.25rem` au-dessus du contour et le dépassement est recoupé par `clip: rect()`. Plus de trait droit au-dessus du contour, plus de marche aux raccords des coins, plus de ligne résiduelle dans l'encoche, quelle que soit l'échelle ou la position subpixel. Remplace le correctif de la 2.1.0 (bandeau en `border-image`). Vaut pour `Input`, `InputText`, `InputEmail`, `InputPassword`, `Autocomplete`, `DatePicker`, `TimePicker` et tout `TextField` MUI à label.
+
+### Retiré
+
+- **Variable CSS `--canop-input-fill`**, introduite en 2.1.0 pour le fond des champs : le nouveau tracé du contour n'en a plus besoin. La `Navbar` ne la renseigne plus ; une valeur posée par un portail est sans effet.
+
 ## [2.1.0] - 2026-10-28
 
 ### Ajouté
