@@ -116,22 +116,6 @@ const POPUP_MARKERS: CanopMapMarker[] = [
   },
 ];
 
-/**
- * Le cadre d'une démonstration de carte, qui ne monte la carte **que pendant
- * qu'elle est à l'écran**.
- *
- * Cette page compte une douzaine de cartes. Chacune ouvre un contexte WebGL, et
- * **un navigateur mobile en plafonne le nombre** — huit sur Android, contre le
- * double sur un poste — puis **supprime les plus anciens** quand la page en
- * demande davantage. Toutes montées d'un coup, les premières perdaient donc leur
- * contexte : cadre blanc, boutons de zoom intacts, et le glyphe d'image cassée
- * que Chromium peint sur un canvas mort. Le défaut ne se voyait ni sur un poste,
- * ni en émulation — l'émulation tourne sur le GPU du poste et n'a pas ce
- * plafond.
- *
- * `once: false` est l'essentiel : la carte se démonte en sortant du champ et
- * rend son contexte, sans quoi on ne ferait que retarder l'épuisement.
- */
 function MapFrame({ children }: { children: ReactNode }) {
   const { ref, inView } = useInView<HTMLDivElement>({ once: false, amount: 0.01 });
 

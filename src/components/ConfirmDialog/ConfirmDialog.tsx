@@ -3,14 +3,17 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import Stack from "@mui/material/Stack";
 import type { ReactNode } from "react";
 import { Button } from "../Button";
+import { Feedback } from "../Feedback";
 import { SkeletonScope } from "../Skeleton/SkeletonScope";
 
 export interface CanopConfirmDialogProps {
   open: boolean;
   title: string;
   message?: ReactNode;
+  error?: ReactNode;
   confirmLabel?: string;
   cancelLabel?: string;
   destructive?: boolean;
@@ -23,6 +26,7 @@ export function ConfirmDialog({
   open,
   title,
   message,
+  error,
   confirmLabel = "Confirmer",
   cancelLabel = "Annuler",
   destructive = false,
@@ -39,9 +43,12 @@ export function ConfirmDialog({
         slotProps={{ paper: { elevation: 0 } }}
       >
         <DialogTitle id="canop-confirm-dialog-title">{title}</DialogTitle>
-        {message ? (
+        {message || error ? (
           <DialogContent>
-            <DialogContentText>{message}</DialogContentText>
+            <Stack spacing={2}>
+              {message ? <DialogContentText>{message}</DialogContentText> : null}
+              <Feedback severity="error">{error}</Feedback>
+            </Stack>
           </DialogContent>
         ) : null}
         <DialogActions>

@@ -1,11 +1,6 @@
 export {
   CanopyBackground,
   type CanopCanopyBackgroundProps,
-  type CanopCanopyLiteScene,
-  type CanopCanopyQuality,
-  type CanopCanopyQualityLevel,
-  type CanopCanopyQualityReason,
-  type CanopCanopyQualityState,
   type CanopCanopyScene,
   type CanopCanopySceneMode,
   type CanopCanopySceneOverride,

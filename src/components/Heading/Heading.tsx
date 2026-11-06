@@ -10,19 +10,10 @@ export type CanopHeadingSize = 1 | 2 | 3 | 4 | 5 | 6;
 export type CanopHeadingAlign = "left" | "center";
 export type CanopHeadingTextElement = "p" | "span" | "div";
 
-/**
- * Taille par point de rupture, dans la forme que MUI comprend déjà partout
- * ailleurs dans la librairie : `size={{ xs: 5, md: 3 }}`.
- *
- * Les paliers non renseignés retombent sur `level`, ce qui laisse un
- * `<Heading level={2} size={{ md: 2 }}>` lisible sous `md` au lieu de perdre
- * toute taille de titre.
- */
 export type CanopResponsiveHeadingSize = Partial<Record<CanopBreakpoint, CanopHeadingSize>>;
 
 export interface CanopHeadingProps {
   ref?: Ref<HTMLElement>;
-  /** `-1` rend le titre focalisable par programme, sans l'ajouter à l'ordre de tabulation. */
   tabIndex?: number;
   level?: CanopHeadingLevel;
   size?: CanopHeadingSize | CanopResponsiveHeadingSize;

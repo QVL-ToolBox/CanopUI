@@ -39,58 +39,18 @@ export interface CanopStackProps extends CanopDataAttributes {
   ref?: Ref<HTMLElement>;
   ariaBusy?: boolean;
   gap?: CanopStackGap;
-  /** Accepte une valeur par point de rupture : `{ xs: "column", md: "row" }`. */
   direction?: CanopResponsiveValue<CanopStackDirection>;
   alignItems?: CanopStackAlign;
   justifyContent?: CanopStackJustify;
-  /** Accepte une valeur par point de rupture : `{ xs: true, md: false }`. */
   wrap?: CanopResponsiveValue<boolean>;
   padding?: CanopStackPadding;
   as?: CanopStackElement;
   ariaLabel?: string;
-  /**
-   * Role ARIA du conteneur, pour les groupes qui en ont un : `radiogroup`,
-   * `group`, `toolbar`, `list`. Sans lui, un groupe de choix construit avec
-   * `Pressable` ne s'annonce pas comme un groupe, et il faut sortir de la
-   * librairie pour le corriger.
-   */
   role?: CanopStackRole;
   onSubmit?: FormEventHandler<HTMLFormElement>;
   fill?: boolean;
-  /**
-   * Part de l'espace que ce `Stack` prend parmi ses frères, relative à la
-   * leur : deux colonnes en `2` et `1` occupent deux tiers et un tiers.
-   *
-   * `fill` seul ne sait faire que des parts égales, puisqu'il vaut
-   * `flex: 1 1 0%` pour tout le monde. Rien d'autre dans la librairie ne
-   * partage une ligne autrement : `CardGrid` n'aligne que des colonnes
-   * strictement égales. Restait à laisser chaque colonne en `flex: 0 1 auto`,
-   * et sa largeur suivait alors le `max-content` de son contenu — un panneau
-   * titré « Ain » et « Alpes-de-Haute-Provence » tour à tour se redimensionne
-   * à chaque changement, et déplace tout ce qui l'entoure.
-   *
-   * La base reste donc à `0%`, comme pour `fill` : les largeurs sont un pur
-   * rapport, insensible au contenu. Poser `weight` suffit — inutile d'ajouter
-   * `fill`, qui ne ferait que redire la même chose.
-   */
   weight?: number;
-  /**
-   * Colle le bloc au haut ou au bas de la **zone défilante** qui le contient,
-   * dès que le défilement l'y amène.
-   *
-   * La zone défilante est `PageContent` — c'est elle qui porte l'`overflowY`.
-   * Un bloc collé à l'intérieur d'un `PageContent` en `fillHeight` ne bougera
-   * donc jamais : cette variante est en `overflow: hidden`, rien n'y défile.
-   *
-   * `sticky` ne se combine ni avec `fill` ni avec `weight` : ceux-ci posent
-   * `flex: 1 1 0%`, donc le bloc occupe toute la hauteur de son parent et n'a
-   * plus aucune course à parcourir.
-   */
   sticky?: CanopStackSticky;
-  /**
-   * La distance entre le bloc collé et le bord, sur l'échelle d'espacement.
-   * Sans effet hors `sticky`.
-   */
   stickyOffset?: CanopStackPadding;
   children: ReactNode;
 }

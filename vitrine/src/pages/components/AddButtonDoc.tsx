@@ -19,6 +19,9 @@ const iconSizeCode = `<AddButton ariaLabel="Ajouter" iconSize="sm" onClick={() =
 
 const disabledCode = `<AddButton ariaLabel="Ajouter" disabled />`;
 
+const inlineCode = `<AddButton ariaLabel="Ajouter" fullWidth={false} onClick={() => {}} />
+<AddButton ariaLabel="Ajouter" fullWidth={false} size="2rem" iconSize="sm" onClick={() => {}} />`;
+
 const fr = {
   intro:
     "Bouton d'ajout centré sur toute la largeur disponible. Il porte l'icône plus et s'appuie sur IconActionButton pour proposer l'action d'ajout principale d'une liste ou d'une section.",
@@ -38,12 +41,17 @@ const fr = {
     iconSizeTitle: "Prop iconSize",
     iconSizeDescription:
       "La taille de l'icône est choisie explicitement, indépendamment de celle du bouton.",
+    inlineTitle: "En ligne",
+    inlineDescription:
+      "Avec fullWidth à false, le bouton n'est plus enveloppé dans un conteneur pleine largeur et se pose en ligne, à côté d'un champ ou d'un titre.",
   },
   props: {
     ariaLabel: "Libellé accessible décrivant l'action d'ajout.",
     onClick: "Handler appelé au clic.",
     size: "Largeur et hauteur du bouton, en unités CSS relatives (rem).",
     iconSize: "Taille de l'icône affichée dans le bouton.",
+    fullWidth:
+      "Centre le bouton dans un conteneur pleine largeur. À false, le bouton est rendu seul et se pose en ligne.",
     disabled: "Désactive le bouton.",
   },
 };
@@ -67,12 +75,17 @@ const en: typeof fr = {
     iconSizeTitle: "iconSize prop",
     iconSizeDescription:
       "The icon size is picked explicitly among the catalog sizes, independently from the button size.",
+    inlineTitle: "Inline",
+    inlineDescription:
+      "With fullWidth set to false, the button is no longer wrapped in a full-width container and sits inline, next to a field or a heading.",
   },
   props: {
     ariaLabel: "Accessible label describing the add action.",
     onClick: "Handler called on click.",
     size: "Button width and height, in relative CSS units (rem).",
     iconSize: "Size of the icon displayed inside the button.",
+    fullWidth:
+      "Centers the button in a full-width container. When false, the button renders alone and sits inline.",
     disabled: "Disables the button.",
   },
 };
@@ -107,6 +120,12 @@ export default function AddButtonDoc() {
       description: t.props.iconSize,
     },
     {
+      name: "fullWidth",
+      type: "boolean",
+      defaultValue: "true",
+      description: t.props.fullWidth,
+    },
+    {
       name: "disabled",
       type: "boolean",
       defaultValue: "false",
@@ -124,6 +143,20 @@ export default function AddButtonDoc() {
           align="stretch"
         >
           <AddButton ariaLabel="Ajouter" onClick={() => {}} />
+        </DemoCard>
+        <DemoCard
+          title={t.demos.inlineTitle}
+          description={t.demos.inlineDescription}
+          code={inlineCode}
+        >
+          <AddButton ariaLabel="Ajouter" fullWidth={false} onClick={() => {}} />
+          <AddButton
+            ariaLabel="Ajouter"
+            fullWidth={false}
+            size="2rem"
+            iconSize="sm"
+            onClick={() => {}}
+          />
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.sizes}>

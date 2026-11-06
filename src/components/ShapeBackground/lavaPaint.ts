@@ -8,7 +8,7 @@ import type { LavaMass } from "./lavaMasses";
 const DECIMALS = 2;
 const PERCENT = 100;
 const GLOW_REACH = 1.7;
-const GLOW_SHARE: Record<CanopThemeMode, number> = { dark: 0.26, light: 0.16 };
+const GLOW_SHARE: Record<CanopThemeMode, number> = { dark: 0.26, light: 0.36 };
 const GLOW_FADE_IN = "opacity 1.2s var(--canop-motion-ease-organic)";
 
 export const LAVA_BLEED_REM = 3;

@@ -10,20 +10,12 @@ import { Text } from "../Text";
 export type CanopShareTone = "hit" | "near" | "miss";
 
 export interface CanopShareResultProps {
-  /** Une ligne par essai, une case par indice. */
   rows: readonly (readonly CanopShareTone[])[];
-  /**
-   * Le texte exact envoyé au presse-papier.
-   *
-   * La librairie ne le fabrique pas : ce qui se partage — la date, le score,
-   * les émojis retenus — appartient au jeu, pas au design system.
-   */
   text: string;
   copyLabel?: string;
   copiedLabel?: string;
   failedLabel?: string;
   ariaLabel?: string;
-  /** Côté d'une case, en unités CSS relatives. */
   cellSize?: string;
 }
 
@@ -33,14 +25,6 @@ const toneBackground: Record<CanopShareTone, string> = {
   miss: "var(--canop-palette-action-disabledBackground)",
 };
 
-/**
- * La grille de résultat d'une partie, et son partage.
- *
- * Les cases sont dessinées, alors que le presse-papier reçoit le texte fourni
- * par le jeu. C'est volontaire : une grille d'émojis se lit mal à l'écran et
- * dépend des polices du système, mais c'est la seule forme qui survive à un
- * collage dans une conversation.
- */
 export function ShareResult({
   rows,
   text,

@@ -1,4 +1,4 @@
-import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 import type { MouseEventHandler } from "react";
 import type { CanopIconSize } from "../Icon";
 import { IconActionButton } from "../IconActionButton";
@@ -6,10 +6,9 @@ import { IconActionButton } from "../IconActionButton";
 export interface CanopAddButtonProps {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
-  /** Largeur et hauteur du bouton, en unités CSS relatives (rem). */
   size?: string;
-  /** Taille de l'icône affichée dans le bouton. */
   iconSize?: CanopIconSize;
+  fullWidth?: boolean;
   ariaLabel: string;
 }
 
@@ -18,24 +17,25 @@ export function AddButton({
   disabled = false,
   size = "2.5rem",
   iconSize,
+  fullWidth = true,
   ariaLabel,
 }: CanopAddButtonProps) {
+  const button = (
+    <IconActionButton
+      icon="plus"
+      ariaLabel={ariaLabel}
+      onClick={onClick}
+      disabled={disabled}
+      size={size}
+      iconSize={iconSize}
+    />
+  );
+
+  if (!fullWidth) return button;
+
   return (
-    <Box
-      sx={{
-        display: "flex",
-        justifyContent: "center",
-        width: "100%",
-      }}
-    >
-      <IconActionButton
-        icon="plus"
-        ariaLabel={ariaLabel}
-        onClick={onClick}
-        disabled={disabled}
-        size={size}
-        iconSize={iconSize}
-      />
-    </Box>
+    <Stack direction="row" sx={{ justifyContent: "center", width: "100%" }}>
+      {button}
+    </Stack>
   );
 }

@@ -1,39 +1,18 @@
 import { attemptStorage } from "./attemptStorage";
 
 export interface CanopLocalStoreOptions<T> {
-  /** Clé de stockage. */
   key: string;
-  /** Version du schéma. Un changement déclenche `migrate`. */
   version?: number;
   initial: T;
-  /**
-   * Reprend une sauvegarde écrite sous une version antérieure.
-   *
-   * Reçoit la charge telle qu'elle a été lue et la version dont elle vient —
-   * `0` pour une sauvegarde écrite avant toute numérotation. Retourner `null`
-   * repart de `initial`, ce qui vaut mieux qu'un écran nourri de données dont
-   * la forme a changé.
-   */
   migrate?: (stored: unknown, version: number) => T | null;
-  /** Support de persistance, ou `null` pour ne rien retenir. */
   storage?: Storage | null;
 }
 
 export interface CanopLocalStore<T> {
-  /**
-   * L'état courant, gardé en mémoire.
-   *
-   * Aucune relecture du stockage : c'est le point. Une lecture qui reparse à
-   * chaque appel se paie au centuple dès qu'elle passe dans une boucle — un
-   * tirage pondéré sur 101 entrées relisait 101 fois la même sauvegarde.
-   */
   get: () => T;
   set: (next: T | ((current: T) => T)) => T;
-  /** Revient à `initial` et efface la sauvegarde. */
   reset: () => T;
-  /** Prévient à chaque changement, y compris ceux venus d'un autre onglet. */
   subscribe: (listener: () => void) => () => void;
-  /** Détache l'écoute inter-onglets. */
   dispose: () => void;
 }
 

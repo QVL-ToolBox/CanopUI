@@ -5,36 +5,18 @@ import { Stack, type CanopStackDirection } from "../Stack";
 import { useTranslation } from "../../i18n";
 import { buildCguUrl } from "../../auth/navigation";
 
-/** L'ancre des mentions legales dans la page des conditions d'utilisation. */
 export const LEGAL_NOTICE_ANCHOR = "mentions-legales";
 
 export interface CanopLegalLinksProps {
-  /** Origine du portail qui heberge les conditions, par exemple `https://auth.qvl-project.com`. */
   authPortalUrl: string;
-  /** Chemin des conditions sur ce portail. */
   cguPath?: string;
   direction?: CanopStackDirection;
   cguLabel?: string;
   noticeLabel?: string;
   ariaLabel?: string;
-  /**
-   * Rend un lien autrement que par une adresse absolue.
-   *
-   * Sert au portail qui **heberge** lui-meme ces pages : il navigue en interne
-   * par son routeur au lieu de recharger une URL. Sans cette porte, ce portail
-   * ne pouvait pas partager le composant, et en gardait une copie a lui.
-   */
   renderLink?: (href: string, label: string) => ReactNode;
 }
 
-/**
- * Le pied de page legal : conditions d'utilisation et mentions legales.
- *
- * Les deux pointent la meme page, les mentions legales n'etant qu'une ancre
- * dedans. Cette ancre vivait en dur dans chaque portail, ce qui la rendait
- * impossible a deplacer sans les visiter tous ; elle est desormais ici, et
- * exportee pour qui en a besoin ailleurs.
- */
 export function LegalLinks({
   authPortalUrl,
   cguPath,

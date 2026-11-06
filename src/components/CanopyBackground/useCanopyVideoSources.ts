@@ -18,7 +18,6 @@ export interface CanopCanopySource {
 export interface UseCanopyVideoSourcesParams {
   scene: CanopCanopyScene;
   playing: boolean;
-  lite: boolean;
   preferMp4: boolean;
   videoRef: RefObject<HTMLVideoElement | null>;
 }
@@ -31,7 +30,6 @@ export interface UseCanopyVideoSourcesResult {
 export function useCanopyVideoSources({
   scene,
   playing,
-  lite,
   preferMp4,
   videoRef,
 }: UseCanopyVideoSourcesParams): UseCanopyVideoSourcesResult {
@@ -39,12 +37,11 @@ export function useCanopyVideoSources({
   useEffect(() => setWebmFallbackToMp4(false), [scene]);
 
   const sources = useMemo<CanopCanopySource[]>(() => {
-    const files = lite && scene.lite ? scene.lite : scene;
-    const webm: CanopCanopySource = { src: files.webm, type: "video/webm" };
-    const mp4: CanopCanopySource = { src: files.mp4, type: "video/mp4" };
+    const webm: CanopCanopySource = { src: scene.webm, type: "video/webm" };
+    const mp4: CanopCanopySource = { src: scene.mp4, type: "video/mp4" };
     if (webmFallbackToMp4) return [mp4];
     return preferMp4 ? [mp4, webm] : [webm, mp4];
-  }, [scene, lite, webmFallbackToMp4, preferMp4]);
+  }, [scene, webmFallbackToMp4, preferMp4]);
 
   const reportFailure = useCallback((video: HTMLVideoElement) => {
     if (video.currentSrc.endsWith(".webm")) setWebmFallbackToMp4(true);

@@ -1,9 +1,5 @@
 import { useCountdown } from "../../time";
 
-/**
- * `"clock"` pour `1:00`, `"seconds"` pour `60`, `"auto"` pour laisser la durée
- * totale trancher.
- */
 export type CanopCountdownFormat = "auto" | "clock" | "seconds";
 
 export interface UseCountdownDisplayOptions {

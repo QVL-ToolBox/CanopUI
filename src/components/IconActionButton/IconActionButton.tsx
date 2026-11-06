@@ -1,30 +1,29 @@
 import MuiIconButton from "@mui/material/IconButton";
 import { useTheme } from "@mui/material/styles";
 import { squircleFill, squircleSurface } from "../../squircle";
-import type { MouseEventHandler, Ref } from "react";
+import type { MouseEventHandler, PointerEventHandler, Ref } from "react";
 import { Icon, type CanopIconName, type CanopIconSize } from "../Icon";
 import { Spinner } from "../Spinner";
 import { hoverOrKeyboardFocus } from "../../interaction";
 import { OptionalTooltip } from "../_shared/OptionalTooltip";
-import { useIconActionButton } from "./useIconActionButton";
+import { useIconActionButton, type CanopIconActionButtonType } from "./useIconActionButton";
+
+export type { CanopIconActionButtonType };
 
 export type CanopIconActionButtonVariant = "default" | "danger" | "secondary" | "accent";
 
 export interface CanopIconActionButtonProps {
   icon: CanopIconName;
-  /**
-   * Intention visuelle. `accent` détache une action secondaire mais désirable : fond `accent.main`,
-   * survol `accent.dark`, glyphe `accent.contrastText`, identiques en thème clair et sombre.
-   */
   variant?: CanopIconActionButtonVariant;
-  /** Largeur et hauteur du bouton, en unités CSS relatives (rem). */
   size?: string;
-  /** Taille de l'icône affichée dans le bouton. */
   iconSize?: CanopIconSize;
+  type?: CanopIconActionButtonType;
   disabled?: boolean;
   loading?: boolean;
   tooltip?: boolean | string;
   onClick?: MouseEventHandler<HTMLButtonElement>;
+  onMouseDown?: MouseEventHandler<HTMLButtonElement>;
+  onPointerDown?: PointerEventHandler<HTMLButtonElement>;
   ariaLabel: string;
   ref?: Ref<HTMLButtonElement>;
   [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
@@ -62,10 +61,13 @@ export function IconActionButton({
   variant = "default",
   size = "2.5rem",
   iconSize = "md",
+  type = "button",
   disabled = false,
   loading = false,
   tooltip,
   onClick,
+  onMouseDown,
+  onPointerDown,
   ariaLabel,
   ref,
   ...dataAttributes
@@ -75,13 +77,14 @@ export function IconActionButton({
   const hoverBgMap = hoverBgFor(isDark);
   const fgMap = fgFor(isDark);
   const restBg = disabled ? "var(--canop-palette-action-disabledBackground)" : bgMap[variant];
-  const { tooltipTitle, tooltipDescribesButton, ariaBusy, spinnerSize, handleClick } =
+  const { tooltipTitle, tooltipDescribesButton, ariaBusy, spinnerSize, buttonType, handleClick } =
     useIconActionButton({
       ariaLabel,
       tooltip,
       disabled,
       loading,
       iconSize,
+      type,
       onClick,
     });
 
@@ -90,7 +93,10 @@ export function IconActionButton({
       <MuiIconButton
         {...dataAttributes}
         ref={ref}
+        type={buttonType}
         onClick={handleClick}
+        onMouseDown={onMouseDown}
+        onPointerDown={onPointerDown}
         disabled={disabled}
         aria-label={ariaLabel}
         aria-busy={ariaBusy}

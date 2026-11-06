@@ -7,9 +7,7 @@ import { Icon } from "../../components/Icon";
 import { Stack } from "../../components/Stack";
 
 export interface CanopUploadDropZoneProps {
-  /** Intitulé affiché dans la zone, et nom accessible par défaut. */
   title: string;
-  /** Nom accessible explicite de la zone de dépôt. Prend le pas sur `title`. */
   ariaLabel?: string;
   hint: string;
   disabled?: boolean;

@@ -50,20 +50,14 @@ function stack(layers: Array<string | null>): string {
   return painted.length > 0 ? painted.join(", ") : NO_LAYER;
 }
 
-/** Valeur CSS `background` du verre : reflet, teinte puis voile, ou `transparent`. */
 export function liquidGlassBackground(params: CanopLiquidGlassParams): string {
   return stack([reflectionLayer(params), tintLayer(params), veilLayer(params)]);
 }
 
-/** Valeur CSS `background` sans `backdrop-filter` : reflet et teinte sur `surface.base` opaque. */
 export function liquidGlassFallbackBackground(params: CanopLiquidGlassParams): string {
   return stack([reflectionLayer(params), tintLayer(params), OPAQUE_SURFACE]);
 }
 
-/**
- * Valeur CSS `backdrop-filter` : `blur()` en rem puis `saturate()`, précédés de `url(#id)` si
- * un id de filtre de réfraction est fourni.
- */
 export function liquidGlassBackdropFilter(
   { blur, saturation }: CanopLiquidGlassParams,
   refractionFilterId?: string,

@@ -9,15 +9,6 @@ export interface CanopLoginUrlOptions {
   loginPath?: string;
   redirectCookieName?: string;
   redirectCookieMaxAge?: number;
-  /**
-   * Domaine du cookie de retour, par exemple `.qvl-project.com`.
-   *
-   * Sans lui, le cookie reste attache au sous-domaine qui l'ecrit, et le
-   * portail d'authentification -- qui vit sur un autre sous-domaine en
-   * production -- ne le lit pas : l'utilisateur se connecte puis atterrit sur
-   * l'accueil au lieu de la page demandee. Vide en local, ou tout tient sur
-   * `localhost`.
-   */
   redirectCookieDomain?: string;
 }
 

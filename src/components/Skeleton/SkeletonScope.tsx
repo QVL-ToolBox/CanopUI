@@ -3,10 +3,6 @@ import { NestedSkeletonScope } from "./NestedSkeletonScope";
 import type { CanopSkeletonSurface } from "./skeletonScopeContext";
 
 export interface CanopSkeletonScopeProps {
-  /**
-   * Surface que les Spinner du sous-arbre remplacent. Absente, elle hérite de la portée parente ;
-   * `null` coupe toute portée, comme à la racine d'un overlay.
-   */
   surface?: CanopSkeletonSurface | null;
   enabled?: boolean;
   children: ReactNode;

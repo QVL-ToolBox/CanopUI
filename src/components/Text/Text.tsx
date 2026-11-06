@@ -33,12 +33,7 @@ export interface CanopTextProps {
   slashedZero?: boolean;
   gutterBottom?: boolean;
   color?: string;
-  /**
-   * Tient sur une ligne et coupe le surplus d'une ellipse. Un élément en ligne (`span`, `code`…)
-   * passe en `inline-block` borné à la largeur de son parent ; les autres passent en `block`.
-   */
   noWrap?: boolean;
-  /** Coupe le texte d'une ellipse au-delà de ce nombre de lignes ; prend le pas sur `noWrap`. */
   lines?: number;
   children: ReactNode;
 }
@@ -74,8 +69,8 @@ const variantSx: Partial<Record<CanopTextVariant, SystemStyleObject<Theme>>> = {
   overline: { textTransform: "uppercase" },
   code: {
     display: "inline-block",
-    px: tokens.spacing["2xs"],
-    py: tokens.spacing["3xs"],
+    paddingX: tokens.spacing["2xs"],
+    paddingY: tokens.spacing["3xs"],
     ...squircleClip(tokens.radius.xs),
     bgcolor: "surface.sunken",
   },

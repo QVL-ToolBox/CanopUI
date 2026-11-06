@@ -9,41 +9,15 @@ import { useCountdownDisplay, type CanopCountdownFormat } from "./useCountdownDi
 export type { CanopCountdownFormat } from "./useCountdownDisplay";
 
 export interface CanopCountdownProps {
-  /** Durée totale, en millisecondes. */
   duration: number;
-  /**
-   * Fait courir l'horloge. Repasser à `false` gèle le temps restant, à
-   * l'instant exact et non au dernier rafraîchissement.
-   *
-   * Le composant part **en marche**, là où `useCountdown` part à l'arrêt : le
-   * hook est une brique qu'on pilote, le composant un affichage qu'on pose.
-   */
   running?: boolean;
-  /** Appelé une seule fois, quand le temps est épuisé. */
   onEnd?: () => void;
-  /**
-   * Seuil d'urgence, en secondes restantes : en dessous, le temps bat, passe
-   * au rouge et emmène la barre avec lui. `0` désactive le battement et laisse
-   * un décompte neutre.
-   */
   urgentBelow?: number;
-  /**
-   * La forme du temps affiché : `"clock"` pour `1:00`, `"seconds"` pour `60`.
-   *
-   * Par défaut (`"auto"`) c'est la **durée totale** qui tranche, au-delà d'une
-   * minute — ce qui laisse une durée d'exactement une minute du côté horloge,
-   * et affiche `1:00` puis `0:45` là où l'écran de règles a promis « 60
-   * secondes ». Le préfixe `0:` n'y dit alors rien : le chrono ne repassera
-   * jamais au-dessus de la minute.
-   */
   format?: CanopCountdownFormat;
-  /** Couleur de la barre hors urgence. */
   color?: CanopProgressBarColor;
-  /** Retire la barre pour ne garder que le temps. */
   showProgress?: boolean;
   icon?: CanopIconName;
   animated?: boolean;
-  /** Nom accessible explicite. Prend le pas sur le libellé traduit. */
   ariaLabel?: string;
 }
 
@@ -60,19 +34,6 @@ const OFFSCREEN_SX = {
   whiteSpace: "nowrap",
 } as const;
 
-/**
- * Un compte à rebours qui se voit venir.
- *
- * Le temps restant, une barre qui se vide, et un battement sous le seuil
- * d'urgence : c'est ce dernier qui manquait le plus, faute de quoi un jeu se
- * rabat sur un état statique — icône rouge, texte rouge — qui ne dit pas que
- * le temps presse, seulement qu'il est court.
- *
- * L'horloge est celle de `useCountdown`, recalculée depuis une échéance
- * absolue : elle ne dérive pas et survit à un onglet mis en arrière-plan.
- * Pour repartir sur une nouvelle question, remonter le composant avec une
- * `key` — c'est le seul moyen de redémarrer une durée identique.
- */
 export function Countdown({
   duration,
   running = true,

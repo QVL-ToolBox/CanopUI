@@ -1,14 +1,5 @@
 import type { CanopBreakpoint } from "../../tokens";
 
-/**
- * Le nombre de colonnes d'une `BentoGrid`.
- *
- * Un nombre se lit « une colonne en `xs`, ce nombre dès `sm` » : la mosaïque
- * s'empile toujours sur téléphone. Un objet fixe un nombre par point de
- * rupture ; les points omis héritent du palier inférieur, et `xs` vaut 1 s'il
- * n'est pas donné. Jamais de grille automatique : contrairement à
- * `CanopCardGridColumns`, le nombre de colonnes est toujours connu.
- */
 export type CanopBentoColumns = number | Partial<Record<CanopBreakpoint, number>>;
 
 export type CanopBentoSpan = number | Partial<Record<CanopBreakpoint, number>>;

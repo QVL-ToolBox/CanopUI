@@ -5,18 +5,11 @@ import { Stack } from "../Stack";
 
 export interface CanopSvgMapControlsProps {
   viewport: UseSvgMapViewportResult;
-  /** Pas de zoom des boutons. 1,6 est plus franc que la molette. */
   step?: number;
 }
 
 const DEFAULT_STEP = 1.6;
 
-/**
- * Les commandes de zoom, pour qui n'a ni molette ni deux doigts.
- *
- * La vue d'ensemble n'apparaît que lorsqu'on est zoomé : un bouton qui ne
- * ferait rien vaut moins qu'un bouton absent.
- */
 export function SvgMapControls({ viewport, step = DEFAULT_STEP }: CanopSvgMapControlsProps) {
   const { t } = useTranslation();
 

@@ -27,16 +27,8 @@ export interface CanopIconProps {
   variant?: CanopIconVariant;
   size?: CanopIconSize;
   color?: CanopIconColor;
-  /** Intitulé de l'icône, et nom accessible par défaut. */
   title?: string;
-  /** Nom accessible explicite. Prend le pas sur `title`. */
   ariaLabel?: string;
-  /**
-   * Classe appliquee au SVG. Indispensable : les composants MUI qui acceptent
-   * une icone la **clonent pour y injecter leur propre classe** -- `Chip` avec
-   * `MuiChip-icon`, `Badge`, `Tab`... Sans cette prop, la classe est perdue et
-   * l'icone perd du meme coup les marges que le composant hote lui destinait.
-   */
   className?: string;
 }
 

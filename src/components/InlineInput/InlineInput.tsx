@@ -5,9 +5,7 @@ import { useInlineInput } from "./useInlineInput";
 export interface CanopInlineInputProps {
   value: string;
   onChange: (value: string) => void;
-  /** Appele a la validation : touche Entree, ou perte du focus. */
   onCommit: () => void;
-  /** Appele a l'abandon : touche Echap. */
   onCancel: () => void;
   placeholder?: string;
   ariaLabel?: string;
@@ -16,20 +14,6 @@ export interface CanopInlineInputProps {
   disabled?: boolean;
 }
 
-/**
- * Le champ d'edition **en place** : renommer un fichier dans sa liste, une
- * colonne dans son en-tete, sans ouvrir de formulaire.
- *
- * Il n'apporte pas seulement une apparence discrete, il porte le
- * **comportement** : Entree valide, Echap abandonne, la perte du focus valide,
- * et les evenements ne remontent pas a l'element cliquable qui l'heberge.
- * C'est cette logique-la qui etait recopiee a la main dans les portails, et
- * qu'on oublie a moitie -- l'arret de propagation surtout, dont l'absence ne
- * se voit qu'a l'usage.
- *
- * Pour un champ de formulaire ordinaire, avec libelle et message d'erreur,
- * utiliser `Input`.
- */
 export function InlineInput({
   value,
   onChange,

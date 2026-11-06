@@ -12,22 +12,12 @@ export type { CanopEmptyStateSurface } from "./emptyStateSurface";
 
 export interface CanopEmptyStateProps {
   title: string;
-  /**
-   * Texte sous le titre, ou n'importe quel noeud : un bandeau d'alerte pour
-   * une page d'acces refuse, une liste de pistes a suivre. Une chaine est
-   * rendue centree en couleur secondaire.
-   */
   description?: ReactNode;
   icon?: ReactNode;
   action?: ReactNode;
   headingLevel?: CanopHeadingLevel;
   minHeight?: string;
   animated?: boolean;
-  /**
-   * `ambient` pose le contenu dans une `Card` en verre liquide, pour un etat
-   * vide seul sur sa page. `plain` n'a aucune surface et se fond dans son
-   * conteneur : a utiliser dans une carte, un tableau ou une zone deja peinte.
-   */
   surface?: CanopEmptyStateSurface;
   size?: CanopEmptyStateSize;
 }

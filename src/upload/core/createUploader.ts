@@ -19,7 +19,6 @@ import { createUploadTransport, type CanopUploadTransport } from "./uploadTransp
 
 export interface CanopUploaderOptions extends CanopUploadTransportOptions {
   chunkSize?: number;
-  /** Taille au-delà de laquelle on découpe. Voir {@link selectStrategy}. */
   singleShotThreshold?: number;
   maxRetriesPerChunk?: number;
   retryBaseDelayMs?: number;

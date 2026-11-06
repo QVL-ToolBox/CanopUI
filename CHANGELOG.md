@@ -4,6 +4,45 @@ Le format suit [Keep a Changelog](https://keepachangelog.com/fr/) et le versioni
 
 ## [Non publié]
 
+## [2.2.0] - 2026-11-06
+
+### Ajouté
+
+- **`CheckListItem` : ligne de liste à cocher.** Case et libellé dans un même `<label>` (toute la ligne coche, cible de `2.75rem` au moins), libellé barré par un trait tracé de gauche à droite quand `checked`, `muted` qui atténue case et libellé mais pas les actions, `editor` qui remplace le libellé visible (un `InlineInput` pour renommer en place, le libellé restant le nom accessible de la case via `Checkbox` `ariaLabel`), `actions` à droite. Sans `onCheckedChange`, la ligne n'a pas de case. Type `CanopCheckListItemProps` exporté.
+- **`CheckListItem` : liste à puces, case au bout.** Props `marker` (`"none" | "bullet"`, puce qui rétrécit quand la ligne est barrée), `checkboxPlacement` (`"start" | "end"` ; au bout, seule la case coche, toucher le libellé ne fait rien) et `checkboxSize` (`"medium" | "large"`, cible de `3rem` en `large`). Défauts : rendu et comportement inchangés. La prop `labelMenu` (menu ouvert en touchant le libellé), jamais publiée, est retirée : plus aucun usage, les actions d'une ligne passent par `actions`. Types `CanopCheckListItemMarker`, `CanopCheckListItemCheckboxPlacement` et `CanopCheckListItemCheckboxSize` exportés.
+- **`QuickAdd` : ajout rapide.** `Input` et bouton d'ajout dans un formulaire : Entrée ou le bouton appellent `onAdd` avec la saisie sans ses espaces de bord, jamais vide ; le champ se vide et garde le focus, et toucher le bouton ne ferme pas le clavier mobile. Type `CanopQuickAddProps` exporté.
+- **`CopyField` : code avec bouton copier.** Valeur en chasse fixe sur une surface `surface.sunken`, sélectionnable d'un toucher, bouton qui passe à la coche sur un rebond à la copie, confirmation annoncée par `LiveRegion`, échec affiché et annoncé. S'appuie sur `useCopyToClipboard`. Type `CanopCopyFieldProps` exporté.
+- **Messages i18n** `canop.quickAdd.submit`, `canop.copyField.copy`, `canop.copyField.copied`, `canop.copyField.failed` (fr et en).
+- **Vitrine : pages `CheckListItem`, `QuickAdd` et `CopyField`.**
+- **`AddButton` : prop `fullWidth`** (`true` par défaut, rendu inchangé). À `false`, le bouton n'est plus enveloppé dans un conteneur pleine largeur centré et se pose en ligne.
+- **`IconActionButton` : props `type`, `onMouseDown` et `onPointerDown`.** `type` (`"button" | "submit" | "reset"`, `"button"` par défaut) permet de valider un formulaire, sauf pendant `loading` où le bouton repasse en `"button"` ; les deux handlers d'appui permettent par exemple de garder le focus sur un champ voisin. Type `CanopIconActionButtonType` exporté.
+- **`Checkbox` : prop `ariaLabel`**, nom accessible de la case quand aucun libellé n'est visible.
+- **`ConfirmDialog` : prop `error`**, message d'erreur affiché sous le message dans un `Feedback` (`role="alert"`, donc annoncé).
+- **`DeleteButton` : prop `errorMessage`** et message i18n `canop.deleteButton.error` (fr et en), affichés quand `onConfirm` échoue.
+- **`QuickAdd` : prop `maxLength`**, transmise à l'`Input` : la frappe ou le collage au-delà est tronqué par le navigateur. Sans limite par défaut.
+- **`QuickAdd` : `onAdd` asynchrone.** `onAdd` renvoie `void | boolean | Promise<void | boolean>`. Une promesse met le bouton en chargement (désactivé, Entrée ignorée) ; résolue, le champ se vide ; rejetée ou résolue à `false`, la saisie est conservée ; le focus reste dans le champ, sans promesse non gérée. En synchrone, `false` garde la saisie. Le bouton est un `IconActionButton` `type="submit"` dont `onMouseDown` garde le clavier mobile ouvert. Types `CanopQuickAddHandler` et `CanopQuickAddOutcome` exportés. Vitrine : démo d'un ajout asynchrone refusé par un quota.
+- **`Input` : prop `maxLength`**, posée sur le champ natif (attribut `maxlength`). Sans limite par défaut.
+- **`SegmentedControl` : badge par option.** Champs optionnels `badge` (`number`, rendu par `Badge` : masqué à 0, `99+` au-delà de 99 ; ou `ReactNode`, rendu dans la même pastille), `badgeLabel` (texte lu pour un badge qui n'est pas du texte) et `badgeColor` (`CanopBadgeColor`, `primary` par défaut) sur `CanopSegmentedControlOption`. Le badge suit le libellé (ou l'icône en `iconOnly`), éclot sur un ressort à chaque changement de valeur (coupé en mouvement réduit), reste lisible sélectionné ou non, et entre dans le nom accessible de l'option (« Reçus (12) »). Sans badge, rendu et nom accessible inchangés.
+- **`Carousel` : prop `visibleCount`** (`1` par défaut, rendu inchangé), nombre de cartes visibles à la fois, ou un nombre par point de rupture (`{ xs: 1, sm: 2, md: 3 }`, lu du plus petit au plus grand). Les cartes gardent une largeur égale ; chaque pas (flèche, barre, balayage, clic par moitié, défilement automatique) décale d'une seule carte, de `[1 2 3]` à `[2 3 4]` puis `[3 4 5]` avec cinq cartes, flèches désactivées aux extrémités hors défilement automatique. Une barre par position. Ramené entre 1 et le nombre de cartes ; au-delà, toutes sont visibles et la navigation disparaît. `useCarousel` accepte `visibleCount` et renvoie `visibleCount`, `positionCount` et `keyHandlers` ; `activeIndex` désigne la première carte visible.
+- **`Carousel` : navigation au clavier sur la fenêtre.** Quand la fenêtre a le focus, les flèches de l'axe (gauche et droite, haut et bas à la verticale) reculent ou avancent d'un pas, Début et Fin vont aux extrémités. Les touches pressées dans une carte ne sont pas interceptées.
+- **Vitrine : badges sur la page `SegmentedControl`** (démo et table des champs d'une option) **et plusieurs cartes visibles sur la page `Carousel`.**
+
+### Modifié
+
+- **Commentaires et JSDoc retirés du code source** (`src/` et `vitrine/src/`), y compris la JSDoc des exports publics conservée en (#62) : les infobulles de l'éditeur ne reprennent plus ces descriptions, la vitrine reste la référence des props. Directives fonctionnelles (`/// <reference>`, `eslint-disable`, `@ts-expect-error`, `@deprecated`) conservées.
+
+### Corrigé
+
+- **Dépendances de développement : `minimatch` forcé en `^11.0.1` sous `@typescript-eslint/typescript-estree`** (`overrides` de `package.json`) pour corriger GHSA-g3hv-75wg-m249, signalé par osv-scanner sur la 10.2.6. Aucun effet sur le paquet publié.
+- **`DeleteButton` : un `onConfirm` qui lève ou rejette n'est plus une promesse non gérée.** La boîte de dialogue reste ouverte, un message d'erreur est affiché et annoncé, et le bouton de confirmation redevient utilisable. L'état et la logique passent dans le hook interne `useDeleteButton`.
+- **`Text` variante `code` : padding écrit `paddingX` / `paddingY`** au lieu des raccourcis MUI `px` / `py`, sans changement visuel.
+- **`ShapeBackground` : la lave se voit enfin en thème clair.** Les points allumés étaient peints en `<couleur>.main` et la lueur à 12 % : clair sur clair, la masse ne se distinguait presque pas du fond crème (l'`accent` jaune de la vitrine disparaissait), si bien que le mouvement paraissait arrêté. En clair, les points allumés passent en `<couleur>.dark` et la lueur `<couleur>.main` monte à 27 % ; le thème sombre ne change pas.
+
+### Retiré
+
+- **`CanopyBackground` (rupture) : plus de qualité adaptative ni de pause automatique.** La vidéo tourne toujours en 1080p, sans pause hors écran ou onglet masqué, sans attendre l'approche de l'écran pour se charger. Retirés : les props `quality` et `onQualityChange`, les types `CanopCanopyQuality`, `CanopCanopyQualityLevel`, `CanopCanopyQualityReason`, `CanopCanopyQualityState` et `CanopCanopyLiteScene`, le champ `lite` de `CanopCanopyScene` et la variante 720p que `canopyScenesFrom` référençait. Migration : supprimer ces props et le champ `lite` des surcharges `scenes` ; un CDN n'a plus à héberger les fichiers `-720.*`. `animated={false}` et `prefers-reduced-motion` servent toujours l'affiche seule, et l'ordre WebM / MP4 reste décidé par `mediaCapabilities`.
+- **Vitrine : la page `CanopyBackground` ne limite plus la lecture à la démo la plus visible** ; la démo de qualité adaptative est retirée.
+
 ## [2.1.2] - 2026-10-29
 
 ### Modifié

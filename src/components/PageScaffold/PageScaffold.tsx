@@ -44,10 +44,6 @@ export interface CanopPageScaffoldProps {
   mobileFooterPlacement?: CanopMobileFooterPlacement;
   actionsPlacement?: CanopActionsPlacement;
   mainElement?: CanopMainElement;
-  /**
-   * Pose une frontière Suspense qui montre un squelette de page pendant qu'une route lazy charge.
-   * Changer la valeur en cours de vie remonte tout le contenu : l'état local des enfants est perdu.
-   */
   skeleton?: boolean;
   children: ReactNode;
 }

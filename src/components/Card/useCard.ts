@@ -16,18 +16,7 @@ import { squircleRingPath, squircleShadow, squircleSurface } from "../../squircl
 import { SQUIRCLE_CLIP_VAR } from "../../squircle/squircleSx";
 
 export type CanopCardVariant = "surface" | "interactive" | "floating" | "stat" | "frosted";
-/**
- * Tonalite semantique de la surface : ce que la carte **signifie**, pas la
- * couleur qu'on veut. Un solde previsionnel negatif est `error`, un quota
- * presque atteint est `warning`.
- */
 export type CanopCardTone = "neutral" | "info" | "success" | "warning" | "error";
-/**
- * Retour immediat sur une action : bonne ou mauvaise reponse.
- *
- * Un eclair, et non une tonalite : il se pose le temps d'etre vu puis
- * disparait, ce qui se pilote avec `useTransientState`.
- */
 export type CanopCardFlash = "success" | "error";
 export type CanopCardElevation = "none" | "sm" | "md" | "lg";
 export type CanopCardRadius = "md" | "lg" | "xl" | "2xl";

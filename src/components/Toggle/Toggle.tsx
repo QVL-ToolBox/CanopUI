@@ -16,9 +16,7 @@ export interface CanopToggleProps {
   checked: boolean;
   onChange: (checked: boolean) => void;
   disabled?: boolean;
-  /** Libellé visible à côté de l'interrupteur, et nom accessible par défaut. */
   label?: string;
-  /** Nom accessible explicite, pour un interrupteur sans libellé visible. Prend le pas sur `label`. */
   ariaLabel?: string;
   size?: "small" | "medium";
   color?: CanopToggleColor;

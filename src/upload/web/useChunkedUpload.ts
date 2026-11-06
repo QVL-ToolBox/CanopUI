@@ -15,7 +15,6 @@ export interface UseChunkedUploadParams {
   parentId?: string;
   filesPath?: string;
   chunkSize?: number;
-  /** Message affiché quand l'échec ne porte aucun message exploitable. */
   errorFallbackLabel?: string;
   onCompleted?: (result: CanopUploadResult) => void;
   onError?: (error: unknown) => void;

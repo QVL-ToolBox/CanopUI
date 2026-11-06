@@ -4,20 +4,6 @@ import { useAutocompleteField } from "./useAutocompleteField";
 
 export type { CanopAutocompleteOption, CanopAutocompleteProps } from "./autocompleteTypes";
 
-/**
- * Un champ qui complète la saisie en ligne à partir d'une liste d'options.
- *
- * La suite du libellé de la première option qui prolonge la saisie s'affiche
- * en gris au curseur ; `Tab`, `Entrée`, `→` ou un toucher l'acceptent. La
- * comparaison ignore accents, casse et séparateurs : « cote d » propose
- * « Côte-d'Or ». Une saisie égale à un libellé n'affiche aucune suggestion.
- * `onChange` reçoit la `value` de l'option, dès que la saisie correspond
- * exactement à son libellé.
- *
- * Les libellés doivent être uniques une fois normalisés : deux options
- * homonymes ne se distinguent pas, seule la première est retenue (un
- * avertissement le signale en développement).
- */
 export function Autocomplete({
   options,
   value,

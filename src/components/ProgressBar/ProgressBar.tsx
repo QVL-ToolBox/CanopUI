@@ -11,15 +11,6 @@ interface ProgressBarCommonProps {
   ariaLabel?: string;
 }
 
-/**
- * Barre simple : `value` est un **pourcentage**, de 0 à 100.
- *
- * `max` et `segments` sont refusés ici, et c'est le cœur du correctif : la
- * barre simple n'a jamais lu `max`, elle l'acceptait sans rien en faire. Un
- * `value={acquis} max={101}` s'affichait donc juste **par coïncidence**, un
- * total proche de cent tenant lieu de pourcentage. Aucune erreur, un affichage
- * faux dès que le total s'en éloigne.
- */
 export interface CanopProgressBarSingleProps extends ProgressBarCommonProps {
   value?: number;
   showValue?: boolean;
@@ -27,7 +18,6 @@ export interface CanopProgressBarSingleProps extends ProgressBarCommonProps {
   max?: never;
 }
 
-/** Barre segmentée : chaque `value` est une part de `max`, ou de leur somme. */
 export interface CanopProgressBarSegmentedProps extends ProgressBarCommonProps {
   segments: CanopProgressSegment[];
   max?: number;

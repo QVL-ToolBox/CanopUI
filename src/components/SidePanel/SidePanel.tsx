@@ -14,16 +14,7 @@ export interface CanopSidePanelProps {
   title?: string;
   width?: string;
   children: ReactNode;
-  /** Pied de panneau libre, rendu tel quel. */
   footer?: ReactNode;
-  /**
-   * Boutons de pied de panneau, alignes a droite comme ceux d'une `Card`.
-   *
-   * C'est la forme qui revenait partout : chaque application realignait ses
-   * boutons a la main, l'une dans un composant a elle, l'autre en recopiant
-   * une rangee dans chaque page, avec des ecarts differents. Pour un pied qui
-   * n'est pas une rangee de boutons, `footer` reste libre.
-   */
   actions?: ReactNode;
 }
 

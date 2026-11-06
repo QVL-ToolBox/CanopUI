@@ -2,20 +2,15 @@ import { useEffect, type RefObject } from "react";
 
 export interface UseCanopyPlaybackParams {
   videoRef: RefObject<HTMLVideoElement | null>;
-  active: boolean;
   sourceKey: string | undefined;
 }
 
 const GESTURE_EVENTS = ["pointerdown", "touchend", "keydown"] as const;
 
-export function useCanopyPlayback({ videoRef, active, sourceKey }: UseCanopyPlaybackParams): void {
+export function useCanopyPlayback({ videoRef, sourceKey }: UseCanopyPlaybackParams): void {
   useEffect(() => {
     const video = videoRef.current;
     if (!video || sourceKey === undefined) return;
-    if (!active) {
-      if (!video.paused) video.pause();
-      return;
-    }
 
     let disposed = false;
     const disarm = () => {
@@ -44,5 +39,5 @@ export function useCanopyPlayback({ videoRef, active, sourceKey }: UseCanopyPlay
       disarm();
       video.removeEventListener("canplay", attempt);
     };
-  }, [active, sourceKey, videoRef]);
+  }, [sourceKey, videoRef]);
 }

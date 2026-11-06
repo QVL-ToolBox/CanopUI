@@ -9,18 +9,14 @@ export interface CanopySceneVideoProps {
   poster: string;
   sources: CanopCanopySource[];
   onMediaError: (event: SyntheticEvent<HTMLVideoElement>) => void;
-  onPlaying: () => void;
 }
 
 const { duration, easing } = tokens.motion;
 const REVEAL_TRANSITION = `opacity ${duration.slower} ${easing.decelerate}`;
 
-function useVideoReveal(onPlaying: () => void) {
+function useVideoReveal() {
   const [revealed, setRevealed] = useState(false);
-  const reveal = useCallback(() => {
-    setRevealed(true);
-    onPlaying();
-  }, [onPlaying]);
+  const reveal = useCallback(() => setRevealed(true), []);
   return { revealed, reveal };
 }
 
@@ -29,9 +25,8 @@ export function CanopySceneVideo({
   poster,
   sources,
   onMediaError,
-  onPlaying,
 }: CanopySceneVideoProps) {
-  const { revealed, reveal } = useVideoReveal(onPlaying);
+  const { revealed, reveal } = useVideoReveal();
 
   return (
     <Box

@@ -4,22 +4,13 @@ import type { UseSvgMapViewportResult } from "../../svgmap";
 
 export interface UseSvgMapGesturesOptions {
   viewport: UseSvgMapViewportResult;
-  /**
-   * Déplacement, en pixels, au-delà duquel un contact devient un glissement.
-   *
-   * Sans ce seuil, tout déplacement de la carte finit par un clic sur la
-   * région relâchée : on croit se déplacer et on répond.
-   */
   tapTolerance?: number;
-  /** Zoom à la molette. */
   wheel?: boolean;
-  /** Pas de la molette. 1,15 avance d'environ 15 % par cran. */
   wheelStep?: number;
 }
 
 export interface UseSvgMapGesturesResult {
   onPointerDown: (event: ReactPointerEvent<SVGSVGElement>) => void;
-  /** Vrai quand le contact courant a dépassé la tolérance. */
   isDragging: () => boolean;
   attach: (element: SVGSVGElement | null) => void;
 }

@@ -29,6 +29,18 @@ const fadeCode = `<Carousel ariaLabel="Projets QVL" transition="fade" navigation
   <Card title="Budgy">…</Card>
 </Carousel>`;
 
+const multipleCode = `<Carousel ariaLabel="Projets QVL" visibleCount={3}>
+  <Card title="CustHome">…</Card>
+  <Card title="Budgy">…</Card>
+  <Card title="Drive">…</Card>
+  <Card title="Authenticator">…</Card>
+  <Card title="Admin">…</Card>
+</Carousel>
+
+<Carousel ariaLabel="Projets QVL" visibleCount={{ xs: 1, sm: 2, md: 3 }} navigation="bars">
+  …
+</Carousel>`;
+
 const autoPlayCode = `<Carousel ariaLabel="Projets QVL" navigation="bars" autoPlay interval={3000}>
   <Card title="CustHome">…</Card>
   <Card title="Budgy">…</Card>
@@ -83,14 +95,23 @@ const cartes = [
   { titre: "Drive", corps: "Coffre de documents partagés." },
 ];
 
+const cinqCartes = [
+  ...cartes,
+  { titre: "Authenticator", corps: "Connexion unique aux portails." },
+  { titre: "Admin", corps: "Pilotage des comptes et des droits." },
+];
+
+const RESPONSIVE_VISIBLE_COUNT = { xs: 1, sm: 2, md: 3 };
+
 const fr = {
   intro:
-    "Carrousel de cartes, une carte à la fois. Deux façons de naviguer — deux flèches posées à côté de la carte, ou une barre par carte — deux orientations, deux transitions, et un défilement automatique dont la durée par carte se règle. En mode barres, un balayage au doigt change de carte, et un clic sur la moitié gauche ou droite de la carte recule ou avance.",
+    "Carrousel de cartes, une à la fois ou plusieurs côte à côte avec visibleCount. Deux façons de naviguer — deux flèches posées à côté de la carte, ou une barre par carte — deux orientations, deux transitions, et un défilement automatique dont la durée par carte se règle. En mode barres, un balayage au doigt change de carte, et un clic sur la moitié gauche ou droite de la carte recule ou avance.",
   sections: {
     arrows: "Flèches",
     bars: "Barres",
     vertical: "Vertical",
     fade: "Fondu",
+    multiple: "Plusieurs cartes visibles",
     autoPlay: "Défilement automatique",
     touch: "Au doigt et au clic",
     api: "API du composant",
@@ -121,6 +142,11 @@ const fr = {
       description:
         "Les cartes ne se déplacent plus, elles se substituent. Utile quand le contenu est dense : un glissement attire l'œil vers le mouvement plutôt que vers la carte qui arrive.",
     },
+    multiple: {
+      title: "Trois cartes sur cinq, puis selon la largeur",
+      description:
+        "visibleCount affiche plusieurs cartes de même largeur. Chaque pas décale d'une seule carte : 1 2 3, puis 2 3 4, puis 3 4 5, où la flèche suivante se désactive. Barres, balayage, clic par moitié et clavier (flèches, Début et Fin sur la fenêtre) avancent du même pas, et il y a une barre par position. Passez un objet par point de rupture, lu du plus petit au plus grand, pour adapter le nombre à l'écran : ici une carte sur mobile, deux à partir de sm, trois à partir de md. Au-delà du nombre de cartes, toutes sont visibles et la navigation disparaît.",
+    },
     autoPlay: {
       title: "Défilement automatique, 3 s par carte",
       description:
@@ -143,15 +169,21 @@ const fr = {
       "Flèches posées à côté de la carte, ou une barre par carte, toutes de même longueur.",
     orientation: "Axe du défilement. À la verticale, flèches et barres changent de place.",
     transition: "Les cartes glissent, ou se substituent en fondu.",
+    visibleCount:
+      "Nombre de cartes visibles à la fois, ou un nombre par point de rupture ({ xs: 1, md: 3 }). Chaque pas décale d'une carte.",
     autoPlay: "Fait défiler les cartes seul. Boucle, et se suspend au survol comme au focus.",
     interval: "Durée d'affichage de chaque carte, en millisecondes.",
     previousLabel: "Nom accessible de la flèche précédente.",
     nextLabel: "Nom accessible de la flèche suivante.",
     children:
-      "Les cartes, un élément par carte. Une seule est visible à la fois. Attention : le carrousel les compte avec Children.toArray, qui aplatit un tableau mais pas un composant ni un fragment — passer <MesCartes /> lui fait voir une seule carte, ce qui masque flèches et barres et annule les transitions, sans aucune erreur.",
+      "Les cartes, un élément par carte. Attention : le carrousel les compte avec Children.toArray, qui aplatit un tableau mais pas un composant ni un fragment — passer <MesCartes /> lui fait voir une seule carte, ce qui masque flèches et barres et annule les transitions, sans aucune erreur.",
   },
   hookProps: {
-    activeIndex: "Index de la carte visible.",
+    activeIndex: "Index de la première carte visible.",
+    visibleCount: "Nombre de cartes visibles, ramené entre 1 et le nombre de cartes.",
+    positionCount: "Nombre de positions possibles, soit une barre par position.",
+    keyHandlers:
+      "À poser sur la fenêtre. Flèches de l'axe, Début et Fin, seulement quand la fenêtre a elle-même le focus.",
     canGoPrevious: "Faux en butée, vrai en permanence si le défilement automatique boucle.",
     canGoNext: "Idem, à l'autre extrémité.",
     goPrevious: "Recule d'une carte.",
@@ -169,12 +201,13 @@ const fr = {
 
 const en: typeof fr = {
   intro:
-    "Card carousel, one card at a time. Two ways to navigate — two arrows beside the card, or one bar per card — two orientations, two transitions, and autoplay with a per-card duration. In bars mode, a touch swipe changes card, and a click on the left or right half of the card steps back or forward.",
+    "Card carousel, one at a time or several side by side with visibleCount. Two ways to navigate — two arrows beside the card, or one bar per card — two orientations, two transitions, and autoplay with a per-card duration. In bars mode, a touch swipe changes card, and a click on the left or right half of the card steps back or forward.",
   sections: {
     arrows: "Arrows",
     bars: "Bars",
     vertical: "Vertical",
     fade: "Fade",
+    multiple: "Several visible cards",
     autoPlay: "Autoplay",
     touch: "Touch and click",
     api: "Component API",
@@ -205,6 +238,11 @@ const en: typeof fr = {
       description:
         "Cards no longer move, they replace one another. Useful with dense content: a slide draws the eye to the motion rather than to the arriving card.",
     },
+    multiple: {
+      title: "Three cards out of five, then by width",
+      description:
+        "visibleCount shows several cards of equal width. Each step shifts by a single card: 1 2 3, then 2 3 4, then 3 4 5, where the next arrow turns disabled. Bars, swipe, half-click and keyboard (arrows, Home and End on the viewport) move by the same step, and there is one bar per position. Pass an object per breakpoint, read from smallest to largest, to fit the count to the screen: here one card on mobile, two from sm, three from md. Beyond the number of cards, all of them are visible and navigation goes away.",
+    },
     autoPlay: {
       title: "Autoplay, 3 s per card",
       description:
@@ -226,15 +264,21 @@ const en: typeof fr = {
     navigation: "Arrows beside the card, or one bar per card, all the same length.",
     orientation: "Scrolling axis. Vertically, arrows and bars move.",
     transition: "Cards slide, or cross-fade.",
+    visibleCount:
+      "Number of cards visible at once, or one number per breakpoint ({ xs: 1, md: 3 }). Each step shifts by one card.",
     autoPlay: "Scrolls the cards on its own. Loops, and pauses on hover and focus.",
     interval: "Display duration of each card, in milliseconds.",
     previousLabel: "Accessible name of the previous arrow.",
     nextLabel: "Accessible name of the next arrow.",
     children:
-      "The cards, one element per card. Only one is visible at a time. Careful: the carousel counts them with Children.toArray, which flattens an array but not a component or a fragment — passing <MyCards /> makes it see a single card, which hides arrows and bars and cancels transitions, with no error at all.",
+      "The cards, one element per card. Careful: the carousel counts them with Children.toArray, which flattens an array but not a component or a fragment — passing <MyCards /> makes it see a single card, which hides arrows and bars and cancels transitions, with no error at all.",
   },
   hookProps: {
-    activeIndex: "Index of the visible card.",
+    activeIndex: "Index of the first visible card.",
+    visibleCount: "Number of visible cards, clamped between 1 and the number of cards.",
+    positionCount: "Number of reachable positions, that is one bar per position.",
+    keyHandlers:
+      "To spread on the viewport. Axis arrows, Home and End, only while the viewport itself has focus.",
     canGoPrevious: "False at the end, always true when autoplay loops.",
     canGoNext: "Same, at the other end.",
     goPrevious: "Steps back one card.",
@@ -288,15 +332,8 @@ function NavigationMaison() {
   );
 }
 
-// `Carousel` compte ses cartes avec `Children.toArray`, qui aplatit un tableau
-// mais **pas** un composant ni un fragment. Ces cartes etaient rendues par un
-// composant `Cartes` : le carrousel n'en voyait donc qu'une seule, ce qui
-// masquait les fleches et les barres (les deux exigent plus d'une carte),
-// annulait les transitions, et affichait les trois cartes cote a cote dans
-// l'unique diapositive. Aucune erreur nulle part. On renvoie donc le tableau
-// lui-meme, pas un element qui l'enveloppe.
-function cartesJsx() {
-  return cartes.map((carte) => (
+function cartesJsx(source = cartes) {
+  return source.map((carte) => (
     <Card key={carte.titre} title={carte.titre}>
       {carte.corps}
     </Card>
@@ -326,6 +363,12 @@ export default function CarouselDoc() {
       defaultValue: '"slide"',
       description: t.props.transition,
     },
+    {
+      name: "visibleCount",
+      type: "number | Partial<Record<CanopBreakpoint, number>>",
+      defaultValue: "1",
+      description: t.props.visibleCount,
+    },
     { name: "autoPlay", type: "boolean", defaultValue: "false", description: t.props.autoPlay },
     { name: "interval", type: "number", defaultValue: "5000", description: t.props.interval },
     { name: "previousLabel", type: "string", description: t.props.previousLabel },
@@ -335,6 +378,8 @@ export default function CarouselDoc() {
 
   const hookRows: PropRow[] = [
     { name: "activeIndex", type: "number", description: t.hookProps.activeIndex },
+    { name: "visibleCount", type: "number", description: t.hookProps.visibleCount },
+    { name: "positionCount", type: "number", description: t.hookProps.positionCount },
     { name: "canGoPrevious", type: "boolean", description: t.hookProps.canGoPrevious },
     { name: "canGoNext", type: "boolean", description: t.hookProps.canGoNext },
     { name: "goPrevious", type: "() => void", description: t.hookProps.goPrevious },
@@ -352,6 +397,11 @@ export default function CarouselDoc() {
       name: "clickHandlers",
       type: "{ onClick }",
       description: t.hookProps.clickHandlers,
+    },
+    {
+      name: "keyHandlers",
+      type: "{ onKeyDown }",
+      description: t.hookProps.keyHandlers,
     },
   ];
 
@@ -444,6 +494,28 @@ export default function CarouselDoc() {
               {cartesJsx()}
             </Carousel>
           </Box>
+        </DemoCard>
+      </DocSection>
+
+      <DocSection title={t.sections.multiple}>
+        <DemoCard
+          title={t.demos.multiple.title}
+          description={t.demos.multiple.description}
+          code={multipleCode}
+          align="stretch"
+        >
+          <Stack gap="lg">
+            <Carousel ariaLabel="Projets QVL, trois cartes" visibleCount={3}>
+              {cartesJsx(cinqCartes)}
+            </Carousel>
+            <Carousel
+              ariaLabel="Projets QVL, selon la largeur"
+              visibleCount={RESPONSIVE_VISIBLE_COUNT}
+              navigation="bars"
+            >
+              {cartesJsx(cinqCartes)}
+            </Carousel>
+          </Stack>
         </DemoCard>
       </DocSection>
 

@@ -15,6 +15,7 @@ export interface CanopCheckboxProps {
   size?: "small" | "medium";
   required?: boolean;
   error?: string | null;
+  ariaLabel?: string;
 }
 
 function isInteractiveTarget(target: EventTarget | null): boolean {
@@ -30,6 +31,7 @@ export function Checkbox({
   size = "medium",
   required = false,
   error = null,
+  ariaLabel,
 }: CanopCheckboxProps) {
   const helperTextId = useId();
   const controlId = useId();
@@ -49,6 +51,7 @@ export function Checkbox({
       slotProps={{
         input: {
           id: controlId,
+          "aria-label": ariaLabel,
           "aria-invalid": hasError || undefined,
           "aria-describedby": hasError ? helperTextId : undefined,
         },

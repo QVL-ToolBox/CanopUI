@@ -92,6 +92,10 @@ const fr = {
     size: "Largeur et hauteur du bouton, en unités CSS relatives (rem).",
     iconSize: "Taille de l'icône affichée dans le bouton.",
     onClick: "Handler appelé au clic.",
+    type: "Type natif du bouton. submit valide le formulaire qui l'entoure, sauf pendant loading.",
+    onMouseDown:
+      "Handler appelé à l'appui souris, avant le clic. Utile pour empêcher qu'un champ voisin perde le focus.",
+    onPointerDown: "Handler appelé à l'appui du pointeur (souris, doigt, stylet), avant le clic.",
     disabled: "Désactive le bouton.",
     loading:
       "Affiche un Spinner de la couleur de l'icône à sa place, pose aria-busy et ignore le clic tout en conservant le focus.",
@@ -149,6 +153,10 @@ const en: typeof fr = {
     size: "Button width and height, in relative CSS units (rem).",
     iconSize: "Size of the icon displayed inside the button.",
     onClick: "Handler called on click.",
+    type: "Native button type. submit submits the surrounding form, except while loading.",
+    onMouseDown:
+      "Handler called on mouse press, before the click. Handy to keep a neighbouring field from losing focus.",
+    onPointerDown: "Handler called on pointer press (mouse, finger, pen), before the click.",
     disabled: "Disables the button.",
     loading:
       "Shows a Spinner in the icon color in its place, sets aria-busy and ignores clicks while keeping focus.",
@@ -200,6 +208,22 @@ export default function IconActionButtonDoc() {
       name: "onClick",
       type: "MouseEventHandler<HTMLButtonElement>",
       description: t.props.onClick,
+    },
+    {
+      name: "type",
+      type: '"button" | "submit" | "reset"',
+      defaultValue: '"button"',
+      description: t.props.type,
+    },
+    {
+      name: "onMouseDown",
+      type: "MouseEventHandler<HTMLButtonElement>",
+      description: t.props.onMouseDown,
+    },
+    {
+      name: "onPointerDown",
+      type: "PointerEventHandler<HTMLButtonElement>",
+      description: t.props.onPointerDown,
     },
     {
       name: "disabled",

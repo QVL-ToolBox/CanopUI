@@ -33,6 +33,13 @@ const customCode = `<DeleteButton
 
 const disabledCode = `<DeleteButton ariaLabel="Supprimer" disabled onConfirm={() => {}} />`;
 
+const failureCode = `<DeleteButton
+  ariaLabel="Supprimer"
+  onConfirm={() => Promise.reject(new Error("Serveur indisponible"))}
+/>`;
+
+const failingDelete = () => Promise.reject(new Error("Serveur indisponible"));
+
 const sizeCode = `<DeleteButton ariaLabel="Supprimer" size="2.5rem" onConfirm={() => {}} />
 <DeleteButton ariaLabel="Supprimer" size="3.25rem" onConfirm={() => {}} />
 <DeleteButton ariaLabel="Supprimer" size="4rem" onConfirm={() => {}} />`;
@@ -47,6 +54,7 @@ const fr = {
   sections: {
     usage: "Utilisation",
     customization: "Personnalisation",
+    failure: "Échec de la suppression",
     sizes: "Tailles",
     disabled: "Désactivé",
     api: "API",
@@ -58,6 +66,9 @@ const fr = {
     customTitle: "Textes de la confirmation",
     customDescription:
       "Personnalisez le titre, le message et les libellés des boutons de la boîte de dialogue.",
+    failureTitle: "onConfirm rejette",
+    failureDescription:
+      "Si onConfirm lève une erreur ou rejette sa promesse, la boîte de dialogue reste ouverte, un message d'erreur est affiché et annoncé, et le bouton de confirmation redevient utilisable.",
     sizeTitle: "Prop size",
     sizeDescription:
       "La taille est une chaîne CSS exprimée en rem et pilote la largeur et la hauteur du bouton.",
@@ -73,6 +84,8 @@ const fr = {
     confirmMessage: "Message affiché dans la boîte de dialogue de confirmation.",
     confirmLabel: "Libellé du bouton de confirmation. Valeur traduite par défaut.",
     cancelLabel: "Libellé du bouton d'annulation. Valeur traduite par défaut.",
+    errorMessage:
+      "Message affiché dans la boîte de dialogue quand onConfirm échoue. Valeur traduite par défaut.",
     disabled: "Désactive le bouton.",
     size: "Largeur et hauteur du bouton, en unités CSS relatives (rem).",
     iconSize: "Taille de l'icône affichée dans le bouton.",
@@ -85,6 +98,7 @@ const en: typeof fr = {
   sections: {
     usage: "Usage",
     customization: "Customization",
+    failure: "Failed deletion",
     sizes: "Sizes",
     disabled: "Disabled",
     api: "API",
@@ -95,6 +109,9 @@ const en: typeof fr = {
       "The click opens a confirmation. The onConfirm action only runs once the user has confirmed.",
     customTitle: "Confirmation texts",
     customDescription: "Customize the title, message and button labels of the dialog.",
+    failureTitle: "onConfirm rejects",
+    failureDescription:
+      "When onConfirm throws or rejects its promise, the dialog stays open, an error message is shown and announced, and the confirm button becomes usable again.",
     sizeTitle: "size prop",
     sizeDescription:
       "The size is a CSS string expressed in rem and drives the width and height of the button.",
@@ -110,6 +127,7 @@ const en: typeof fr = {
     confirmMessage: "Message displayed in the confirmation dialog.",
     confirmLabel: "Label of the confirmation button. Translated value by default.",
     cancelLabel: "Label of the cancel button. Translated value by default.",
+    errorMessage: "Message shown in the dialog when onConfirm fails. Translated value by default.",
     disabled: "Disables the button.",
     size: "Button width and height, in relative CSS units (rem).",
     iconSize: "Size of the icon displayed inside the button.",
@@ -168,6 +186,11 @@ export default function DeleteButtonDoc() {
       description: t.props.cancelLabel,
     },
     {
+      name: "errorMessage",
+      type: "string",
+      description: t.props.errorMessage,
+    },
+    {
       name: "disabled",
       type: "boolean",
       defaultValue: "false",
@@ -212,6 +235,15 @@ export default function DeleteButtonDoc() {
             cancelLabel="Annuler"
             onConfirm={() => {}}
           />
+        </DemoCard>
+      </DocSection>
+      <DocSection title={t.sections.failure}>
+        <DemoCard
+          title={t.demos.failureTitle}
+          description={t.demos.failureDescription}
+          code={failureCode}
+        >
+          <DeleteButton ariaLabel="Supprimer" onConfirm={failingDelete} />
         </DemoCard>
       </DocSection>
       <DocSection title={t.sections.sizes}>

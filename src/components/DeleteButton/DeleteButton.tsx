@@ -1,24 +1,20 @@
-import { useState, type ReactNode } from "react";
+import type { ReactNode } from "react";
 import { ConfirmDialog } from "../ConfirmDialog";
 import type { CanopIconSize } from "../Icon";
 import { IconActionButton } from "../IconActionButton";
 import { useTranslation } from "../../i18n";
+import { useDeleteButton } from "./useDeleteButton";
 
 export interface CanopDeleteButtonProps {
   onConfirm: () => void | Promise<void>;
   ariaLabel: string;
-
   confirmTitle?: string;
-
   confirmMessage?: ReactNode;
-
   confirmLabel?: string;
-
   cancelLabel?: string;
+  errorMessage?: string;
   disabled?: boolean;
-  /** Largeur et hauteur du bouton, en unités CSS relatives (rem). */
   size?: string;
-  /** Taille de l'icône affichée dans le bouton. */
   iconSize?: CanopIconSize;
 }
 
@@ -29,23 +25,13 @@ export function DeleteButton({
   confirmMessage,
   confirmLabel,
   cancelLabel,
+  errorMessage,
   disabled = false,
   size = "2.5rem",
   iconSize,
 }: CanopDeleteButtonProps) {
   const { t } = useTranslation();
-  const [open, setOpen] = useState(false);
-  const [busy, setBusy] = useState(false);
-
-  const handleConfirm = async () => {
-    setBusy(true);
-    try {
-      await onConfirm();
-      setOpen(false);
-    } finally {
-      setBusy(false);
-    }
-  };
+  const { open, busy, failed, openDialog, closeDialog, confirm } = useDeleteButton({ onConfirm });
 
   return (
     <>
@@ -56,18 +42,19 @@ export function DeleteButton({
         disabled={disabled}
         size={size}
         iconSize={iconSize}
-        onClick={() => setOpen(true)}
+        onClick={openDialog}
       />
       <ConfirmDialog
         open={open}
         title={confirmTitle ?? t("canop.deleteButton.title")}
         message={confirmMessage}
+        error={failed ? (errorMessage ?? t("canop.deleteButton.error")) : null}
         confirmLabel={confirmLabel ?? t("canop.deleteButton.confirm")}
         cancelLabel={cancelLabel ?? t("canop.deleteButton.cancel")}
         destructive
         loading={busy}
-        onConfirm={handleConfirm}
-        onCancel={() => setOpen(false)}
+        onConfirm={confirm}
+        onCancel={closeDialog}
       />
     </>
   );

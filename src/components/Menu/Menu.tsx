@@ -11,7 +11,6 @@ export interface CanopMenuPosition {
 }
 
 export interface CanopMenuItemModel {
-  /** Cle stable. A defaut, le libelle sert de cle. */
   key?: string;
   label: string;
   icon?: CanopIconName;
@@ -27,16 +26,6 @@ export interface CanopMenuProps {
   position?: CanopMenuPosition;
   ariaLabel?: string;
   onItemClick?: () => void;
-  /**
-   * Les entrees du menu, decrites plutot que composees.
-   *
-   * Chaque entree ferme le menu avant d'agir. C'est la forme que les
-   * applications reconstruisaient chacune de son cote, en oubliant tantot la
-   * fermeture, tantot l'ordre entre fermer et agir.
-   *
-   * Pour un menu qui contient autre chose que des entrees -- un en-tete, un
-   * separateur, un champ -- passer `children`.
-   */
   items?: CanopMenuItemModel[];
   children?: ReactNode;
 }

@@ -12,33 +12,20 @@ import {
 } from "./viewBox";
 
 export interface UseSvgMapViewportOptions {
-  /** Vue d'ensemble, au format de l'attribut `viewBox`. */
   viewBox: string;
-  /** Zoom maximal, exprimé en facteur de la vue d'ensemble. */
   maxZoom?: number;
 }
 
 export interface UseSvgMapViewportResult {
-  /** À poser sur le `<svg>`. */
   viewBox: string;
   box: CanopViewBox;
   base: CanopViewBox;
   zoomed: boolean;
-  /** Un facteur inférieur à 1 rapproche, supérieur éloigne. */
   zoomBy: (factor: number, origin?: CanopViewBoxOrigin) => void;
-  /** Déplacement exprimé en fraction de la taille de la vue. */
   panBy: (dxFraction: number, dyFraction: number) => void;
-  /** Cadre sur un ensemble de régions, désignées par leur identifiant. */
   fitTo: (ids: readonly string[], options?: { padding?: number }) => void;
   reset: () => void;
   setBox: (next: CanopViewBox) => void;
-  /**
-   * Le composant y dépose ses tracés.
-   *
-   * La géométrie appartient à la vue : sans ce registre, `fitTo` n'aurait
-   * aucun moyen de connaître l'étendue d'une région, et le cadrage devrait
-   * être recalculé à la main dans chaque application.
-   */
   registerRegion: (id: string, element: SVGGraphicsElement | null) => void;
 }
 

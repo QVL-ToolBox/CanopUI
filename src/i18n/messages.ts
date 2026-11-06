@@ -116,6 +116,7 @@ const baseMessages: Record<CanopLocale, CanopMessages> = {
     "canop.deleteButton.title": "Confirmer la suppression ?",
     "canop.deleteButton.confirm": "Supprimer",
     "canop.deleteButton.cancel": "Annuler",
+    "canop.deleteButton.error": "La suppression a échoué. Réessayez.",
     "canop.validation.required": "Ce champ est requis.",
     "canop.validation.email": "Format d'email invalide.",
     "canop.validation.pattern": "Format invalide.",
@@ -147,6 +148,10 @@ const baseMessages: Record<CanopLocale, CanopMessages> = {
     "canop.thermometer.normal": "normale",
     "canop.thermometer.high": "élevée",
     "canop.thermometer.critical": "critique",
+    "canop.quickAdd.submit": "Ajouter",
+    "canop.copyField.copy": "Copier",
+    "canop.copyField.copied": "Copié dans le presse-papier",
+    "canop.copyField.failed": "Copie impossible, sélectionnez le texte pour le copier",
   },
   en: {
     "canop.themeToggle.group": "Theme",
@@ -256,6 +261,7 @@ const baseMessages: Record<CanopLocale, CanopMessages> = {
     "canop.deleteButton.title": "Confirm deletion?",
     "canop.deleteButton.confirm": "Delete",
     "canop.deleteButton.cancel": "Cancel",
+    "canop.deleteButton.error": "Deletion failed. Please try again.",
     "canop.validation.required": "This field is required.",
     "canop.validation.email": "Invalid email format.",
     "canop.validation.pattern": "Invalid format.",
@@ -287,6 +293,10 @@ const baseMessages: Record<CanopLocale, CanopMessages> = {
     "canop.thermometer.normal": "normal",
     "canop.thermometer.high": "high",
     "canop.thermometer.critical": "critical",
+    "canop.quickAdd.submit": "Add",
+    "canop.copyField.copy": "Copy",
+    "canop.copyField.copied": "Copied to clipboard",
+    "canop.copyField.failed": "Copy failed, select the text to copy it",
   },
 };
 

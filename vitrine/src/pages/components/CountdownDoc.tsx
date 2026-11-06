@@ -63,11 +63,6 @@ function Chrono({ labels }: { labels: { start: string; pause: string; restart: s
   );
 }
 
-/**
- * L'implementation que le hook remplace : elle retire une seconde par tick, et
- * accumule donc le retard de chaque rendu. Elle n'est ici que pour la
- * comparaison -- ne pas s'en inspirer.
- */
 function useNaifCountdown(duration: number, running: boolean): number {
   const [left, setLeft] = useState(duration);
   useEffect(() => {

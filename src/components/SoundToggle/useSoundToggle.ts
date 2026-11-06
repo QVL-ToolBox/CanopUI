@@ -4,7 +4,6 @@ import type { CanopIconName } from "../Icon";
 
 export interface UseSoundToggleResult {
   muted: boolean;
-  /** Nom accessible du bouton : il annonce l'action, pas l'état. */
   label: string;
   icon: CanopIconName;
   toggle: () => void;

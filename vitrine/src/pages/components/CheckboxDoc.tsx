@@ -168,6 +168,8 @@ const fr = {
     size: "Taille de la case.",
     required: "Marque le champ comme obligatoire.",
     error: "Message d'erreur affiché sous la case et passant le contrôle en état d'erreur.",
+    ariaLabel:
+      "Nom accessible de la case quand aucun libellé n'est visible, par exemple dans une ligne de liste.",
   },
 };
 
@@ -209,6 +211,8 @@ const en: typeof fr = {
     size: "Size of the checkbox.",
     required: "Marks the field as required.",
     error: "Error message displayed below the checkbox, putting the control in an error state.",
+    ariaLabel:
+      "Accessible name of the checkbox when no label is visible, for instance in a list row.",
   },
 };
 
@@ -262,6 +266,11 @@ export default function CheckboxDoc() {
       type: "string | null",
       defaultValue: "null",
       description: t.props.error,
+    },
+    {
+      name: "ariaLabel",
+      type: "string",
+      description: t.props.ariaLabel,
     },
   ];
   return (

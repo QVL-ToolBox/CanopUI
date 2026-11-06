@@ -55,6 +55,32 @@ const options: CanopSegmentedControlIconOption[] = [
   ariaLabel="Affichage"
 />`;
 
+const badgeCode = `const options = [
+  { value: "inbox", label: "Reçus", badge: 12 },
+  { value: "drafts", label: "Brouillons", badge: 3, badgeColor: "secondary" },
+  { value: "sent", label: "Envoyés", badge: "Nouveau", badgeColor: "accent" },
+];
+
+<SegmentedControl options={options} value={box} onChange={setBox} ariaLabel="Boîte" />
+
+const views = [
+  { value: "grid", label: "Vue grille", icon: "apps" },
+  { value: "list", label: "Vue liste", icon: "menu", badge: 128, badgeColor: "error" },
+];
+
+<SegmentedControl iconOnly options={views} value={view} onChange={setView} ariaLabel="Affichage" />`;
+
+const badgeOptions: CanopSegmentedControlOption[] = [
+  { value: "inbox", label: "Reçus", badge: 12 },
+  { value: "drafts", label: "Brouillons", badge: 3, badgeColor: "secondary" },
+  { value: "sent", label: "Envoyés", badge: "Nouveau", badgeColor: "accent" },
+];
+
+const badgeIconOptions: CanopSegmentedControlIconOption[] = [
+  { value: "grid", label: "Vue grille", icon: "apps" },
+  { value: "list", label: "Vue liste", icon: "menu", badge: 128, badgeColor: "error" },
+];
+
 const viewOptions: CanopSegmentedControlOption[] = [
   { value: "grid", label: "Grille", icon: "apps" },
   { value: "list", label: "Liste", icon: "menu" },
@@ -134,6 +160,23 @@ function IconOnlyDemo() {
   );
 }
 
+function BadgeDemo() {
+  const [box, setBox] = useState("inbox");
+  const [view, setView] = useState("grid");
+  return (
+    <>
+      <SegmentedControl options={badgeOptions} value={box} onChange={setBox} ariaLabel="Boîte" />
+      <SegmentedControl
+        iconOnly
+        options={badgeIconOptions}
+        value={view}
+        onChange={setView}
+        ariaLabel="Affichage avec compteur"
+      />
+    </>
+  );
+}
+
 function FullWidthDemo() {
   const [value, setValue] = useState("all");
   return (
@@ -154,8 +197,10 @@ const fr = {
     basic: "Utilisation",
     sizes: "Tailles",
     iconOnly: "Icônes seules",
+    badges: "Badges",
     fullWidth: "Pleine largeur",
     api: "API",
+    optionApi: "Champs d'une option",
   },
   demos: {
     basicTitle: "Contrôlé avec icônes",
@@ -167,13 +212,26 @@ const fr = {
     iconOnlyTitle: "iconOnly",
     iconOnlyDescription:
       "Segments carrés à icône seule dans un conteneur en pilule, comme la bascule d'affichage de la Toolbar. Chaque option doit porter une icône ; son label reste le nom accessible du segment. L'icône active passe en variante pleine.",
+    badgesTitle: "badge sur une option",
+    badgesDescription:
+      "Chaque option accepte un badge : un nombre, rendu par Badge (masqué à 0, 99+ au-delà de 99), ou un court texte. Il éclot sur un ressort quand sa valeur change et reste lisible que l'option soit choisie ou non. Le badge entre dans le nom accessible de l'option, par exemple « Reçus (12) » ; pour un badge qui n'est pas du texte, badgeLabel donne ce qui est lu. badgeColor choisit la couleur de palette, primary par défaut.",
     fullWidthTitle: "fullWidth",
     fullWidthDescription:
       "Étire le sélecteur sur toute la largeur, chaque segment occupant une part égale.",
   },
+  optionProps: {
+    value: "Valeur de l'option, transmise à onChange.",
+    label: "Libellé visible, ou nom accessible en iconOnly.",
+    icon: "Icône du registre, obligatoire en iconOnly.",
+    disabled: "Désactive l'option, sautée par la navigation clavier.",
+    badge: "Compteur (number) ou court contenu (ReactNode) affiché après le libellé.",
+    badgeLabel:
+      "Texte lu par les lecteurs d'écran pour le badge ; déduit d'un nombre ou d'un texte.",
+    badgeColor: "Couleur de palette du badge.",
+  },
   props: {
     options:
-      "Liste des options ; chacune porte value, label, une icône et un état désactivé optionnels.",
+      "Liste des options ; chacune porte value, label, et en option une icône, un état désactivé et un badge.",
     value: "Valeur actuellement sélectionnée.",
     onChange: "Handler appelé avec la nouvelle valeur au changement de segment.",
     ariaLabel: "Libellé accessible du groupe (attribut aria-label du radiogroup).",
@@ -191,8 +249,10 @@ const en: typeof fr = {
     basic: "Usage",
     sizes: "Sizes",
     iconOnly: "Icons only",
+    badges: "Badges",
     fullWidth: "Full width",
     api: "API",
+    optionApi: "Option fields",
   },
   demos: {
     basicTitle: "Controlled with icons",
@@ -203,12 +263,25 @@ const en: typeof fr = {
     iconOnlyTitle: "iconOnly",
     iconOnlyDescription:
       "Square icon-only segments in a pill container, like the Toolbar view toggle. Every option must carry an icon; its label remains the accessible name of the segment. The active icon switches to its solid variant.",
+    badgesTitle: "badge on an option",
+    badgesDescription:
+      "Each option accepts a badge: a number, rendered by Badge (hidden at 0, 99+ above 99), or a short text. It pops in on a spring when its value changes and stays readable whether the option is selected or not. The badge is part of the option's accessible name, for example “Inbox (12)”; for a badge that is not text, badgeLabel gives what is read. badgeColor picks the palette colour, primary by default.",
     fullWidthTitle: "fullWidth",
     fullWidthDescription:
       "Stretches the control to the full width, each segment taking an equal share.",
   },
+  optionProps: {
+    value: "Option value, passed to onChange.",
+    label: "Visible label, or accessible name with iconOnly.",
+    icon: "Registry icon, required with iconOnly.",
+    disabled: "Disables the option, skipped by keyboard navigation.",
+    badge: "Counter (number) or short content (ReactNode) shown after the label.",
+    badgeLabel: "Text read by screen readers for the badge; inferred from a number or a text.",
+    badgeColor: "Palette colour of the badge.",
+  },
   props: {
-    options: "List of options; each carries value, label, an optional icon and disabled state.",
+    options:
+      "List of options; each carries value, label, and optionally an icon, a disabled state and a badge.",
     value: "Currently selected value.",
     onChange: "Handler called with the new value when the segment changes.",
     ariaLabel: "Accessible label of the group (radiogroup aria-label attribute).",
@@ -244,6 +317,26 @@ export default function SegmentedControlDoc() {
     { name: "iconOnly", type: "boolean", defaultValue: "false", description: t.props.iconOnly },
   ];
 
+  const optionRows: PropRow[] = [
+    { name: "value", type: "T", required: true, description: t.optionProps.value },
+    { name: "label", type: "string", required: true, description: t.optionProps.label },
+    { name: "icon", type: "CanopIconName", description: t.optionProps.icon },
+    {
+      name: "disabled",
+      type: "boolean",
+      defaultValue: "false",
+      description: t.optionProps.disabled,
+    },
+    { name: "badge", type: "number | ReactNode", description: t.optionProps.badge },
+    { name: "badgeLabel", type: "string", description: t.optionProps.badgeLabel },
+    {
+      name: "badgeColor",
+      type: "CanopBadgeColor",
+      defaultValue: '"primary"',
+      description: t.optionProps.badgeColor,
+    },
+  ];
+
   return (
     <DocPage title="SegmentedControl" intro={t.intro} importCode={importCode}>
       <DocSection title={t.sections.basic}>
@@ -275,6 +368,16 @@ export default function SegmentedControlDoc() {
           <IconOnlyDemo />
         </DemoCard>
       </DocSection>
+      <DocSection title={t.sections.badges}>
+        <DemoCard
+          title={t.demos.badgesTitle}
+          description={t.demos.badgesDescription}
+          code={badgeCode}
+          align="start"
+        >
+          <BadgeDemo />
+        </DemoCard>
+      </DocSection>
       <DocSection title={t.sections.fullWidth}>
         <DemoCard
           title={t.demos.fullWidthTitle}
@@ -287,6 +390,9 @@ export default function SegmentedControlDoc() {
       </DocSection>
       <DocSection title={t.sections.api}>
         <PropsTable rows={propRows} />
+      </DocSection>
+      <DocSection title={t.sections.optionApi}>
+        <PropsTable rows={optionRows} />
       </DocSection>
     </DocPage>
   );

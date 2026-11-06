@@ -32,38 +32,17 @@ export interface CanopInputProps {
   autoComplete?: string;
   autoFocus?: boolean;
   size?: CanopInputSize;
-  /**
-   * Une référence sur le champ natif, pour lui rendre le focus sans le
-   * remonter.
-   *
-   * `autoFocus` ne joue qu'au montage : reprendre la main sur un champ déjà
-   * présent — après chaque question d'un quiz, après une erreur de saisie —
-   * obligeait à poser une `key` changeante, donc à **détruire et reconstruire**
-   * le champ. Le focus revient, mais avec lui l'animation d'entrée du libellé,
-   * la perte de l'état de validation locale et une transition qui n'a aucune
-   * raison d'être rejouée.
-   */
   inputRef?: Ref<HTMLInputElement>;
   icon?: CanopIconName;
   pattern?: RegExp;
   patternMessage?: string;
   validate?: (value: string) => string | null;
-  /**
-   * Propose en gris la suite de la saisie : une liste de textes, ou un
-   * résolveur (synchrone ou asynchrone) relu à chaque frappe. Changer de
-   * résolveur prend effet à la frappe suivante.
-   */
   completion?: CanopCompletionSource;
   completionNormalize?: (text: string) => string;
-  /**
-   * Appelé avec la suggestion entière quand l'utilisateur l'accepte : `Tab`,
-   * `Entrée`, `→`, `Ctrl`/`⌥` + `→` sur son dernier mot, ou un toucher sur le
-   * texte gris. Une saisie qui finit par égaler une suggestion, lettre à
-   * lettre, n'est pas une acceptation.
-   */
   onCompletionAccept?: (suggestion: string) => void;
   ariaLabel?: string;
   onBlur?: () => void;
+  maxLength?: number;
 }
 
 export function Input({
@@ -91,6 +70,7 @@ export function Input({
   onCompletionAccept,
   ariaLabel,
   onBlur,
+  maxLength,
 }: CanopInputProps) {
   const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
@@ -184,6 +164,7 @@ export function Input({
           htmlInput: {
             ...(completesInline ? inlineCompletion.inputProps : undefined),
             "aria-label": ariaLabel,
+            maxLength,
           },
         }}
       />

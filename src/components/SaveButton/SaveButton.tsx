@@ -6,19 +6,11 @@ import { useSaveButton } from "./useSaveButton";
 
 export interface CanopSaveButtonProps {
   onSave: () => void | Promise<void>;
-
   successMessage?: string;
-
   errorMessage?: string;
-
   disabled?: boolean;
-
-  /** Largeur et hauteur du bouton, en unités CSS relatives (rem). */
   size?: string;
-
-  /** Taille de l'icône affichée dans le bouton. */
   iconSize?: CanopIconSize;
-
   ariaLabel?: string;
 }
 

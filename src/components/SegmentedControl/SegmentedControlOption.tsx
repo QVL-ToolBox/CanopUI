@@ -8,6 +8,8 @@ import { SQUIRCLE_CLIP_VAR } from "../../squircle/squircleSx";
 import { glowFilter, useNeonGlow } from "../../theme/neonGlow";
 import { Icon } from "../Icon";
 import { SlidingIndicator } from "../SlidingIndicator";
+import { SegmentedControlBadge } from "./SegmentedControlBadge";
+import { useSegmentBadge } from "./useSegmentBadge";
 import type { CanopSegmentedControlOption, CanopSegmentedControlSize } from "./useSegmentedControl";
 
 const SEGMENT_INDICATOR_HALO = glowFilter("primary", "rest");
@@ -16,6 +18,9 @@ const paddingBySize: Record<CanopSegmentedControlSize, { x: number; y: number }>
   small: { x: 1.25, y: 0.5 },
   medium: { x: 1.75, y: 0.75 },
 };
+
+const ICON_ONLY_BADGE_PADDING = { x: 0.5, y: 0 };
+const ICON_ONLY_PADDING = { x: 0, y: 0 };
 
 const minHeightBySize: Record<CanopSegmentedControlSize, string> = {
   small: "2rem",
@@ -42,7 +47,9 @@ export function SegmentedControlOption<T extends string>({
   onSelect,
 }: SegmentedControlOptionProps<T>) {
   const glows = useNeonGlow();
-  const padding = iconOnly ? { x: 0, y: 0 } : paddingBySize[size];
+  const { badge, ariaLabel } = useSegmentBadge(option, iconOnly);
+  const iconOnlyPadding = badge ? ICON_ONLY_BADGE_PADDING : ICON_ONLY_PADDING;
+  const padding = iconOnly ? iconOnlyPadding : paddingBySize[size];
   const minHeight = minHeightBySize[size];
   const indicatorRadius = iconOnly ? "var(--canop-radius-pill)" : "var(--canop-radius-md)";
 
@@ -51,7 +58,7 @@ export function SegmentedControlOption<T extends string>({
       ref={registerRef}
       role="radio"
       aria-checked={selected}
-      aria-label={iconOnly ? option.label : undefined}
+      aria-label={ariaLabel}
       tabIndex={selected ? 0 : -1}
       disabled={option.disabled}
       onClick={onSelect}
@@ -109,6 +116,7 @@ export function SegmentedControlOption<T extends string>({
             {option.label}
           </Typography>
         )}
+        {badge ? <SegmentedControlBadge key={badge.key} badge={badge} /> : null}
       </Stack>
     </ButtonBase>
   );

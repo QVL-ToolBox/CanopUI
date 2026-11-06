@@ -3,13 +3,18 @@ import {
   useEffect,
   useRef,
   useState,
+  type KeyboardEvent,
   type MouseEvent,
   type PointerEvent,
 } from "react";
 import { useReducedMotion } from "../../motion";
 import {
   CAROUSEL_DEFAULT_INTERVAL,
+  CAROUSEL_DEFAULT_VISIBLE_COUNT,
   clampIndex,
+  clampVisibleCount,
+  keyboardStep,
+  positionCountOf,
   stepIndex,
   swipeDirection,
   type CanopCarouselOrientation,
@@ -17,41 +22,47 @@ import {
 
 export interface UseCarouselOptions {
   count: number;
+  visibleCount?: number;
   orientation?: CanopCarouselOrientation;
   autoPlay?: boolean;
-  /** Duree d'affichage par carte, en millisecondes. */
   interval?: number;
 }
 
 export interface UseCarouselResult {
   activeIndex: number;
+  visibleCount: number;
+  positionCount: number;
   canGoPrevious: boolean;
   canGoNext: boolean;
   goPrevious: () => void;
   goNext: () => void;
   goTo: (index: number) => void;
-  /** Le defilement automatique tourne-t-il reellement en ce moment. */
   playing: boolean;
   pause: () => void;
   resume: () => void;
-  /** A poser sur la fenetre : ne reagit qu'au doigt, jamais a la souris. */
   swipeHandlers: {
     onPointerDown: (event: PointerEvent) => void;
     onPointerUp: (event: PointerEvent) => void;
     onPointerCancel: () => void;
   };
-  /**
-   * A poser sur la fenetre : un clic dans la moitie avant recule, dans la
-   * moitie arriere avance. Les clics des elements interactifs de la carte leur
-   * restent acquis.
-   */
   clickHandlers: {
     onClick: (event: MouseEvent<HTMLElement>) => void;
   };
+  keyHandlers: {
+    onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
+  };
+}
+
+const INTERACTIFS_GARDANT_LEURS_CLICS =
+  "a, button, input, select, textarea, label, [role=button], [role=link]";
+
+function keepsItsClick(target: EventTarget): boolean {
+  return target instanceof Element && target.closest(INTERACTIFS_GARDANT_LEURS_CLICS) !== null;
 }
 
 export function useCarousel({
   count,
+  visibleCount: requestedVisibleCount = CAROUSEL_DEFAULT_VISIBLE_COUNT,
   orientation = "horizontal",
   autoPlay = false,
   interval = CAROUSEL_DEFAULT_INTERVAL,
@@ -62,26 +73,31 @@ export function useCarousel({
   const origin = useRef<{ x: number; y: number } | null>(null);
   const clickFollowingSwipeToIgnore = useRef(false);
 
+  const visibleCount = clampVisibleCount(requestedVisibleCount, count);
+  const positionCount = positionCountOf(count, visibleCount);
   const loop = autoPlay;
 
   useEffect(
-    function keepIndexInRangeWhenCardRemoved() {
-      setActiveIndex((current) => clampIndex(current, count));
+    function keepIndexInRangeWhenWindowShrinks() {
+      setActiveIndex((current) => clampIndex(current, positionCount));
     },
-    [count],
+    [positionCount],
   );
 
-  const goTo = useCallback((index: number) => setActiveIndex(clampIndex(index, count)), [count]);
+  const goTo = useCallback(
+    (index: number) => setActiveIndex(clampIndex(index, positionCount)),
+    [positionCount],
+  );
   const goPrevious = useCallback(
-    () => setActiveIndex((current) => stepIndex(current, count, -1, loop)),
-    [count, loop],
+    () => setActiveIndex((current) => stepIndex(current, positionCount, -1, loop)),
+    [positionCount, loop],
   );
   const goNext = useCallback(
-    () => setActiveIndex((current) => stepIndex(current, count, 1, loop)),
-    [count, loop],
+    () => setActiveIndex((current) => stepIndex(current, positionCount, 1, loop)),
+    [positionCount, loop],
   );
 
-  const playing = autoPlay && !paused && !reducedMotion && count > 1;
+  const playing = autoPlay && !paused && !reducedMotion && positionCount > 1;
 
   useEffect(() => {
     if (!playing) return;
@@ -114,16 +130,13 @@ export function useCarousel({
     origin.current = null;
   }, []);
 
-  const INTERACTIFS_GARDANT_LEURS_CLICS =
-    "a, button, input, select, textarea, label, [role=button], [role=link]";
-
   const onClick = useCallback(
     (event: MouseEvent<HTMLElement>) => {
       if (clickFollowingSwipeToIgnore.current) {
         clickFollowingSwipeToIgnore.current = false;
         return;
       }
-      if ((event.target as HTMLElement).closest(INTERACTIFS_GARDANT_LEURS_CLICS)) return;
+      if (keepsItsClick(event.target)) return;
       const boite = event.currentTarget.getBoundingClientRect();
       const avant =
         orientation === "vertical"
@@ -135,10 +148,29 @@ export function useCarousel({
     [orientation, goPrevious, goNext],
   );
 
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLElement>) => {
+      if (event.target !== event.currentTarget || positionCount <= 1) return;
+      const step = keyboardStep(event.key, orientation);
+      if (step !== 0) {
+        event.preventDefault();
+        if (step === 1) goNext();
+        else goPrevious();
+        return;
+      }
+      if (event.key !== "Home" && event.key !== "End") return;
+      event.preventDefault();
+      goTo(event.key === "Home" ? 0 : positionCount - 1);
+    },
+    [orientation, positionCount, goNext, goPrevious, goTo],
+  );
+
   return {
     activeIndex,
-    canGoPrevious: loop ? count > 1 : activeIndex > 0,
-    canGoNext: loop ? count > 1 : activeIndex < count - 1,
+    visibleCount,
+    positionCount,
+    canGoPrevious: loop ? positionCount > 1 : activeIndex > 0,
+    canGoNext: loop ? positionCount > 1 : activeIndex < positionCount - 1,
     goPrevious,
     goNext,
     goTo,
@@ -147,5 +179,6 @@ export function useCarousel({
     resume,
     swipeHandlers: { onPointerDown, onPointerUp, onPointerCancel },
     clickHandlers: { onClick },
+    keyHandlers: { onKeyDown },
   };
 }

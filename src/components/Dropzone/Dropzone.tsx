@@ -10,9 +10,7 @@ import { useDropzone } from "./useDropzone";
 
 export interface CanopDropzoneProps {
   onFiles: (files: File[]) => void;
-  /** Intitulé affiché dans la zone, et nom accessible par défaut. */
   title: string;
-  /** Nom accessible explicite de la zone de dépôt. Prend le pas sur `title`. */
   ariaLabel?: string;
   hint?: string;
   overlayLabel?: string;

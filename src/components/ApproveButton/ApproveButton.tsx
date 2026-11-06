@@ -5,9 +5,7 @@ import { IconActionButton } from "../IconActionButton";
 export interface CanopApproveButtonProps {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   disabled?: boolean;
-  /** Largeur et hauteur du bouton, en unités CSS relatives (rem). */
   size?: string;
-  /** Taille de l'icône affichée dans le bouton. */
   iconSize?: CanopIconSize;
   ariaLabel: string;
 }

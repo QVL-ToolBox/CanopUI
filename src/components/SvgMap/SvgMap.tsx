@@ -13,96 +13,26 @@ import { useSvgMapGestures } from "./useSvgMapGestures";
 
 export interface CanopSvgMapRegion {
   id: string;
-  /** Le tracé, tel quel : l'attribut `d` d'un `<path>`. */
   path: string;
-  /**
-   * Nom lisible, **affiché** en infobulle au survol (`<title>`), et nom
-   * accessible à défaut d'`ariaLabel`.
-   */
   name?: string;
-  /**
-   * Nom accessible de la région, **jamais affiché**.
-   *
-   * Il existe parce que les deux besoins ne se confondent pas : un jeu de
-   * désignation retire `name` pour qu'aucune infobulle ne vende la réponse au
-   * survol, et se retrouvait alors avec un nom accessible replié sur l'`id` —
-   * donc un lecteur d'écran qui annonce le numéro du département cherché. Cette
-   * propriété étiquette la région sans rien montrer.
-   *
-   * Ordre de résolution du nom accessible d'une région sélectionnable :
-   * `ariaLabel`, puis `name`, puis l'`id` en dernier recours — un bouton sans
-   * nom accessible étant pire encore. **Si l'`id` porte l'information à
-   * deviner, poser `ariaLabel`** : c'est le seul moyen de ne pas la dire.
-   */
   ariaLabel?: string;
 }
 
 export interface CanopSvgMapProps {
-  /** Vue d'ensemble du SVG, au format de l'attribut `viewBox`. */
   viewBox: string;
   regions: readonly CanopSvgMapRegion[];
-  /** Couleur de remplissage d'une région. Appelée à chaque rendu. */
   fill?: (id: string) => string;
-  /**
-   * Couleur du contour des régions, `divider` par défaut.
-   *
-   * Ce jeton est le trait discret qui sépare deux surfaces, et il convient
-   * tant que la carte n'est qu'une illustration. Il ne suffit plus dès que le
-   * **découpage lui-même porte l'information** : en thème sombre, `divider`
-   * est une surface neutre logée dans la même famille que tous les
-   * remplissages disponibles, et le contour y plafonne à 1,47:1 — sous le 3:1
-   * que WCAG 1.4.11 demande à un objet graphique. Une carte qu'on lit, ou sur
-   * laquelle on désigne, doit donc monter son trait : `text.disabled` vaut
-   * 2,94:1 en clair et 3,07:1 en sombre, le plus discret qui approche le
-   * seuil des deux côtés.
-   */
   stroke?: string;
   onSelect?: (id: string) => void;
-  /**
-   * Rend les régions cliquables et atteignables au clavier.
-   *
-   * Une carte non sélectionnable reste une image : elle se déplace et se
-   * zoome, mais ne répond pas.
-   */
   selectable?: boolean;
-  /**
-   * Vue partagée avec l'appelant, pour piloter le cadrage de l'extérieur —
-   * un bouton « Île-de-France », par exemple. Sans elle, le composant tient
-   * la sienne.
-   */
   viewport?: UseSvgMapViewportResult;
   maxZoom?: number;
-  /**
-   * Largeur maximale de la carte, centrée dans son conteneur au-delà.
-   *
-   * Une carte occupe toute la largeur qu'on lui laisse et sa hauteur suit le
-   * rapport du `viewBox` : sous un conteneur large, une vue presque carrée
-   * dépasse l'écran en hauteur. Sans cette prop, chaque appelant devait
-   * l'encadrer lui-même.
-   */
   maxWidth?: string;
-  /**
-   * Hauteur maximale de la carte.
-   *
-   * Elle est **traduite en largeur** — `hauteur × rapport du viewBox` — parce
-   * qu'une carte tire sa hauteur de sa largeur : posée telle quelle, une
-   * hauteur maximale ne rétrécirait rien, elle laisserait le dessin déborder
-   * du cadre au lieu de le contraindre. Traduite, elle borne réellement la
-   * carte, le cadre reste collé au dessin — donc les commandes de zoom aussi —
-   * et le centrage de `maxWidth` vaut pour les deux.
-   *
-   * C'est la borne qui compte dès que la place manque en hauteur : sur un
-   * écran de bureau peu haut, une vue presque carrée est plafonnée par la
-   * hauteur utile bien avant de l'être par la largeur, et l'élargir n'y change
-   * rien. Posée avec `maxWidth`, la plus serrée des deux l'emporte.
-   */
   maxHeight?: string;
-  /** Boutons de zoom intégrés. */
   controls?: boolean;
   tapTolerance?: number;
   wheel?: boolean;
   ariaLabel?: string;
-  /** Posé au-dessus de la carte : légende, commandes maison, consigne. */
   overlay?: ReactNode;
 }
 

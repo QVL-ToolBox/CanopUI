@@ -1,4 +1,5 @@
 import Box from "@mui/material/Box";
+import type { ReactNode } from "react";
 import { tokens } from "../../tokens";
 import { squircleClip } from "../../squircle";
 import { innerGlow, useNeonGlow } from "../../theme/neonGlow";
@@ -7,7 +8,7 @@ import type { CanopBadgeColor } from "./useBadge";
 interface BadgePillProps {
   isDot: boolean;
   color: CanopBadgeColor;
-  label: string;
+  label: ReactNode;
   ariaLabel?: string;
 }
 

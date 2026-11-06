@@ -8,7 +8,7 @@ export interface LavaInks {
   lit: string;
 }
 
-const LIT_SHADE: Record<CanopThemeMode, "main" | "light"> = { dark: "light", light: "main" };
+const LIT_SHADE: Record<CanopThemeMode, "light" | "dark"> = { dark: "light", light: "dark" };
 
 function readVariable(element: Element, name: string): string {
   return getComputedStyle(element).getPropertyValue(name).trim();

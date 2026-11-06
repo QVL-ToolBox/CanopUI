@@ -232,15 +232,14 @@ défiler la page ; `gestures="direct"` convient quand la carte est le contenu pr
 ### Fond de canopée — un greffon Vite, rien à recopier
 
 Depuis `canopui` 0.0, `PageScaffold` est habillé par défaut par `CanopyBackground` : une canopée filmée
-du sol vers le zénith, rendue sous Blender, en deux scènes — une par thème. Les dix fichiers
+du sol vers le zénith, rendue sous Blender, en deux scènes — une par thème. Les six fichiers
 sont **livrés dans le paquet** sous `dist/assets/video/` : pour chaque thème, un WebM et un MP4
-en 1080p (`canopy-<mode>.webm/.mp4`, WebM de 4,8 Mo en sombre et 6,4 Mo en clair), un WebM et
-un MP4 en 720p (`canopy-<mode>-720.webm/.mp4`, de 1,4 à 2,1 Mo chacun) et l'image d'affiche
-(`canopy-<mode>-poster.jpg`).
+en 1080p (`canopy-<mode>.webm/.mp4`, WebM de 4,8 Mo en sombre et 6,4 Mo en clair) et l'image
+d'affiche (`canopy-<mode>-poster.jpg`).
 
 Ils ne peuvent pas passer par le bundle du consommateur : Vite **inline en base64 tout asset
-qu'un module référence**, et une quarantaine de Mo de vidéo deviendraient plus de 50 Mo de
-chaîne de caractères chargés d'un bloc. Ils sont donc servis comme des fichiers, depuis `CANOPY_ASSET_BASE`, soit
+qu'un module référence**, et des dizaines de Mo de vidéo deviendraient une chaîne de caractères
+encore plus lourde, chargée d'un bloc. Ils sont donc servis comme des fichiers, depuis `CANOPY_ASSET_BASE`, soit
 `/canopui/video` — et c'est **le greffon livré avec la librairie** qui s'en charge, en
 développement comme au build :
 
@@ -274,26 +273,16 @@ const scenes = canopyScenesFrom("https://cdn.qvl-project.com/canopy");
 <CanopyBackground scenes={scenes} />;
 ```
 
-Un portail qui sert les scènes depuis un CDN doit y héberger **les dix fichiers**, variantes
-`-720.*` comprises : `canopyScenesFrom` les référence d'office comme palier intermédiaire.
+Un portail qui sert les scènes depuis un CDN doit y héberger les six fichiers.
 
-Un navigateur ne lit qu'**une seule vidéo** à la fois, celle du thème actif au niveau retenu.
-L'ordre des sources est décidé par `mediaCapabilities` : le WebM (VP9, plus léger) passe en
-premier, sauf quand le navigateur annonce, en `quality="auto"`, que le VP9 n'est pas décodé de
-façon économe (`powerEfficient`, autrement dit sans la carte graphique) alors que le H.264 l'est.
-Le MP4 passe alors devant : quelques Mo de plus, mais une lecture qui ne sollicite pas le
-processeur.
-Les MP4 sont en faststart, lisibles avant la fin du téléchargement. Rien n'est joué quand
+Un navigateur ne lit qu'**une seule vidéo** à la fois, celle du thème actif, toujours en 1080p :
+ni pause automatique, ni baisse de résolution. L'affiche est peinte d'abord, puis la vidéo
+apparaît en fondu dès sa première image jouée. L'ordre des sources est décidé par
+`mediaCapabilities` : le WebM (VP9, plus léger) passe en premier, sauf quand le navigateur
+annonce que le VP9 n'est pas décodé de façon économe (`powerEfficient`, autrement dit sans la
+carte graphique) alors que le H.264 l'est. Le MP4 passe alors devant. Les MP4 sont en faststart,
+lisibles avant la fin du téléchargement. Rien n'est joué avec `animated={false}` ou quand
 l'utilisateur a demandé un mouvement réduit : l'image d'affiche est rendue à la place.
-
-La prop `quality` (`"auto"` par défaut, `"high"`, `"low"`) règle le coût du fond. En `auto`,
-l'affiche est peinte d'abord, la vidéo ne se télécharge qu'à l'approche de l'écran, apparaît en
-fondu, se met en pause hors écran ou onglet masqué, et descend d'un cran — vers la variante 720p,
-fournie par défaut (`scenes.lite`), puis vers l'affiche — sur connexion limitée, appareil
-modeste, images perdues à la lecture ou blocages répétés de mise en mémoire tampon ; économiseur
-de données et 2G passent directement à l'affiche. Une décision de descente n'est jamais annulée
-pendant la vie du composant. `onQualityChange` remonte le niveau servi et sa raison, y compris
-l'affiche imposée par `animated={false}` (`disabled`) ou le mouvement réduit (`reduced-motion`).
 
 Un portail qui ne veut pas de ce fond passe en un mot au `ShapeBackground`, une trame de points
 traversée de masses lumineuses façon lampe à lave, teintée de `primary` (ou d'`accent` avec

@@ -4,17 +4,10 @@ import { useSoundToggle } from "./useSoundToggle";
 
 export interface CanopSoundToggleProps {
   variant?: CanopIconActionButtonVariant;
-  /** Largeur et hauteur du bouton, en unités CSS relatives (rem). */
   size?: string;
   iconSize?: CanopIconSize;
 }
 
-/**
- * Le bouton de coupure du son.
- *
- * Il ne garde aucun état : la coupure vit dans le provider, sinon deux boutons
- * posés sur deux écrans afficheraient des vérités différentes.
- */
 export function SoundToggle({
   variant = "secondary",
   size = "2.5rem",

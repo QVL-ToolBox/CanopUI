@@ -363,6 +363,8 @@ const fr = {
       "Appelé avec la suggestion entière quand elle est acceptée : Tab, Entrée, →, Ctrl + → sur son dernier mot ou un toucher sur le texte gris. Une saisie qui finit par égaler la suggestion n'en est pas une. Sans suggestion visible, Entrée garde son rôle natif.",
     ariaLabel: "Nom accessible explicite, pour un champ sans libellé visible.",
     onBlur: "Appelé quand le champ perd le focus, après la validation intégrée.",
+    maxLength:
+      "Nombre maximal de caractères, posé sur le champ natif : au-delà, la frappe ou le collage est tronqué par le navigateur. Sans limite par défaut.",
     showStrength:
       "Affiche l'indicateur de robustesse et active la validation des critères de sécurité.",
     strengthValue: "Mot de passe évalué en temps réel selon les critères de sécurité.",
@@ -500,6 +502,8 @@ const en: typeof fr = {
       "Called with the whole suggestion when it is accepted: Tab, Enter, →, Ctrl + → on its last word or a tap on the gray text. Typing until the entry equals the suggestion does not count. With no visible suggestion, Enter keeps its native role.",
     ariaLabel: "Explicit accessible name, for a field with no visible label.",
     onBlur: "Called when the field loses focus, after the built-in validation.",
+    maxLength:
+      "Maximum number of characters, set on the native field: beyond it, the browser truncates typing or pasting. Unlimited by default.",
     showStrength: "Shows the strength indicator and enables validation of the security criteria.",
     strengthValue: "Password evaluated in real time against the security criteria.",
   },
@@ -643,6 +647,12 @@ export default function InputDoc() {
       type: "() => void",
       defaultValue: "—",
       description: t.props.onBlur,
+    },
+    {
+      name: "maxLength",
+      type: "number",
+      defaultValue: "—",
+      description: t.props.maxLength,
     },
   ];
   const inputPasswordRows: PropRow[] = [

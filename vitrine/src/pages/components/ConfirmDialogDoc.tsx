@@ -126,6 +126,8 @@ const fr = {
     open: "Contrôle l'ouverture du dialogue.",
     title: "Titre du dialogue, généralement formulé sous forme de question.",
     message: "Contenu explicatif affiché sous le titre. Masqué si absent.",
+    error:
+      "Message d'erreur affiché sous le message et annoncé aux lecteurs d'écran. Masqué si absent.",
     confirmLabel: "Libellé du bouton de confirmation.",
     cancelLabel: "Libellé du bouton d'annulation.",
     destructive:
@@ -156,6 +158,8 @@ const en: typeof fr = {
     open: "Controls the opening of the dialog.",
     title: "Title of the dialog, usually phrased as a question.",
     message: "Explanatory content displayed below the title. Hidden when absent.",
+    error:
+      "Error message shown below the message and announced to screen readers. Hidden when absent.",
     confirmLabel: "Label of the confirmation button.",
     cancelLabel: "Label of the cancel button.",
     destructive:
@@ -187,6 +191,11 @@ export default function ConfirmDialogDoc() {
       name: "message",
       type: "ReactNode",
       description: t.props.message,
+    },
+    {
+      name: "error",
+      type: "ReactNode",
+      description: t.props.error,
     },
     {
       name: "confirmLabel",

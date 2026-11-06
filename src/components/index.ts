@@ -159,6 +159,7 @@ export {
 export {
   IconActionButton,
   type CanopIconActionButtonProps,
+  type CanopIconActionButtonType,
   type CanopIconActionButtonVariant,
 } from "./IconActionButton";
 export { InlineInput, type CanopInlineInputProps } from "./InlineInput";
@@ -342,16 +343,25 @@ export {
   canopyScenesFrom,
   resolveCanopyScene,
   type CanopCanopyBackgroundProps,
-  type CanopCanopyLiteScene,
-  type CanopCanopyQuality,
-  type CanopCanopyQualityLevel,
-  type CanopCanopyQualityReason,
-  type CanopCanopyQualityState,
   type CanopCanopyScene,
   type CanopCanopySceneMode,
   type CanopCanopySceneOverride,
 } from "./CanopyBackground";
 export { Checkbox, type CanopCheckboxProps } from "./Checkbox";
+export {
+  CheckListItem,
+  type CanopCheckListItemProps,
+  type CanopCheckListItemMarker,
+  type CanopCheckListItemCheckboxPlacement,
+  type CanopCheckListItemCheckboxSize,
+} from "./CheckListItem";
+export { CopyField, type CanopCopyFieldProps } from "./CopyField";
+export {
+  QuickAdd,
+  type CanopQuickAddHandler,
+  type CanopQuickAddOutcome,
+  type CanopQuickAddProps,
+} from "./QuickAdd";
 export { BulletList, type CanopBulletListItem, type CanopBulletListProps } from "./BulletList";
 export {
   Donut,

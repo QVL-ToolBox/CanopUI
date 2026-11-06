@@ -1,43 +1,23 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 export interface UseCountdownOptions {
-  /** Durée totale, en millisecondes. */
   duration: number;
-  /** Fait courir l'horloge. Repasser à `false` gèle le temps restant. */
   running?: boolean;
-  /** Fréquence de rafraîchissement de l'affichage, en millisecondes. */
   interval?: number;
-  /** Appelé une seule fois, quand le temps est épuisé. */
   onEnd?: () => void;
 }
 
 export interface UseCountdownResult {
-  /** Temps restant, en millisecondes. Jamais négatif. */
   remaining: number;
-  /** Temps restant arrondi à la seconde supérieure, pour l'affichage. */
   seconds: number;
-  /** Temps écoulé, en millisecondes. */
   elapsed: number;
-  /** Part écoulée, de 0 à 1. */
   progress: number;
   ended: boolean;
-  /** Repart de la durée pleine. */
   restart: () => void;
 }
 
 const DEFAULT_INTERVAL = 100;
 
-/**
- * Un compte à rebours qui ne dérive pas.
- *
- * Le temps restant est **recalculé depuis une échéance absolue**, il n'est
- * jamais décrémenté. Un compte à rebours qui retire une seconde à chaque tick
- * accumule le retard de chaque rendu : soixante secondes affichées en font
- * davantage en vrai, et l'écart grandit avec la charge de la page. Il se
- * trompe aussi lourdement quand l'onglet passe en arrière-plan, où le
- * navigateur bride les minuteries — ici le réveil affiche le temps réellement
- * écoulé, parce que c'est l'horloge qui fait foi, pas le nombre de ticks.
- */
 export function useCountdown({
   duration,
   running = false,

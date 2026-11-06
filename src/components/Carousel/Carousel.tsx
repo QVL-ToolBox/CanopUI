@@ -1,48 +1,49 @@
 import Box from "@mui/material/Box";
-import { Children, useCallback, useRef, type ReactNode } from "react";
+import { Children, type ReactNode } from "react";
 import { useTranslation } from "../../i18n";
 import { withoutFocusRing } from "../../interaction";
 import { tokens } from "../../tokens";
-import { CarouselArrow, type CarouselArrowDirection } from "./CarouselArrow";
+import type { CanopResponsiveValue } from "../_shared/responsiveValue";
+import { CarouselArrow } from "./CarouselArrow";
 import { CarouselIndicators } from "./CarouselIndicators";
+import { CarouselSlide } from "./CarouselSlide";
 import {
   CAROUSEL_DEFAULT_INTERVAL,
-  slideTransform,
+  CAROUSEL_DEFAULT_VISIBLE_COUNT,
+  isInWindow,
   type CanopCarouselNavigation,
   type CanopCarouselOrientation,
   type CanopCarouselTransition,
 } from "./carouselHelpers";
 import { useCarousel } from "./useCarousel";
+import { useCarouselArrowFocus } from "./useCarouselArrowFocus";
+import { useCarouselVisibleCount } from "./useCarouselVisibleCount";
 
 export type { CanopCarouselNavigation, CanopCarouselOrientation, CanopCarouselTransition };
 
 export interface CanopCarouselProps {
   ariaLabel: string;
-  /** `arrows` place une fleche de chaque cote de la carte, `bars` une barre par carte. */
   navigation?: CanopCarouselNavigation;
   orientation?: CanopCarouselOrientation;
   transition?: CanopCarouselTransition;
-  /** Fait defiler les cartes seul. Boucle, et se suspend au survol et au focus. */
+  visibleCount?: CanopResponsiveValue<number>;
   autoPlay?: boolean;
-  /** Duree d'affichage par carte, en millisecondes. */
   interval?: number;
   previousLabel?: string;
   nextLabel?: string;
   children: ReactNode;
 }
 
-const SHADOW_GUTTER = tokens.spacing.sm;
-
-const TRANSITION = [
-  `transform var(--canop-motion-duration-slow) ${tokens.motion.easing.organic}`,
-  `opacity var(--canop-motion-duration-base) ${tokens.motion.easing.standard}`,
-].join(", ");
+function windowTracks(visibleCount: number): string {
+  return `repeat(${visibleCount}, minmax(0, 1fr))`;
+}
 
 export function Carousel({
   ariaLabel,
   navigation = "arrows",
   orientation = "horizontal",
   transition = "slide",
+  visibleCount: requestedVisibleCount = CAROUSEL_DEFAULT_VISIBLE_COUNT,
   autoPlay = false,
   interval = CAROUSEL_DEFAULT_INTERVAL,
   previousLabel,
@@ -51,11 +52,13 @@ export function Carousel({
 }: CanopCarouselProps) {
   const { t } = useTranslation();
   const slides = Children.toArray(children);
-  const count = slides.length;
   const isVertical = orientation === "vertical";
+  const responsiveVisibleCount = useCarouselVisibleCount(requestedVisibleCount);
 
   const {
     activeIndex,
+    visibleCount,
+    positionCount,
     canGoPrevious,
     canGoNext,
     goPrevious,
@@ -66,31 +69,25 @@ export function Carousel({
     resume,
     swipeHandlers,
     clickHandlers,
-  } = useCarousel({ count, orientation, autoPlay, interval });
+    keyHandlers,
+  } = useCarousel({
+    count: slides.length,
+    visibleCount: responsiveVisibleCount,
+    orientation,
+    autoPlay,
+    interval,
+  });
+  const { previousArrowRef, nextArrowRef, viewportRef, focusFallback } = useCarouselArrowFocus();
 
-  const previousArrowRef = useRef<HTMLButtonElement | null>(null);
-  const nextArrowRef = useRef<HTMLButtonElement | null>(null);
-  const viewportRef = useRef<HTMLDivElement | null>(null);
-
-  const focusFallback = useCallback((from: CarouselArrowDirection) => {
-    const sibling = from === "previous" ? nextArrowRef.current : previousArrowRef.current;
-    if (sibling && !sibling.disabled) {
-      sibling.focus();
-      return;
-    }
-    viewportRef.current?.focus();
-  }, []);
-
-  const showArrows = navigation === "arrows" && count > 1;
-  const showBars = navigation === "bars" && count > 1;
+  const navigable = positionCount > 1;
+  const showArrows = navigation === "arrows" && navigable;
+  const showBars = navigation === "bars" && navigable;
+  const moving = transition === "slide" || visibleCount > 1;
   const pageScrollAxisLeftToBrowser = isVertical ? "pan-x" : "pan-y";
+  const tracks = windowTracks(visibleCount);
 
   return (
-    <Box
-      sx={{
-        position: "relative",
-      }}
-    >
+    <Box sx={{ position: "relative" }}>
       <Box
         sx={{
           display: "flex",
@@ -116,11 +113,12 @@ export function Carousel({
           ref={viewportRef}
           role="region"
           aria-label={ariaLabel}
-          tabIndex={count > 1 ? 0 : undefined}
+          tabIndex={navigable ? 0 : undefined}
           onPointerEnter={pause}
           onPointerLeave={resume}
           onFocus={pause}
           onBlur={resume}
+          {...keyHandlers}
           {...(showBars ? { ...swipeHandlers, ...clickHandlers } : {})}
           sx={{
             display: "grid",
@@ -129,34 +127,23 @@ export function Carousel({
             minWidth: 0,
             width: "100%",
             touchAction: pageScrollAxisLeftToBrowser,
-            gridTemplateAreas: '"slide"',
+            ...(isVertical ? { gridTemplateRows: tracks } : { gridTemplateColumns: tracks }),
             ...withoutFocusRing,
             ...(showBars && isVertical ? { paddingRight: tokens.spacing.lg } : null),
           }}
         >
-          {slides.map((slide, index) => {
-            const offset = index - activeIndex;
-            const active = index === activeIndex;
-            return (
-              <Box
-                key={index}
-                aria-hidden={active ? undefined : true}
-                sx={{
-                  gridArea: "slide",
-                  minWidth: 0,
-                  padding: SHADOW_GUTTER,
-                  transition: TRANSITION,
-                  ...(transition === "fade"
-                    ? { opacity: active ? 1 : 0 }
-                    : { transform: slideTransform(offset, orientation) }),
-                  ...(active ? null : { pointerEvents: "none" }),
-                  "@media (prefers-reduced-motion: reduce)": { transition: "none" },
-                }}
-              >
-                {slide}
-              </Box>
-            );
-          })}
+          {slides.map((slide, index) => (
+            <CarouselSlide
+              key={index}
+              offset={index - activeIndex}
+              visible={isInWindow(index, activeIndex, visibleCount)}
+              orientation={orientation}
+              transition={transition}
+              moving={moving}
+            >
+              {slide}
+            </CarouselSlide>
+          ))}
         </Box>
 
         {showArrows && (
@@ -176,7 +163,7 @@ export function Carousel({
         <CarouselIndicators
           ariaLabel={ariaLabel}
           orientation={orientation}
-          count={count}
+          count={positionCount}
           activeIndex={activeIndex}
           autoPlaying={playing}
           interval={interval}

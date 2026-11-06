@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 
-/** `refraction` : Chromium avec filtre SVG dans `backdrop-filter` ; sinon `fallback`. */
 export type CanopRefractionSupport = "refraction" | "fallback";
 
 interface BrandedUserAgent {
@@ -40,7 +39,6 @@ function detectRefractionSupport(): CanopRefractionSupport {
   return isChromium() && parsesSvgBackdropFilter() ? "refraction" : "fallback";
 }
 
-/** Détecte une fois la prise en charge de la réfraction ; `fallback` si `enabled` est faux. */
 export function useRefractionSupport(enabled = true): CanopRefractionSupport {
   return useMemo(() => (enabled ? detectRefractionSupport() : "fallback"), [enabled]);
 }

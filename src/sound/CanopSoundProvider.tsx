@@ -34,30 +34,14 @@ function writeStoredOrKeepForSession(storageKey: string | null, settings: Stored
 }
 
 export interface CanopSoundProviderProps {
-  /** Silence au premier lancement, avant tout choix de l'utilisateur. */
   defaultMuted?: boolean;
-  /** Volume général au premier lancement, de 0 à 1. */
   defaultVolume?: number;
-  /** Clé de persistance du réglage, ou `null` pour ne rien retenir. */
   storageKey?: string | null;
-  /** Fichiers audio par son, avec repli sur la synthèse en cas d'échec. */
   sources?: CanopSoundEngineOptions["sources"];
-  /** Recettes synthétisées personnalisées, par son. */
   recipes?: Partial<Record<CanopSoundName, CanopSoundRecipe>>;
   children: ReactNode;
 }
 
-/**
- * Porte l'état sonore de l'application : la coupure, le volume, et le moteur.
- *
- * L'état est partagé, et c'est le point. Chaque écran qui gardait son propre
- * `useState(isMuted())` se désynchronisait du bouton de coupure dès qu'un
- * autre écran le touchait.
- *
- * Il n'existe aucune media query « moins de son » — `prefers-reduced-motion`
- * ne parle que d'animation. Le réglage est donc explicite et persisté, et rien
- * ne joue avant un geste de l'utilisateur.
- */
 export function CanopSoundProvider({
   defaultMuted = false,
   defaultVolume = 1,

@@ -33,9 +33,6 @@ const viewportCode = `const viewport = useSvgMapViewport({ viewBox: franceMap.vi
 <Button onClick={() => viewport.fitTo(IDF)}>Île-de-France</Button>
 <SvgMap viewport={viewport} viewBox={france.viewBox} regions={regions} />`;
 
-// Les types du paquet renvoient vers un module qui n'est pas installé, donc
-// tout y arrive en `any`. On redit la forme ici plutôt que de laisser passer
-// un `any` implicite dans la démonstration.
 interface FranceLocation {
   id: string;
   name: string;
@@ -60,7 +57,6 @@ const CIBLE = "var(--canop-palette-primary-main)";
 const JUSTE = "var(--canop-palette-success-main)";
 const FAUX = "var(--canop-palette-error-main)";
 
-/** Une progression plausible et stable, pour montrer le coloriage. */
 function niveauDe(id: string): number {
   let hash = 2166136261;
   for (const caractere of id) {

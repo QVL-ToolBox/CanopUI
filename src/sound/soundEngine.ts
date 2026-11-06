@@ -5,44 +5,21 @@ import {
   type CanopSoundRecipe,
 } from "./soundRecipes";
 
-/**
- * Ce qu'il est réellement advenu d'une demande de lecture.
- *
- * Exposé, et non journalisé : un son qui ne sort pas est invisible, donc
- * indébogable. C'est la même leçon que la vidéo du fond animé, où un échec de
- * décodage silencieux avait coûté une session entière.
- */
 export type CanopSoundOutcome = "file" | "synth" | "muted" | "unavailable";
 
 export interface CanopPlayOptions {
   muted?: boolean;
-  /** Volume général, de 0 à 1, appliqué par-dessus le volume de la recette. */
   volume?: number;
 }
 
 export interface CanopSoundEngineOptions {
-  /** Remplace tout ou partie du catalogue synthétisé. */
   recipes?: Partial<Record<CanopSoundName, CanopSoundRecipe>>;
-  /**
-   * Fichiers audio à utiliser à la place de la synthèse, par son.
-   *
-   * Un fichier absent, refusé ou indécodable **ne rend jamais l'application
-   * muette** : la synthèse reprend la main, et l'échec n'est tenté qu'une fois.
-   */
   sources?: Partial<Record<CanopSoundName, string>>;
 }
 
 export interface CanopSoundEngine {
   play(name: CanopSoundName, options?: CanopPlayOptions): CanopSoundOutcome;
-  /** Précharge les fichiers déclarés. Sans effet quand il n'y en a aucun. */
   preload(): Promise<void>;
-  /**
-   * Crée et réveille le contexte audio.
-   *
-   * À appeler depuis un geste de l'utilisateur : les navigateurs suspendent
-   * tout contexte créé sans interaction, et un contexte suspendu joue dans le
-   * vide sans lever d'erreur.
-   */
   unlock(): void;
   dispose(): void;
 }

@@ -14,8 +14,8 @@ describe("identite publique du paquet", () => {
     expect(paquet.name).toBe("@canop/ui");
   });
 
-  it("porte la version 2.1.2", () => {
-    expect(paquet.version).toBe("2.1.2");
+  it("porte la version 2.2.0", () => {
+    expect(paquet.version).toBe("2.2.0");
   });
 
   it.each([".", "./map", "./vite", "./styles.css"])(

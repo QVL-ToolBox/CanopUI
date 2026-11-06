@@ -15,21 +15,12 @@ const fillSx = {
 
 export interface PresenceItemProps {
   children: ReactNode;
-  /**
-   * Fait glisser l'élément jusqu'à sa nouvelle place quand un voisin sort.
-   * Ignoré en mouvement réduit.
-   */
   layout?: boolean;
   fill?: boolean;
   role?: AriaRole;
   ariaBusy?: boolean;
 }
 
-/**
- * Élément qui entre en fondu et sort en glissant. Doit être l'enfant direct
- * d'un `Presence` et porter une `key` stable (un id, jamais un index), posée
- * par le consommateur.
- */
 export function PresenceItem({
   children,
   layout = false,

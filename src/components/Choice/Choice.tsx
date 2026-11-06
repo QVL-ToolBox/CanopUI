@@ -4,13 +4,6 @@ import { Pressable, type CanopPressableSpacing } from "../Pressable";
 import { Stack } from "../Stack";
 import type { ReactNode } from "react";
 
-/**
- * Ce que devient une réponse une fois la question tranchée.
- *
- * `correct` désigne **la** bonne réponse, qu'elle ait été choisie ou non :
- * c'est ce qui permet de la révéler après une erreur. `incorrect` désigne
- * celle qui a été choisie à tort.
- */
 export type CanopChoiceState = "neutral" | "correct" | "incorrect";
 
 export interface CanopChoiceProps {
@@ -20,7 +13,6 @@ export interface CanopChoiceProps {
   disabled?: boolean;
   fullWidth?: boolean;
   padding?: CanopPressableSpacing;
-  /** Nom accessible explicite, si le contenu ne suffit pas. */
   ariaLabel?: string;
 }
 
@@ -36,17 +28,6 @@ const MARK = {
   incorrect: { icon: "close", color: "error", key: "canop.choice.incorrect" },
 } as const;
 
-/**
- * Une réponse proposée, qui sait dire si elle était la bonne.
- *
- * `Pressable` apporte déjà la forme et le clavier, mais
- * n'a pas d'état juste ou faux — or c'est l'interaction la plus fréquente d'un
- * questionnaire, et chaque application la redessinait à coups de classes CSS.
- *
- * L'état n'est **pas porté par la seule couleur** : une marque cochée ou
- * barrée apparaît, et elle est nommée. Un daltonien, ou quelqu'un qui écoute
- * la page, sait donc lui aussi ce qui vient d'être répondu.
- */
 export function Choice({
   children,
   onClick,

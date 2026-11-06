@@ -20,15 +20,6 @@ export interface CanopStatCardProps {
   iconColor?: CanopIconColor;
   positiveIsGood?: boolean;
   animated?: boolean;
-  /**
-   * Teinte la carte entiere selon ce que la valeur **signifie** : un solde
-   * previsionnel positif en vert, negatif en rouge.
-   *
-   * A distinguer de `iconColor`, qui n'habille que l'icone, et de `variation`,
-   * qui parle de l'ecart et non du niveau. C'est le seul des trois qui repond a
-   * « cette valeur est-elle une bonne nouvelle ». Les applications le
-   * dessinaient a la main, avec un `color-mix` sur la bordure et le fond.
-   */
   tone?: CanopCardTone;
   onClick?: () => void;
   ariaLabel?: string;

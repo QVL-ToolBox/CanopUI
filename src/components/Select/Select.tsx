@@ -9,10 +9,6 @@ import { useFieldLabelling } from "../_shared/useFieldLabelling";
 export interface CanopSelectOption {
   value: string;
   label?: string;
-  /**
-   * Adornment optionnel (icône, pastille…) affiché avant le libellé — à la fois
-   * dans la liste déroulante et sur la valeur sélectionnée.
-   */
   icon?: ReactNode;
 }
 
@@ -20,9 +16,7 @@ export interface CanopSelectProps {
   options: CanopSelectOption[];
   value: string;
   onChange: (value: string) => void;
-  /** Libellé visible au-dessus du champ, et nom accessible par défaut. */
   label?: string;
-  /** Nom accessible explicite, pour un champ sans libellé visible. Prend le pas sur `label`. */
   ariaLabel?: string;
   placeholder?: string;
 }
@@ -34,12 +28,6 @@ const ROW_SX = {
   minWidth: 0,
 } as const;
 
-/**
- * Sélecteur mono-valeur (une seule option à la fois). Pendant de `MultiSelect`
- * pour les cas où l'utilisateur ne peut choisir qu'une valeur. Chaque option
- * peut porter une icône/pastille optionnelle, rendue dans la liste et sur la
- * valeur sélectionnée.
- */
 export function Select({
   options,
   value,

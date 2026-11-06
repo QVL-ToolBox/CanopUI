@@ -10,19 +10,13 @@ import { FieldLabel } from "../_shared/FieldLabel";
 import { useFieldLabelling } from "../_shared/useFieldLabelling";
 import type { CanopSelectOption } from "../Select";
 
-/**
- * Même forme d'option que `CanopSelectOption` : les deux sélecteurs décrivent le
- * même concept et partagent donc les mêmes capacités, icône comprise.
- */
 export type CanopMultiSelectOption = CanopSelectOption;
 
 export interface CanopMultiSelectProps {
   options: CanopMultiSelectOption[];
   value: string[];
   onChange: (value: string[]) => void;
-  /** Libellé visible au-dessus du champ, et nom accessible par défaut. */
   label?: string;
-  /** Nom accessible explicite, pour un champ sans libellé visible. Prend le pas sur `label`. */
   ariaLabel?: string;
   placeholder?: string;
 }

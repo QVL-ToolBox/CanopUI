@@ -41,11 +41,6 @@ interface CanopSegmentedControlIconOnlyProps<
   T extends string,
 > extends CanopSegmentedControlBaseProps<T> {
   options: CanopSegmentedControlIconOption<T>[];
-  /**
-   * Segments carrés à icône seule, dans un conteneur en forme de pilule. Chaque option doit
-   * porter une `icon` ; son `label` devient le nom accessible (`aria-label`) du segment.
-   * L'icône passe en variante `solid` sur le segment sélectionné.
-   */
   iconOnly: true;
 }
 
@@ -80,7 +75,6 @@ export function SegmentedControl<T extends string = string>({
           padding: iconOnly ? ICON_ONLY_PADDING : 0.5,
           display: "inline-flex",
           width: fullWidth ? "100%" : "auto",
-
           ...squircleSurface({
             radius: iconOnly ? iconOnlyRadiusBySize[size] : "var(--canop-radius-lg)",
             shape: iconOnly ? "pill" : undefined,

@@ -13,16 +13,6 @@ export interface CanopLegendToneEntry {
 }
 
 export interface CanopLegendColorEntry {
-  /**
-   * Un jeton de couleur du thème — `"background.paper"`, `"primary.light"` —
-   * pour les entrées qu'aucune tonalité sémantique ne décrit.
-   *
-   * Une légende explique un code couleur : elle ne vaut que si sa pastille
-   * porte **la couleur réellement employée**. Les quatre tonalités couvrent les
-   * états, pas les surfaces, et `neutral` est câblé sur `text.secondary` : une
-   * carte au repos, peinte en `background.paper`, n'avait donc aucune pastille
-   * juste, et le seul recours honnête était de retirer l'entrée de la légende.
-   */
   color: string;
   label: string;
 }

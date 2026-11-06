@@ -1,6 +1,6 @@
 {
   "name": "@canop/ui",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "type": "module",
   "description": "CanopUI - design system QVL-Studio, librairie de composants React (wrapper MUI). Fork de CH-UI-Library v0.7.0 (QVL-CustHome)",
   "license": "MIT",
@@ -92,5 +92,10 @@
   },
   "engines": {
     "node": ">=20"
+  },
+  "overrides": {
+    "@typescript-eslint/typescript-estree": {
+      "minimatch": "^11.0.1"
+    }
   }
 }

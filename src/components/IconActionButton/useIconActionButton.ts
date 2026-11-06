@@ -2,12 +2,15 @@ import type { MouseEventHandler } from "react";
 import type { CanopIconSize } from "../Icon";
 import type { CanopSpinnerSize } from "../Spinner";
 
+export type CanopIconActionButtonType = "button" | "submit" | "reset";
+
 export interface UseIconActionButtonOptions {
   ariaLabel: string;
   tooltip?: boolean | string;
   disabled: boolean;
   loading: boolean;
   iconSize: CanopIconSize;
+  type: CanopIconActionButtonType;
   onClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -16,6 +19,7 @@ export interface UseIconActionButtonResult {
   tooltipDescribesButton: boolean;
   ariaBusy?: true;
   spinnerSize: CanopSpinnerSize;
+  buttonType: CanopIconActionButtonType;
   handleClick?: MouseEventHandler<HTMLButtonElement>;
 }
 
@@ -39,6 +43,7 @@ export function useIconActionButton({
   disabled,
   loading,
   iconSize,
+  type,
   onClick,
 }: UseIconActionButtonOptions): UseIconActionButtonResult {
   const tooltipTitle = disabled ? undefined : tooltipTitleFrom(tooltip, ariaLabel);
@@ -48,6 +53,7 @@ export function useIconActionButton({
     tooltipDescribesButton: tooltipTitle !== undefined && tooltipTitle !== ariaLabel,
     ariaBusy: loading ? true : undefined,
     spinnerSize: spinnerSizeByIconSize[iconSize],
+    buttonType: loading ? "button" : type,
     handleClick: loading ? undefined : onClick,
   };
 }

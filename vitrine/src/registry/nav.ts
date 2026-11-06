@@ -136,6 +136,30 @@ const inputsCategory: NavCategory = {
       },
     },
     {
+      path: "/components/check-list-item",
+      title: same("CheckListItem"),
+      description: {
+        fr: "Ligne de liste à cocher : libellé barré, état atténué et actions.",
+        en: "Checklist row: struck-through label, muted state and actions.",
+      },
+    },
+    {
+      path: "/components/quick-add",
+      title: same("QuickAdd"),
+      description: {
+        fr: "Ajout rapide : Entrée ajoute, le champ se vide et garde le focus.",
+        en: "Quick add: Enter adds, the field clears and keeps focus.",
+      },
+    },
+    {
+      path: "/components/copy-field",
+      title: same("CopyField"),
+      description: {
+        fr: "Code affiché avec son bouton copier et sa confirmation.",
+        en: "A displayed code with its copy button and confirmation.",
+      },
+    },
+    {
       path: "/components/toggle",
       title: same("Toggle"),
       description: {

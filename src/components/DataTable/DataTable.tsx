@@ -52,61 +52,32 @@ export interface CanopDataTableProps<T> {
   getRowKey: (row: T) => string;
   loading?: boolean;
   skeleton?: boolean;
-  /** Contenu affiché quand rows est vide ; par défaut la traduction canop.dataTable.empty. */
   emptyMessage?: ReactNode;
   actions?: (row: T) => ReactNode;
   actionsHeader?: ReactNode;
   actionsWidth?: string | number;
-  /**
-   * Ajoute une action d'edition en fin de ligne, apres les actions du portail.
-   * Le tableau se charge du bouton, de son nom accessible et de sa place ; ce
-   * que l'edition declenche reste au portail, via `onRowEdit`.
-   */
   editable?: boolean;
-  /** Appele au clic sur l'action d'edition. */
   onRowEdit?: (row: T) => void;
-  /** Rend l'action d'edition inactive sur certaines lignes. */
   canEditRow?: (row: T) => boolean;
-  /** Nom accessible de l'action d'edition ; par defaut `canop.dataTable.edit`. */
   editLabel?: string;
   fixedLayout?: boolean;
   rowSx?: (row: T) => Record<string, unknown>;
-  /**
-   * En-têtes figées en haut au scroll (sticky). En défilement de page (sans `maxHeight` ni
-   * `fillHeight`), la barre reste squircle mais les lignes ne sont pas découpées sous ses coins :
-   * pour un rendu parfait, borner la hauteur. Dans ce mode, le défilement horizontal intégré est
-   * coupé pour que l'en-tête colle à la page : bornez la hauteur pour combiner les deux.
-   */
   stickyHeader?: boolean;
   fillHeight?: boolean;
   maxHeight?: string | number;
-  /** Rend la ligne déplaçable (glisser-déposer). */
   draggableRow?: (row: T) => boolean;
-  /** Indique si la ligne peut recevoir un élément déposé. */
   canDropRow?: (row: T) => boolean;
-  /** Appelé au dépôt : (ligne cible, clé de la ligne déposée). */
   onRowDrop?: (target: T, draggedKey: string) => void;
-  /** Appelé au double-clic sur une ligne. */
   onRowDoubleClick?: (row: T) => void;
-  /** Active la sélection : colonne de cases à cocher, clic, Ctrl/Maj+clic, cadre. */
   selectable?: boolean;
-  /** Clés sélectionnées (sélection contrôlée). */
   selectedKeys?: string[];
-  /** Appelé quand la sélection change. */
   onSelectionChange?: (keys: string[]) => void;
-  /** Appelé au clic droit sur une ligne (menu contextuel). */
   onRowContextMenu?: (row: T, event: React.MouseEvent) => void;
-  /** Anime l'apparition des lignes quand elles entrent dans le viewport. */
   animated?: boolean;
-  /** Active la navigation clavier (flèches haut/bas, Entrée) avec scroll auto. */
   enableKeyboardNav?: boolean;
-  /** Affiche la scrollbar du conteneur scrollable (masquée si false). */
   displayScrollbar?: boolean;
-  /** Appelé à l'activation d'une ligne au clavier (Entrée). */
   onRowActivate?: (row: T) => void;
-  /** Breakpoint sous lequel les colonnes hideOnMobile sont masquées. */
   mobileBreakpoint?: CanopBreakpoint;
-  /** Nom accessible de la zone défilante ; par défaut `canop.dataTable.scrollRegion`. */
   ariaLabel?: string;
 }
 

@@ -23,12 +23,9 @@ export interface CanopSliderProps {
   min?: number;
   max?: number;
   step?: number;
-  /** Libellé affiché au-dessus du curseur, et nom accessible par défaut. */
   label?: string;
-  /** Nom accessible explicite. Prend le pas sur `label`. */
   ariaLabel?: string;
   showValue?: boolean;
-  /** Met la valeur en forme partout où elle est lue : en-tête, bulle, lecteur d'écran. */
   format?: (value: number) => string;
   marks?: boolean;
   disabled?: boolean;

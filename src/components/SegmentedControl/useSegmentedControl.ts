@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useRef } from "react";
-import type { KeyboardEvent } from "react";
+import type { KeyboardEvent, ReactNode } from "react";
+import type { CanopBadgeColor } from "../Badge";
 import type { CanopIconName } from "../Icon";
 
 export type CanopSegmentedControlSize = "small" | "medium";
@@ -9,6 +10,9 @@ export interface CanopSegmentedControlOption<T extends string = string> {
   label: string;
   icon?: CanopIconName;
   disabled?: boolean;
+  badge?: ReactNode;
+  badgeLabel?: string;
+  badgeColor?: CanopBadgeColor;
 }
 
 export interface CanopSegmentedControlIconOption<

@@ -20,10 +20,6 @@ export interface CanopFileCardProps {
   previewUrl?: string;
   metadata?: string;
   selectable?: boolean;
-  /**
-   * Sélectionne par appui long sur la carte, sans case à cocher. Seul geste de
-   * sélection disponible au doigt quand `selectable` est laissé de côté.
-   */
   selectOnLongPress?: boolean;
   selected?: boolean;
   onSelectionChange?: (selected: boolean) => void;
